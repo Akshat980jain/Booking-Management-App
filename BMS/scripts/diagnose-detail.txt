@@ -1,0 +1,64 @@
+Auth: signed in as akshat980jain@gmail.com
+
+=== All provider IDs ===
+Error: none
+Data: [
+  {
+    "provider_id": "fb5b523c-39cb-4f5d-b224-d0a16a167c8b",
+    "user_id": "0f727be2-a619-4c28-918e-c3458aec7d0f",
+    "profession": "General Physician",
+    "full_name": "Aarjav Jain"
+  }
+]
+
+=== Query by provider_id: fb5b523c-39cb-4f5d-b224-d0a16a167c8b ===
+Error: none
+Data: {
+  "provider_id": "fb5b523c-39cb-4f5d-b224-d0a16a167c8b",
+  "user_id": "0f727be2-a619-4c28-918e-c3458aec7d0f",
+  "profession": "General Physician",
+  "specialty": "Cardiologist",
+  "bio": null,
+  "consultation_fee": 50,
+  "location": "Muzaffarnagar",
+  "years_of_experience": 5,
+  "average_rating": null,
+  "total_reviews": 0,
+  "video_enabled": true,
+  "video_consultation_fee": null,
+  "is_verified": false,
+  "full_name": "Aarjav Jain",
+  "avatar_url": null,
+  "city": "Muzaffarnagar",
+  "country": null
+}
+
+=== provider_profiles table ===
+Error: none
+Data: [
+  {
+    "id": "fb5b523c-39cb-4f5d-b224-d0a16a167c8b",
+    "user_id": "0f727be2-a619-4c28-918e-c3458aec7d0f",
+    "profession": "General Physician"
+  }
+]
+
+=== Query provider_profiles by id: fb5b523c-39cb-4f5d-b224-d0a16a167c8b ===
+Error: none
+Data: {
+  "id": "fb5b523c-39cb-4f5d-b224-d0a16a167c8b",
+  "user_id": "0f727be2-a619-4c28-918e-c3458aec7d0f",
+  "profession": "General Physician",
+  "specialty": "Cardiologist",
+  "bio": null,
+  "consultation_fee": 50,
+  "location": "Muzaffarnagar",
+  "years_of_experience": 5,
+  "average_rating": null,
+  "total_reviews": 0,
+  "is_approved": true,
+  "is_active": true,
+  "video_enabled": true,
+  "video_consultation_fee": null,
+  "is_verified": false
+}

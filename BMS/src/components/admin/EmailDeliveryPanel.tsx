@@ -308,7 +308,7 @@ const EmailDeliveryPanel = () => {
             <li>Go to Brevo Dashboard → Settings → Webhooks</li>
             <li>Add a new transactional webhook</li>
             <li>
-              URL: <code className="bg-muted px-1 rounded">https://eqbtrurgizszxdwnhhlk.supabase.co/functions/v1/brevo-webhook</code>
+              URL: <code className="bg-muted px-1 rounded">{`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/brevo-webhook`}</code>
             </li>
             <li>Select events: delivered, opened, hard_bounce, soft_bounce, blocked, error</li>
           </ol>

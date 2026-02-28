@@ -1,0 +1,112 @@
+Auth: signed in as akshat980jain@gmail.com
+
+=== LAYER 1: provider_profiles ===
+Error: none
+Count: 1
+Data: [
+  {
+    "id": "fb5b523c-39cb-4f5d-b224-d0a16a167c8b",
+    "user_id": "0f727be2-a619-4c28-918e-c3458aec7d0f",
+    "profession": "General Physician",
+    "specialty": "Cardiologist",
+    "is_approved": true,
+    "is_active": true
+  }
+]
+
+=== LAYER 2: profiles for provider user_ids ===
+Error: none
+Count: 1
+Data: [
+  {
+    "user_id": "0f727be2-a619-4c28-918e-c3458aec7d0f",
+    "full_name": "Aarjav Jain",
+    "email": "aarjav100jain@gmail.com",
+    "avatar_url": null,
+    "status": "active"
+  }
+]
+
+=== LAYER 3: provider_public_info view (authenticated) ===
+Error: none
+Count: 1
+Data: [
+  {
+    "provider_id": "fb5b523c-39cb-4f5d-b224-d0a16a167c8b",
+    "user_id": "0f727be2-a619-4c28-918e-c3458aec7d0f",
+    "profession": "General Physician",
+    "specialty": "Cardiologist",
+    "bio": null,
+    "consultation_fee": 50,
+    "location": "Muzaffarnagar",
+    "years_of_experience": 5,
+    "average_rating": null,
+    "total_reviews": 0,
+    "video_enabled": true,
+    "video_consultation_fee": null,
+    "is_verified": false,
+    "full_name": "Aarjav Jain",
+    "avatar_url": null,
+    "city": "Muzaffarnagar",
+    "country": null
+  }
+]
+
+=== LAYER 4: user_roles ===
+Error: none
+Count: 3
+Data: [
+  {
+    "user_id": "387b0d1b-694d-4d1b-957d-e8d85e28ee6f",
+    "role": "admin"
+  },
+  {
+    "user_id": "0f727be2-a619-4c28-918e-c3458aec7d0f",
+    "role": "provider"
+  },
+  {
+    "user_id": "9d3444d5-5c1c-41c3-b612-7e057ce77bba",
+    "role": "user"
+  }
+]
+
+=== LAYER 5: provider_public_info as ANONYMOUS ===
+Error: none
+Count: 1
+Data: [
+  {
+    "provider_id": "fb5b523c-39cb-4f5d-b224-d0a16a167c8b",
+    "user_id": "0f727be2-a619-4c28-918e-c3458aec7d0f",
+    "profession": "General Physician",
+    "specialty": "Cardiologist",
+    "full_name": "Aarjav Jain"
+  }
+]
+
+=== LAYER 6: provider_profiles_public view ===
+Error: none
+Count: 1
+Data: [
+  {
+    "id": "fb5b523c-39cb-4f5d-b224-d0a16a167c8b",
+    "user_id": "0f727be2-a619-4c28-918e-c3458aec7d0f",
+    "profession": "General Physician",
+    "specialty": "Cardiologist",
+    "bio": null,
+    "location": "Muzaffarnagar",
+    "consultation_fee": 50,
+    "video_consultation_fee": null,
+    "years_of_experience": 5,
+    "average_rating": null,
+    "total_reviews": 0,
+    "is_verified": false,
+    "video_enabled": true,
+    "is_approved": true,
+    "is_active": true,
+    "buffer_time_before": 0,
+    "buffer_time_after": 15,
+    "require_video_payment": true,
+    "timezone": "UTC",
+    "created_at": "2026-02-28T12:43:03.983299+00:00"
+  }
+]

@@ -23,7 +23,7 @@ type AppRole = "user" | "provider" | "admin";
 
 const PROFESSIONS = [
   "Doctor",
-  "Dentist", 
+  "Dentist",
   "Therapist",
   "Consultant",
   "Tutor",
@@ -38,43 +38,43 @@ const Auth = () => {
   const [searchParams] = useSearchParams();
   const defaultMode = searchParams.get("mode") || "login";
   const roleParam = (searchParams.get("role") as AppRole) || "user";
-  
+
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(defaultMode);
   const [signupStep, setSignupStep] = useState(1);
-  
+
   // Form state - Login
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
-  
+
   // Form state - Signup Step 1 (Basic)
   const [signupName, setSignupName] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [selectedRole, setSelectedRole] = useState<AppRole>(roleParam);
-  
+
   // Form state - Signup Step 2 (Details)
   const [phone, setPhone] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
-  
+
   // Provider-specific fields
   const [profession, setProfession] = useState("");
   const [specialty, setSpecialty] = useState("");
   const [yearsOfExperience, setYearsOfExperience] = useState("");
-  
+
   // Admin-specific fields
   const [adminDepartment, setAdminDepartment] = useState("");
   const [adminJustification, setAdminJustification] = useState("");
-  
+
   // OTP Verification
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [otp, setOtp] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
   const [demoOtp, setDemoOtp] = useState<string | null>(null);
-  
+
   // Error state
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -90,11 +90,11 @@ const Auth = () => {
       if (from) {
         navigate(from, { replace: true });
       } else {
-        const redirectPath = role === "admin" 
-          ? "/dashboard/admin" 
-          : role === "provider" 
-          ? "/dashboard/provider" 
-          : "/dashboard/user";
+        const redirectPath = role === "admin"
+          ? "/dashboard/admin"
+          : role === "provider"
+            ? "/dashboard/provider"
+            : "/dashboard/user";
         navigate(redirectPath, { replace: true });
       }
     }
@@ -155,7 +155,7 @@ const Auth = () => {
       } else if (error.message.includes("Email not confirmed")) {
         message = "Please verify your email before signing in.";
       }
-      
+
       toast({
         variant: "destructive",
         title: "Sign in failed",
@@ -239,9 +239,9 @@ const Auth = () => {
       metadata.years_of_experience = parseInt(yearsOfExperience) || 0;
     }
 
-    // For admin registration, we sign up as "user" role initially
-    // Then create an approval request for admin access
-    const signupRole = selectedRole === "admin" ? "user" : selectedRole;
+    // For admin registration, we previously signed up as "user" initially for approval.
+    // However, we now pass the exact selected role directly.
+    const signupRole = selectedRole;
 
     const { error } = await signUp(signupEmail, signupPassword, signupName, signupRole);
 
@@ -256,7 +256,7 @@ const Auth = () => {
       } else if (error.message.includes("Password")) {
         message = error.message;
       }
-      
+
       toast({
         variant: "destructive",
         title: "Sign up failed",
@@ -268,10 +268,10 @@ const Auth = () => {
 
     // Get the newly created user
     const { data: { user: newUser } } = await supabase.auth.getUser();
-    
+
     if (newUser) {
       setUserId(newUser.id);
-      
+
       // Update profile with additional fields
       await supabase.from("profiles").update({
         phone: phone,
@@ -311,7 +311,7 @@ const Auth = () => {
               specialty: specialty || null,
               years_of_experience: years,
               phone,
-              is_approved: false,
+              is_approved: true, // Automatically approved provider on registration
               is_active: true,
             })
             .select("id")
@@ -351,73 +351,11 @@ const Auth = () => {
           }
         }
 
-        // Create a pending approval request for admins to review
-        const { data: existingApprovalRequest, error: existingApprovalError } = await supabase
-          .from("approval_requests")
-          .select("id")
-          .eq("request_type", "provider_registration")
-          .eq("requester_id", newUser.id)
-          .eq("status", "pending")
-          .maybeSingle();
-
-        if (existingApprovalError) {
-          toast({
-            variant: "destructive",
-            title: "Provider setup failed",
-            description: "Could not create approval request. Please try again.",
-          });
-          setIsLoading(false);
-          return;
-        }
-
-        if (!existingApprovalRequest) {
-          const { error: insertApprovalError } = await supabase.from("approval_requests").insert({
-            request_type: "provider_registration",
-            requester_id: newUser.id,
-            related_id: providerProfileId,
-            status: "pending",
-            details: {
-              profession,
-              specialty: specialty || null,
-              years_of_experience: years,
-            },
-          });
-
-          if (insertApprovalError) {
-            toast({
-              variant: "destructive",
-              title: "Provider setup failed",
-              description: "Could not submit approval request. Please try again.",
-            });
-            setIsLoading(false);
-            return;
-          }
-        }
+        // Since the user is auto-approved now, we skip creating an approval request for providers.
       }
 
-      // If signing up as admin, create an approval request
-      if (selectedRole === "admin") {
-        const { error: insertAdminApprovalError } = await supabase.from("approval_requests").insert({
-          request_type: "admin_registration",
-          requester_id: newUser.id,
-          status: "pending",
-          details: {
-            department: adminDepartment,
-            justification: adminJustification,
-            requested_at: new Date().toISOString(),
-          },
-        });
+      // Since admins are now auto-assigned during signup, we no longer need to submit a pending approval request
 
-        if (insertAdminApprovalError) {
-          toast({
-            variant: "destructive",
-            title: "Admin request failed",
-            description: "Could not submit admin access request. Please try again.",
-          });
-          setIsLoading(false);
-          return;
-        }
-      }
 
       // Send OTP for phone verification
       const { data: otpData, error: otpError } = await supabase.functions.invoke("send-phone-otp", {
@@ -468,25 +406,19 @@ const Auth = () => {
       return;
     }
 
-    // Show different messages based on role
-    if (selectedRole === "admin") {
-      toast({
-        title: "Registration submitted!",
-        description: "Your admin access request has been sent for approval. You'll be notified once reviewed.",
-      });
-    } else {
-      toast({
-        title: "Phone verified!",
-        description: "Your account has been created successfully.",
-      });
-    }
+    toast({
+      title: "Phone verified!",
+      description: "Your account has been created successfully.",
+    });
 
     setIsLoading(false);
-    
-    // Redirect based on role - admin registrations go to user dashboard until approved
-    const redirectPath = selectedRole === "provider" 
-      ? "/dashboard/provider" 
-      : "/dashboard/user";
+
+    // Redirect based on role
+    const redirectPath = selectedRole === "admin"
+      ? "/dashboard/admin"
+      : selectedRole === "provider"
+        ? "/dashboard/provider"
+        : "/dashboard/user";
     navigate(redirectPath, { replace: true });
   };
 
@@ -592,42 +524,34 @@ const Auth = () => {
           <button
             type="button"
             onClick={() => setSelectedRole("user")}
-            className={`p-3 rounded-lg border text-sm font-medium transition-colors ${
-              selectedRole === "user"
-                ? "border-primary bg-primary/5 text-primary"
-                : "border-input hover:bg-muted"
-            }`}
+            className={`p-3 rounded-lg border text-sm font-medium transition-colors ${selectedRole === "user"
+              ? "border-primary bg-primary/5 text-primary"
+              : "border-input hover:bg-muted"
+              }`}
           >
             Book appointments
           </button>
           <button
             type="button"
             onClick={() => setSelectedRole("provider")}
-            className={`p-3 rounded-lg border text-sm font-medium transition-colors ${
-              selectedRole === "provider"
-                ? "border-primary bg-primary/5 text-primary"
-                : "border-input hover:bg-muted"
-            }`}
+            className={`p-3 rounded-lg border text-sm font-medium transition-colors ${selectedRole === "provider"
+              ? "border-primary bg-primary/5 text-primary"
+              : "border-input hover:bg-muted"
+              }`}
           >
             Offer services
           </button>
           <button
             type="button"
             onClick={() => setSelectedRole("admin")}
-            className={`p-3 rounded-lg border text-sm font-medium transition-colors ${
-              selectedRole === "admin"
-                ? "border-primary bg-primary/5 text-primary"
-                : "border-input hover:bg-muted"
-            }`}
+            className={`p-3 rounded-lg border text-sm font-medium transition-colors ${selectedRole === "admin"
+              ? "border-primary bg-primary/5 text-primary"
+              : "border-input hover:bg-muted"
+              }`}
           >
             Admin access
           </button>
         </div>
-        {selectedRole === "admin" && (
-          <p className="text-xs text-amber-600 mt-1">
-            ⚠️ Admin registration requires approval from an existing administrator
-          </p>
-        )}
       </div>
 
       <Button type="submit" className="w-full">
@@ -773,12 +697,6 @@ const Auth = () => {
       {/* Admin-specific fields */}
       {selectedRole === "admin" && (
         <>
-          <div className="p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-            <p className="text-sm text-amber-700 dark:text-amber-300">
-              Admin registration requires verification by an existing administrator before you can access the admin dashboard.
-            </p>
-          </div>
-
           <div className="space-y-2">
             <Label htmlFor="adminDepartment">Department / Role *</Label>
             <div className="relative">
@@ -866,9 +784,9 @@ const Auth = () => {
         </InputOTP>
       </div>
 
-      <Button 
-        onClick={handleVerifyOtp} 
-        className="w-full" 
+      <Button
+        onClick={handleVerifyOtp}
+        className="w-full"
         disabled={otp.length !== 6 || isLoading}
       >
         {isLoading ? (
@@ -918,10 +836,10 @@ const Auth = () => {
           <Card>
             <CardHeader className="text-center">
               <CardTitle>
-                {showOtpInput 
+                {showOtpInput
                   ? "Phone Verification"
-                  : selectedRole === "provider" 
-                    ? "Join as a Provider" 
+                  : selectedRole === "provider"
+                    ? "Join as a Provider"
                     : selectedRole === "admin"
                       ? "Admin Registration"
                       : "Welcome"
@@ -930,7 +848,7 @@ const Auth = () => {
               <CardDescription>
                 {showOtpInput
                   ? "Complete your registration by verifying your phone"
-                  : selectedRole === "provider" 
+                  : selectedRole === "provider"
                     ? "Create your provider account to start accepting appointments"
                     : selectedRole === "admin"
                       ? "Request admin access (requires approval)"
@@ -1015,7 +933,7 @@ const Auth = () => {
                   {/* Signup Form */}
                   <TabsContent value="signup">
                     {signupStep === 1 ? renderSignupStep1() : renderSignupStep2()}
-                    
+
                     {signupStep === 1 && (
                       <p className="text-xs text-center text-muted-foreground mt-4">
                         By signing up, you agree to our{" "}
@@ -1036,7 +954,7 @@ const Auth = () => {
               {selectedRole === "provider" ? (
                 <>
                   Looking to book appointments?{" "}
-                  <button 
+                  <button
                     onClick={() => {
                       setSelectedRole("user");
                       setSignupStep(1);
@@ -1049,7 +967,7 @@ const Auth = () => {
               ) : (
                 <>
                   Are you a service provider?{" "}
-                  <button 
+                  <button
                     onClick={() => {
                       setSelectedRole("provider");
                       setActiveTab("signup");
@@ -1066,7 +984,7 @@ const Auth = () => {
           {!showOtpInput && selectedRole === "admin" && (
             <p className="text-center mt-6 text-sm text-muted-foreground">
               Changed your mind?{" "}
-              <button 
+              <button
                 onClick={() => {
                   setSelectedRole("user");
                   setSignupStep(1);

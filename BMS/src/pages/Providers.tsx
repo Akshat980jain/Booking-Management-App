@@ -27,23 +27,10 @@ const categoryIcons = [
   { value: "stylist", label: "Stylists", icon: Sparkles },
 ];
 
-const categories = [
-  { value: "all", label: "All Categories" },
-  { value: "General Physician", label: "General Physician" },
-  { value: "Cardiologist", label: "Cardiologist" },
-  { value: "Dermatologist", label: "Dermatologist" },
-  { value: "Pediatrician", label: "Pediatrician" },
-  { value: "Math Tutor", label: "Math Tutor" },
-  { value: "Science Tutor", label: "Science Tutor" },
-  { value: "Business Consultant", label: "Business Consultant" },
-  { value: "Financial Advisor", label: "Financial Advisor" },
-  { value: "Fitness Trainer", label: "Fitness Trainer" },
-];
-
 const Providers = () => {
   const [searchParams] = useSearchParams();
-  const categoryParam = searchParams.get("category") || "";
-  
+  const categoryParam = searchParams.get("category") || "all";
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(categoryParam);
   const [sortBy, setSortBy] = useState("recommended");
@@ -97,7 +84,7 @@ const Providers = () => {
           <p className="text-muted-foreground text-lg mb-8">
             Book appointments with top doctors, lawyers, barbers, and more
           </p>
-          
+
           {/* Search Bar */}
           <div className="max-w-2xl mx-auto flex gap-2">
             <div className="relative flex-1">
@@ -122,10 +109,11 @@ const Providers = () => {
             {categoryIcons.map((category) => (
               <button
                 key={category.value}
-                onClick={() => setSelectedCategory(category.value)}
-                className={`flex flex-col items-center gap-3 p-4 rounded-xl border transition-all hover:border-primary hover:bg-primary/5 ${
-                  selectedCategory === category.value ? "border-primary bg-primary/5" : "border-border"
-                }`}
+                onClick={() => setSelectedCategory(
+                  selectedCategory === category.value ? "all" : category.value
+                )}
+                className={`flex flex-col items-center gap-3 p-4 rounded-xl border transition-all hover:border-primary hover:bg-primary/5 ${selectedCategory === category.value ? "border-primary bg-primary/5" : "border-border"
+                  }`}
               >
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
                   <category.icon className="h-7 w-7 text-primary" />
@@ -138,18 +126,6 @@ const Providers = () => {
 
         {/* Filters */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-full md:w-48">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((category) => (
-                <SelectItem key={category.value} value={category.value}>
-                  {category.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-full md:w-48">
               <SelectValue placeholder="Sort by" />
@@ -197,7 +173,7 @@ const Providers = () => {
                     variant="outline"
                     onClick={() => {
                       setSearchQuery("");
-                      setSelectedCategory("");
+                      setSelectedCategory("all");
                     }}
                   >
                     Clear Filters
@@ -222,7 +198,7 @@ const Providers = () => {
                             <h3 className="font-semibold text-lg truncate">
                               {provider.profile?.full_name || "Provider"}
                             </h3>
-                            <VerificationBadge 
+                            <VerificationBadge
                               isVerified={(provider as any).is_verified || false}
                               verificationType={(provider as any).verification_type}
                               size="sm"

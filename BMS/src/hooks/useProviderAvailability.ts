@@ -88,7 +88,7 @@ export const useProviderAvailability = () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data: inserted, error: insertError } = await (supabase as any)
           .from("provider_availability")
-          .insert(dataToUpsert)
+          .upsert(dataToUpsert, { onConflict: 'provider_id, day_of_week' })
           .select("id");
 
         if (insertError) throw insertError;

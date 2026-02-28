@@ -153,8 +153,18 @@ const ProviderDetail = () => {
             Back to providers
           </Link>
           <Card>
-            <CardContent className="py-12 text-center">
-              <p className="text-muted-foreground">Provider not found.</p>
+            <CardContent className="py-12 text-center space-y-4">
+              <p className="text-muted-foreground">
+                {error ? "Something went wrong loading this provider." : "Provider not found or no longer available."}
+              </p>
+              <div className="flex gap-3 justify-center">
+                <Button variant="outline" onClick={() => window.location.reload()}>
+                  Try Again
+                </Button>
+                <Link to="/providers">
+                  <Button>Browse Providers</Button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
         </div>

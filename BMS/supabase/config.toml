@@ -1,4 +1,4 @@
-project_id = "eqbtrurgizszxdwnhhlk"
+project_id = "qmznlttogejdbcnrxggt"
 
 [functions.send-appeal]
 verify_jwt = false
