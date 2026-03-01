@@ -306,10 +306,14 @@ const ApprovalRequestsPanel = () => {
               user_id: item.requester_id,
               title: "Provider Access Approved",
               message: "Your provider registration has been approved. You now have access to the provider dashboard.",
-              type: "success",
+              type: "provider_approved",
               send_email: true,
               recipient_email: userProfile?.email,
               recipient_name: userProfile?.full_name,
+              template_variables: {
+                provider_name: userProfile?.full_name || "Provider",
+                user_name: userProfile?.full_name || "Provider",
+              },
             },
           });
         } catch (notifyError) {

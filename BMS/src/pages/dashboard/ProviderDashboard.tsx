@@ -30,6 +30,7 @@ import {
   Mail,
   Send,
   Wallet,
+  CreditCard,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -211,6 +212,15 @@ const ProviderDashboard = () => {
     updatePayment(data);
     setPaymentDialogOpen(false);
     setSelectedAppointment(null);
+  };
+
+  const handleWaivePayment = (appointment: ProviderAppointment) => {
+    updatePayment({
+      id: appointment.id,
+      payment_status: "waived",
+      payment_method: "waived",
+      payment_amount: 0,
+    });
   };
 
   const handleSendContactEmail = async () => {
@@ -517,6 +527,12 @@ const ProviderDashboard = () => {
                                       <Mail className="h-4 w-4 mr-2" />
                                       Contact Patient
                                     </DropdownMenuItem>
+                                    {appointment.payment_status !== "paid" && appointment.payment_status !== "waived" && (
+                                      <DropdownMenuItem onClick={() => handleWaivePayment(appointment)}>
+                                        <CreditCard className="h-4 w-4 mr-2" />
+                                        Waive Payment
+                                      </DropdownMenuItem>
+                                    )}
                                     <DropdownMenuItem
                                       className="text-destructive"
                                       onClick={() => handleRejectClick(appointment)}
@@ -654,6 +670,12 @@ const ProviderDashboard = () => {
                                       <Mail className="h-4 w-4 mr-2" />
                                       Contact Patient
                                     </DropdownMenuItem>
+                                    {appointment.payment_status !== "paid" && appointment.payment_status !== "waived" && (
+                                      <DropdownMenuItem onClick={() => handleWaivePayment(appointment)}>
+                                        <CreditCard className="h-4 w-4 mr-2" />
+                                        Waive Payment
+                                      </DropdownMenuItem>
+                                    )}
                                     <DropdownMenuItem
                                       className="text-destructive"
                                       onClick={() => handleRejectClick(appointment)}

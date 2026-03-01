@@ -26,6 +26,7 @@ interface ProviderProfile {
   video_enabled: boolean | null;
   video_consultation_fee: number | null;
   require_video_payment: boolean | null;
+  require_payment: boolean | null;
 }
 
 interface UpdateProfileData {
@@ -45,6 +46,7 @@ interface UpdateProviderProfileData {
   video_enabled?: boolean | null;
   video_consultation_fee?: number | null;
   require_video_payment?: boolean | null;
+  require_payment?: boolean | null;
 }
 
 // Fix #3: Explicit columns — no phone_verification_code or other sensitive fields
@@ -57,7 +59,7 @@ export const useProfile = () => {
     queryKey: ["profile", user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      
+
       const { data, error } = await supabase
         .from("profiles")
         .select("id, user_id, full_name, email, phone, avatar_url")
@@ -124,7 +126,7 @@ export const useProviderProfile = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase as any)
         .from("provider_profiles")
-        .select("id, user_id, profession, specialty, bio, consultation_fee, location, years_of_experience, is_approved, is_active, video_enabled, video_consultation_fee, require_video_payment")
+        .select("id, user_id, profession, specialty, bio, consultation_fee, location, years_of_experience, is_approved, is_active, video_enabled, video_consultation_fee, require_video_payment, require_payment")
         .eq("user_id", user.id)
         .maybeSingle();
 
@@ -143,7 +145,7 @@ export const useProviderProfile = () => {
         .from("provider_profiles")
         .update(updates)
         .eq("user_id", user.id)
-        .select("id, user_id, profession, specialty, bio, consultation_fee, location, years_of_experience, is_approved, is_active, video_enabled, video_consultation_fee, require_video_payment")
+        .select("id, user_id, profession, specialty, bio, consultation_fee, location, years_of_experience, is_approved, is_active, video_enabled, video_consultation_fee, require_video_payment, require_payment")
         .maybeSingle();
 
       if (error) throw error;

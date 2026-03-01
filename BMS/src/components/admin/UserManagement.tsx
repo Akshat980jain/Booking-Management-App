@@ -140,7 +140,7 @@ const UserManagement = () => {
           const { error: profileError } = await supabase
             .from("provider_profiles")
             .insert({ user_id: userId, profession: "General", is_approved: true });
-          
+
           if (profileError) throw profileError;
         } else {
           // Ensure existing provider profile is approved
@@ -195,6 +195,30 @@ const UserManagement = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+
+      // Send account_suspended email for suspend/ban actions
+      if (selectedUser && (newStatus === "suspended" || newStatus === "banned")) {
+        try {
+          supabase.functions.invoke("send-notification", {
+            body: {
+              user_id: selectedUser.user_id,
+              title: "Account Suspended",
+              message: statusReason || `Your account has been ${newStatus}. If you believe this is an error, please contact support.`,
+              type: "account_suspended",
+              send_email: true,
+              recipient_email: selectedUser.email,
+              recipient_name: selectedUser.full_name,
+              template_variables: {
+                user_name: selectedUser.full_name || "User",
+                reason: statusReason || `Your account has been ${newStatus}.`,
+              },
+            },
+          });
+        } catch (emailError) {
+          console.error("Failed to send account suspended email:", emailError);
+        }
+      }
+
       toast({
         title: "Status updated",
         description: `User status has been changed to ${newStatus}.`,
@@ -274,7 +298,7 @@ const UserManagement = () => {
     setSelectedUser(user);
     setLoadingActivity(true);
     setActivityDialogOpen(true);
-    
+
     try {
       // Fetch user's appointment statistics
       const { data: appointments, error } = await supabase
@@ -315,10 +339,10 @@ const UserManagement = () => {
 
   const confirmStatusChange = () => {
     if (selectedUser && newStatus) {
-      changeStatusMutation.mutate({ 
-        userId: selectedUser.user_id, 
-        status: newStatus, 
-        reason: statusReason 
+      changeStatusMutation.mutate({
+        userId: selectedUser.user_id,
+        status: newStatus,
+        reason: statusReason
       });
     }
   };
@@ -481,7 +505,7 @@ const UserManagement = () => {
                                 <Ban className="h-4 w-4 mr-2 text-amber-600" />
                                 Suspend User
                               </DropdownMenuItem>
-                              <DropdownMenuItem 
+                              <DropdownMenuItem
                                 onClick={() => handleChangeStatus(user, "banned")}
                                 className="text-destructive"
                               >
@@ -542,8 +566,8 @@ const UserManagement = () => {
             <Button variant="outline" onClick={() => setRoleDialogOpen(false)}>
               Cancel
             </Button>
-            <Button 
-              onClick={confirmRoleChange} 
+            <Button
+              onClick={confirmRoleChange}
               disabled={changeRoleMutation.isPending}
             >
               {changeRoleMutation.isPending && (
@@ -563,7 +587,7 @@ const UserManagement = () => {
               {newStatus === "active" ? "Reactivate User" : newStatus === "suspended" ? "Suspend User" : "Ban User"}
             </DialogTitle>
             <DialogDescription>
-              {newStatus === "active" 
+              {newStatus === "active"
                 ? `Reactivate ${selectedUser?.full_name || selectedUser?.email}'s account`
                 : `${newStatus === "suspended" ? "Suspend" : "Ban"} ${selectedUser?.full_name || selectedUser?.email}'s account`
               }
@@ -596,8 +620,8 @@ const UserManagement = () => {
             <Button variant="outline" onClick={() => setStatusDialogOpen(false)}>
               Cancel
             </Button>
-            <Button 
-              onClick={confirmStatusChange} 
+            <Button
+              onClick={confirmStatusChange}
               disabled={changeStatusMutation.isPending}
               variant={newStatus === "banned" ? "destructive" : newStatus === "active" ? "default" : "outline"}
             >
@@ -642,8 +666,8 @@ const UserManagement = () => {
             <Button variant="outline" onClick={() => setEmailDialogOpen(false)}>
               Cancel
             </Button>
-            <Button 
-              onClick={confirmSendEmail} 
+            <Button
+              onClick={confirmSendEmail}
               disabled={sendEmailMutation.isPending || !emailSubject || !emailMessage}
             >
               {sendEmailMutation.isPending && (

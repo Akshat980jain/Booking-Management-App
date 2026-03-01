@@ -234,7 +234,7 @@ const Providers = () => {
                       {/* Book Button */}
                       <Link to={`/providers/${provider.id}`} className="block">
                         <Button className="w-full">
-                          Book Appointment • {formatPrice(provider.consultation_fee)}
+                          Book Appointment • {provider.require_payment === false ? "Free" : formatPrice(provider.consultation_fee)}
                         </Button>
                       </Link>
                     </CardContent>

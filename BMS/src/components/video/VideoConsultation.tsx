@@ -69,27 +69,28 @@ export const VideoConsultation = ({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data, error } = await (supabase as any)
           .from("appointments")
-          .select("payment_status, payment_amount, provider:provider_id(consultation_fee, video_consultation_fee, require_video_payment)")
+          .select("payment_status, payment_amount, provider:provider_id(consultation_fee, video_consultation_fee, require_video_payment, require_payment)")
           .eq("id", appointmentId)
           .single();
 
         if (error) throw error;
         setPaymentStatus(data?.payment_status || "unpaid");
-        
+
         // Check if provider requires video payment
-        const requiresPayment = data?.provider?.require_video_payment ?? true;
-        
+        const requiresVideoPayment = data?.provider?.require_video_payment ?? true;
+        const requiresGeneralPayment = data?.provider?.require_payment ?? true;
+
         // Use nullish coalescing to properly handle 0 values
         // If video_consultation_fee is explicitly set (including 0), use it
         // Otherwise fall back to consultation_fee, then payment_amount
         const videoFee = data?.provider?.video_consultation_fee;
         const consultationFee = data?.provider?.consultation_fee;
         const fee = videoFee ?? consultationFee ?? data?.payment_amount ?? 500;
-        
+
         setPaymentAmount(fee);
-        
-        // If provider doesn't require payment OR fee is 0, mark as paid
-        if (!requiresPayment || fee === 0) {
+
+        // If provider doesn't require payment (general or video-specific) OR fee is 0, mark as paid
+        if (!requiresGeneralPayment || !requiresVideoPayment || fee === 0) {
           setPaymentStatus("paid");
         }
       } catch (err) {
@@ -289,7 +290,7 @@ export const VideoConsultation = ({
     try {
       // Convert amount from rupees to paise (cents equivalent for INR)
       const amountInPaise = Math.round((paymentAmount || 500) * 100);
-      
+
       const { data, error } = await supabase.functions.invoke("create-appointment-payment", {
         body: {
           appointment_id: appointmentId,
@@ -322,7 +323,7 @@ export const VideoConsultation = ({
 
   const timeUntilStart = getTimeUntilStart();
   const joinEnabled = canJoin();
-  const isPaid = paymentStatus === "paid";
+  const isPaid = paymentStatus === "paid" || paymentStatus === "waived";
 
   // Show loading while checking payment
   if (isCheckingPayment && !isProvider) {

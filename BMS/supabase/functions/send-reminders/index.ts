@@ -14,7 +14,7 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    const brevoApiKey = Deno.env.get("BREVO_API_KEY");
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
@@ -84,7 +84,7 @@ Deno.serve(async (req) => {
 
     // Check for already sent reminders (using notifications table)
     const appointmentIds = appointmentsToRemind.map((a) => a.id);
-    
+
     const { data: existingReminders } = await supabase
       .from("notifications")
       .select("related_appointment_id")
@@ -133,6 +133,26 @@ Deno.serve(async (req) => {
       providerUserProfiles?.map((p) => [p.user_id, p.full_name]) || []
     );
 
+    // Fetch DB email template for reminders (once, reuse for all)
+    let dbTemplate: { subject: string; html_content: string } | null = null;
+    try {
+      const { data: tpl } = await supabase
+        .from("email_templates")
+        .select("subject, html_content, is_active")
+        .eq("name", "appointment_reminder")
+        .maybeSingle();
+
+      if (tpl && tpl.is_active) {
+        dbTemplate = tpl as { subject: string; html_content: string };
+        console.log("Using DB template for appointment_reminder");
+      }
+    } catch (tplError) {
+      console.warn("Could not fetch appointment_reminder template:", tplError);
+    }
+
+    const senderEmail = Deno.env.get("BREVO_SENDER_EMAIL") || "noreply@bookease.com";
+    const senderName = Deno.env.get("BREVO_SENDER_NAME") || "BookEase";
+
     let sentCount = 0;
 
     // Send reminders
@@ -178,27 +198,52 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      // Send email if Resend is configured
-      if (resendApiKey && user.email) {
+      // Send email via Brevo
+      if (brevoApiKey && user.email) {
         try {
-          const emailResponse = await fetch("https://api.resend.com/emails", {
+          // Use DB template if available, otherwise fallback to hardcoded HTML
+          let emailSubject: string;
+          let emailHtml: string;
+
+          if (dbTemplate) {
+            // Substitute template variables
+            const vars: Record<string, string> = {
+              user_name: user.full_name || "there",
+              provider_name: providerName || "Your provider",
+              date: formattedDate,
+            };
+            emailSubject = dbTemplate.subject;
+            emailHtml = dbTemplate.html_content;
+            for (const [key, value] of Object.entries(vars)) {
+              const placeholder = new RegExp(`\\{\\{${key}\\}\\}`, "g");
+              emailSubject = emailSubject.replace(placeholder, value);
+              emailHtml = emailHtml.replace(placeholder, value);
+            }
+          } else {
+            emailSubject = `⏰ ${title} - ${formattedDate}`;
+            emailHtml = generateReminderEmail(user.full_name, providerName || "Your provider", formattedDate, formatTime(apt.start_time), provider?.location);
+          }
+
+          const emailResponse = await fetch("https://api.brevo.com/v3/smtp/email", {
             method: "POST",
             headers: {
-              Authorization: `Bearer ${resendApiKey}`,
+              "api-key": brevoApiKey,
               "Content-Type": "application/json",
+              "Accept": "application/json",
             },
             body: JSON.stringify({
-              from: "BookEase <notifications@resend.dev>",
-              to: [user.email],
-              subject: `⏰ ${title} - ${formattedDate}`,
-              html: generateReminderEmail(user.full_name, providerName || "Your provider", formattedDate, formatTime(apt.start_time), provider?.location),
+              sender: { name: senderName, email: senderEmail },
+              to: [{ email: user.email, name: user.full_name || user.email }],
+              subject: emailSubject,
+              htmlContent: emailHtml,
+              textContent: `Hi ${user.full_name || "there"},\n\n${message}\n\n— BookEase`,
             }),
           });
 
           if (!emailResponse.ok) {
-            console.error(`Email failed for ${apt.id}:`, await emailResponse.text());
+            console.error(`Brevo email failed for ${apt.id}:`, await emailResponse.text());
           } else {
-            console.log(`Email sent to ${user.email} for appointment ${apt.id}`);
+            console.log(`Email sent to ${user.email} for appointment ${apt.id} via Brevo`);
           }
         } catch (emailError) {
           console.error(`Email error for ${apt.id}:`, emailError);

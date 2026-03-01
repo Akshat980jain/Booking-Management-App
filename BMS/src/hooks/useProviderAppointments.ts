@@ -177,6 +177,12 @@ export const useProviderAppointments = () => {
             recipient_email: appointment.user_profile.email,
             recipient_name: appointment.user_profile.full_name,
             send_email: true,
+            template_variables: {
+              user_name: appointment.user_profile.full_name || "Patient",
+              provider_name: providerName,
+              date: formattedDate,
+              reason: cancellation_reason || "",
+            },
           });
         }
       }
@@ -266,10 +272,16 @@ export const useProviderAppointments = () => {
       queryClient.invalidateQueries({ queryKey: ["provider-appointments", providerId] });
 
       toast({
-        title: variables.payment_status === "paid" ? "Payment Recorded" : "Payment Status Updated",
+        title: variables.payment_status === "paid"
+          ? "Payment Recorded"
+          : variables.payment_status === "waived"
+            ? "Payment Waived"
+            : "Payment Status Updated",
         description: variables.payment_status === "paid"
           ? `Payment of ${variables.payment_amount ? `${formatCurrencyValue(variables.payment_amount, currency)} via ` : ""}${variables.payment_method.toUpperCase()} recorded successfully.`
-          : "Payment marked as unpaid.",
+          : variables.payment_status === "waived"
+            ? "Payment has been waived for this appointment."
+            : "Payment marked as unpaid.",
       });
     },
     onError: (error) => {

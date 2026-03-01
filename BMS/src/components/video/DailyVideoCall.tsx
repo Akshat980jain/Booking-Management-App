@@ -176,9 +176,12 @@ export const DailyVideoCall = ({
     participants.forEach((p) => {
       const videoEl = videoRefs.current.get(p.sessionId);
       if (videoEl && p.videoTrack) {
-        const stream = new MediaStream([p.videoTrack]);
-        if (videoEl.srcObject !== stream) {
-          videoEl.srcObject = stream;
+        // Only reassign if the track actually changed
+        const existingTrack = videoEl.srcObject instanceof MediaStream
+          ? videoEl.srcObject.getVideoTracks()[0]
+          : null;
+        if (existingTrack !== p.videoTrack) {
+          videoEl.srcObject = new MediaStream([p.videoTrack]);
         }
       }
 
@@ -192,9 +195,13 @@ export const DailyVideoCall = ({
           document.body.appendChild(audioEl);
           audioRefs.current.set(p.sessionId, audioEl);
         }
-        const audioStream = new MediaStream([p.audioTrack]);
-        if (audioEl.srcObject !== audioStream) {
-          audioEl.srcObject = audioStream;
+        // Only reassign if the track actually changed
+        const existingTrack = audioEl.srcObject instanceof MediaStream
+          ? audioEl.srcObject.getAudioTracks()[0]
+          : null;
+        if (existingTrack !== p.audioTrack) {
+          audioEl.srcObject = new MediaStream([p.audioTrack]);
+          audioEl.play().catch(() => { });
         }
       }
     });
@@ -332,7 +339,7 @@ export const DailyVideoCall = ({
         "flex flex-col bg-[#111] text-white h-full",
         isFullscreen ? "fixed inset-0 z-50" : "relative rounded-xl overflow-hidden"
       )}
-      style={{ minHeight: isFullscreen ? "100vh" : "500px" }}
+      style={{ height: isFullscreen ? "100vh" : "100%", minHeight: "500px" }}
     >
       {/* Top Bar */}
       <div className="flex items-center justify-between px-4 py-3 bg-black/40 backdrop-blur-sm z-20">
@@ -360,7 +367,7 @@ export const DailyVideoCall = ({
       </div>
 
       {/* Main Video Area */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative min-h-0 overflow-hidden">
         {/* Remote / primary video */}
         {remoteParticipants.length > 0 ? (
           <div
@@ -474,7 +481,7 @@ function ParticipantView({
         autoPlay
         playsInline
         muted={participant.isLocal}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-contain bg-black"
       />
       {large && (
         <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent">

@@ -22,15 +22,14 @@ const ForgotPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
+
   // Form state
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [resetToken, setResetToken] = useState("");
-  const [demoOtp, setDemoOtp] = useState<string | null>(null);
-  
+
   // Error state
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -49,7 +48,7 @@ const ForgotPassword = () => {
 
   const validatePasswords = (): boolean => {
     const passwordErrors: Record<string, string> = {};
-    
+
     try {
       passwordSchema.parse(newPassword);
     } catch (error) {
@@ -57,46 +56,41 @@ const ForgotPassword = () => {
         passwordErrors.newPassword = error.errors[0].message;
       }
     }
-    
+
     if (newPassword !== confirmPassword) {
       passwordErrors.confirmPassword = "Passwords do not match";
     }
-    
+
     setErrors(passwordErrors);
     return Object.keys(passwordErrors).length === 0;
   };
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateEmail()) return;
-    
+
     setIsLoading(true);
-    
+
     try {
       const { data, error } = await supabase.functions.invoke("send-password-reset-otp", {
         body: { email: email.trim().toLowerCase() }
       });
-      
+
       if (error) {
         throw error;
       }
-      
+
       if (data?.error) {
         toast.error(data.error);
         setIsLoading(false);
         return;
       }
-      
-      // For demo purposes, show the OTP
-      if (data?.demo_otp) {
-        setDemoOtp(data.demo_otp);
-      }
-      
+
       if (data?.reset_token) {
         setResetToken(data.reset_token);
       }
-      
+
       toast.success("Verification code sent to your email");
       setStep("otp");
     } catch (error) {
@@ -109,29 +103,29 @@ const ForgotPassword = () => {
 
   const handleVerifyOtp = async () => {
     if (otp.length !== 6) return;
-    
+
     setIsLoading(true);
-    
+
     try {
       const { data, error } = await supabase.functions.invoke("verify-password-reset-otp", {
-        body: { 
+        body: {
           email: email.trim().toLowerCase(),
           otp,
           reset_token: resetToken
         }
       });
-      
+
       if (error) {
         throw error;
       }
-      
+
       if (data?.error) {
         toast.error(data.error);
         setOtp("");
         setIsLoading(false);
         return;
       }
-      
+
       if (data?.verified) {
         toast.success("Email verified successfully");
         setStep("reset");
@@ -148,22 +142,18 @@ const ForgotPassword = () => {
   const handleResendOtp = async () => {
     setIsLoading(true);
     setOtp("");
-    
+
     try {
       const { data, error } = await supabase.functions.invoke("send-password-reset-otp", {
         body: { email: email.trim().toLowerCase() }
       });
-      
+
       if (error) throw error;
-      
-      if (data?.demo_otp) {
-        setDemoOtp(data.demo_otp);
-      }
-      
+
       if (data?.reset_token) {
         setResetToken(data.reset_token);
       }
-      
+
       toast.success("New verification code sent to your email");
     } catch (error) {
       console.error("Error resending OTP:", error);
@@ -175,18 +165,18 @@ const ForgotPassword = () => {
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validatePasswords()) return;
-    
+
     setIsLoading(true);
-    
+
     try {
       // Use Supabase's updateUser to reset password
       // First we need to sign in with the reset token then update
       const { error } = await supabase.auth.updateUser({
         password: newPassword
       });
-      
+
       if (error) {
         // If user is not authenticated, we need to use a different approach
         // Call our edge function to handle the password update
@@ -197,12 +187,12 @@ const ForgotPassword = () => {
             new_password: newPassword
           }
         });
-        
+
         if (resetError || data?.error) {
           throw new Error(data?.error || "Failed to reset password");
         }
       }
-      
+
       toast.success("Password reset successfully!");
       setStep("success");
     } catch (error: any) {
@@ -236,7 +226,7 @@ const ForgotPassword = () => {
           We'll send a verification code to this email
         </p>
       </div>
-      
+
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? (
           <>
@@ -258,15 +248,6 @@ const ForgotPassword = () => {
         </p>
       </div>
 
-      {/* Demo OTP notice */}
-      {demoOtp && (
-        <div className="p-3 bg-accent border border-border rounded-lg text-center">
-          <p className="text-xs text-accent-foreground">
-            Demo mode: Your verification code is <strong>{demoOtp}</strong>
-          </p>
-        </div>
-      )}
-
       <div className="flex justify-center">
         <InputOTP
           value={otp}
@@ -284,9 +265,9 @@ const ForgotPassword = () => {
         </InputOTP>
       </div>
 
-      <Button 
-        onClick={handleVerifyOtp} 
-        className="w-full" 
+      <Button
+        onClick={handleVerifyOtp}
+        className="w-full"
         disabled={otp.length !== 6 || isLoading}
       >
         {isLoading ? (
@@ -304,7 +285,6 @@ const ForgotPassword = () => {
           onClick={() => {
             setStep("email");
             setOtp("");
-            setDemoOtp(null);
           }}
           className="text-muted-foreground hover:text-foreground"
         >
@@ -352,7 +332,7 @@ const ForgotPassword = () => {
           Must be at least 8 characters
         </p>
       </div>
-      
+
       <div className="space-y-2">
         <Label htmlFor="confirmPassword">Confirm Password</Label>
         <div className="relative">
@@ -378,7 +358,7 @@ const ForgotPassword = () => {
           <p className="text-sm text-destructive">{errors.confirmPassword}</p>
         )}
       </div>
-      
+
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? (
           <>
@@ -475,11 +455,10 @@ const ForgotPassword = () => {
               {["email", "otp", "reset"].map((s, i) => (
                 <div
                   key={s}
-                  className={`h-2 w-8 rounded-full transition-colors ${
-                    ["email", "otp", "reset"].indexOf(step) >= i
+                  className={`h-2 w-8 rounded-full transition-colors ${["email", "otp", "reset"].indexOf(step) >= i
                       ? "bg-primary"
                       : "bg-muted"
-                  }`}
+                    }`}
                 />
               ))}
             </div>

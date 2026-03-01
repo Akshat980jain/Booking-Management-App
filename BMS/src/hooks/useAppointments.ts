@@ -39,6 +39,7 @@ export interface ProviderInfo {
   video_consultation_fee: number | null;
   location: string | null;
   user_id: string;
+  require_payment: boolean | null;
 }
 
 export interface AppointmentWithProvider extends Appointment {
@@ -123,7 +124,8 @@ export const useAppointments = () => {
             consultation_fee,
             video_consultation_fee,
             location,
-            user_id
+            user_id,
+            require_payment
           )
         `)
         .eq("user_id", user.id)

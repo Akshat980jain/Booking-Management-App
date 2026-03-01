@@ -38,6 +38,7 @@ const ProviderSettings = () => {
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
   const [showVideoOption, setShowVideoOption] = useState(providerProfile?.video_enabled ?? false);
   const [requireVideoPayment, setRequireVideoPayment] = useState(providerProfile?.require_video_payment ?? true);
+  const [requirePayment, setRequirePayment] = useState(providerProfile?.require_payment ?? true);
 
   // Notification Preferences
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -51,19 +52,20 @@ const ProviderSettings = () => {
   const [googleCalendarConnected, setGoogleCalendarConnected] = useState(false);
   const [autoSyncEnabled, setAutoSyncEnabled] = useState(true);
   const [syncBothWays, setSyncBothWays] = useState(false);
-  
+
   // Update state when providerProfile loads
   useEffect(() => {
     if (providerProfile) {
       setProfileVisible(providerProfile.is_active ?? true);
       setShowVideoOption(providerProfile.video_enabled ?? false);
       setRequireVideoPayment(providerProfile.require_video_payment ?? true);
+      setRequirePayment(providerProfile.require_payment ?? true);
     }
   }, [providerProfile]);
 
   const handleSaveVisibility = async () => {
     if (!providerProfile?.id) return;
-    
+
     setSaving(true);
     try {
       const { error } = await supabase
@@ -72,6 +74,7 @@ const ProviderSettings = () => {
           is_active: profileVisible,
           video_enabled: showVideoOption,
           require_video_payment: requireVideoPayment,
+          require_payment: requirePayment,
         })
         .eq("id", providerProfile.id);
 
@@ -207,6 +210,24 @@ const ProviderSettings = () => {
                 <Switch
                   checked={showVideoOption}
                   onCheckedChange={setShowVideoOption}
+                />
+              </div>
+
+              <Separator />
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-base font-medium flex items-center gap-2">
+                    <CreditCard className="h-4 w-4" />
+                    Require Payment for Appointments
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    When disabled, clients can book without paying — "Free" badge will show on your profile
+                  </p>
+                </div>
+                <Switch
+                  checked={requirePayment}
+                  onCheckedChange={setRequirePayment}
                 />
               </div>
 

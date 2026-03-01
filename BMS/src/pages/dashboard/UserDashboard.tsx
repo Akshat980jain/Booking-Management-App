@@ -212,7 +212,9 @@ const UserDashboard = () => {
     const canPay =
       (appointment.status === "pending" || appointment.status === "approved") &&
       appointment.payment_status !== "paid" &&
-      appointmentFee > 0;
+      appointment.payment_status !== "waived" &&
+      appointmentFee > 0 &&
+      appointment.provider?.require_payment !== false;
 
     return (
       <Card key={appointment.id}>
@@ -716,6 +718,8 @@ const UserDashboard = () => {
                   </span>
                   {selectedAppointment.payment_status === "paid" ? (
                     <Badge className="bg-green-500/10 text-green-600 border-green-200">Paid</Badge>
+                  ) : selectedAppointment.payment_status === "waived" ? (
+                    <Badge className="bg-blue-500/10 text-blue-600 border-blue-200">Waived</Badge>
                   ) : (
                     <Badge variant="secondary">Unpaid</Badge>
                   )}

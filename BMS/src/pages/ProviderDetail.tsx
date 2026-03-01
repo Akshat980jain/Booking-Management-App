@@ -90,8 +90,8 @@ const ProviderDetail = () => {
         recurrence_end_date: recurrenceEndDate ? format(recurrenceEndDate, "yyyy-MM-dd") : undefined,
       });
 
-      // If there's a consultation fee, process payment
-      if (fee && fee > 0) {
+      // If there's a consultation fee and provider requires payment, process payment
+      if (fee && fee > 0 && provider?.require_payment !== false) {
         setIsProcessingPayment(true);
         try {
           const { data, error: paymentError } = await supabase.functions.invoke("create-appointment-payment", {
@@ -229,9 +229,11 @@ const ProviderDetail = () => {
                       <div className="flex items-center gap-1">
                         <DollarSign className="h-4 w-4" />
                         <span>
-                          {provider.consultation_fee
-                            ? `${formatCurrencyValue(provider.consultation_fee)} per session`
-                            : "Free consultation"}
+                          {provider.require_payment === false
+                            ? "Free consultation"
+                            : provider.consultation_fee
+                              ? `${formatCurrencyValue(provider.consultation_fee)} per session`
+                              : "Free consultation"}
                         </span>
                       </div>
                     </div>
@@ -288,9 +290,11 @@ const ProviderDetail = () => {
                         </div>
                         <div className="text-right">
                           <p className="font-semibold text-primary">
-                            {provider.consultation_fee
-                              ? formatCurrencyValue(provider.consultation_fee)
-                              : "Free"}
+                            {provider.require_payment === false
+                              ? "Free"
+                              : provider.consultation_fee
+                                ? formatCurrencyValue(provider.consultation_fee)
+                                : "Free"}
                           </p>
                           <p className="text-xs text-muted-foreground">per session</p>
                         </div>
@@ -453,9 +457,13 @@ const ProviderDetail = () => {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         ? (provider as any).video_consultation_fee
                         : provider?.consultation_fee;
-                      return fee && fee > 0 ? (
+                      return fee && fee > 0 && provider?.require_payment !== false ? (
                         <p className="font-medium text-foreground mt-1">
                           Total: {formatCurrencyValue(fee)}
+                        </p>
+                      ) : provider?.require_payment === false ? (
+                        <p className="font-medium text-green-600 mt-1">
+                          Free Consultation
                         </p>
                       ) : null;
                     })()}

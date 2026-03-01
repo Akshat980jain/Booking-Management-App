@@ -73,7 +73,6 @@ const Auth = () => {
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [otp, setOtp] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
-  const [demoOtp, setDemoOtp] = useState<string | null>(null);
 
   // Error state
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -372,11 +371,6 @@ const Auth = () => {
         return;
       }
 
-      // For demo purposes, show the OTP
-      if (otpData?.demo_otp) {
-        setDemoOtp(otpData.demo_otp);
-      }
-
       setShowOtpInput(true);
       toast({
         title: "Verification code sent!",
@@ -411,6 +405,26 @@ const Auth = () => {
       description: "Your account has been created successfully.",
     });
 
+    // Send welcome email (non-blocking)
+    try {
+      await supabase.functions.invoke("send-notification", {
+        body: {
+          user_id: userId,
+          title: "Welcome to BookEase!",
+          message: "Thank you for joining BookEase. We're excited to have you on board!",
+          type: "welcome",
+          send_email: true,
+          recipient_email: signupEmail,
+          recipient_name: signupName,
+          template_variables: {
+            user_name: signupName,
+          },
+        },
+      });
+    } catch (welcomeEmailError) {
+      console.error("Failed to send welcome email:", welcomeEmailError);
+    }
+
     setIsLoading(false);
 
     // Redirect based on role
@@ -438,9 +452,6 @@ const Auth = () => {
         description: "Please try again later.",
       });
     } else {
-      if (data?.demo_otp) {
-        setDemoOtp(data.demo_otp);
-      }
       toast({
         title: "Code resent!",
         description: "A new verification code has been sent to your phone.",
@@ -757,15 +768,6 @@ const Auth = () => {
           Enter the 6-digit code sent to {phone}
         </p>
       </div>
-
-      {/* Demo OTP notice */}
-      {demoOtp && (
-        <div className="p-3 bg-accent border border-border rounded-lg text-center">
-          <p className="text-xs text-accent-foreground">
-            Demo mode: Your verification code is <strong>{demoOtp}</strong>
-          </p>
-        </div>
-      )}
 
       <div className="flex justify-center">
         <InputOTP

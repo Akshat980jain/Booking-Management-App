@@ -65,6 +65,9 @@ const validateNotificationInput = (body: Record<string, unknown>): { valid: bool
     "reschedule_declined",
     "contact_message",
     "account_appeal",
+    "account_suspended",
+    "welcome",
+    "provider_approved",
   ];
 
   if (!type || !validTypes.includes(type as string)) {
@@ -82,6 +85,59 @@ const sanitize = (str: string): string => {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#x27;")
     .trim();
+};
+
+// Map notification type to DB email_templates.name
+const getTemplateName = (type: string): string | null => {
+  const map: Record<string, string> = {
+    booking_confirmed: "appointment_confirmation",
+    booking_cancelled: "appointment_cancelled",
+    reminder: "appointment_reminder",
+    account_suspended: "account_suspended",
+    provider_approved: "provider_approved",
+    welcome: "welcome",
+  };
+  return map[type] || null;
+};
+
+// Fetch a DB email template, substitute variables, and return subject+html.
+// Returns null if no active template is found.
+const fetchAndRenderTemplate = async (
+  supabase: ReturnType<typeof createClient>,
+  type: string,
+  variables: Record<string, string>,
+): Promise<{ subject: string; htmlContent: string } | null> => {
+  const templateName = getTemplateName(type);
+  if (!templateName) return null;
+
+  try {
+    const { data: template, error } = await supabase
+      .from("email_templates")
+      .select("subject, html_content, is_active")
+      .eq("name", templateName)
+      .maybeSingle();
+
+    if (error || !template || !template.is_active) {
+      console.log(`No active DB template found for "${templateName}", using fallback.`);
+      return null;
+    }
+
+    // Substitute {{variable}} placeholders
+    let subject = template.subject as string;
+    let htmlContent = template.html_content as string;
+
+    for (const [key, value] of Object.entries(variables)) {
+      const placeholder = new RegExp(`\\{\\{${key}\\}\\}`, "g");
+      subject = subject.replace(placeholder, value);
+      htmlContent = htmlContent.replace(placeholder, value);
+    }
+
+    console.log(`Using DB template "${templateName}" for type "${type}".`);
+    return { subject, htmlContent };
+  } catch (err) {
+    console.error(`Error fetching DB template "${templateName}":`, err);
+    return null;
+  }
 };
 
 Deno.serve(async (req) => {
@@ -187,9 +243,25 @@ Deno.serve(async (req) => {
         emailResult = { attempted: true, accepted: false, messageId: null, providerResponse: null };
       } else {
         try {
-          // Generate email content based on notification type
-          const emailSubject = getEmailSubject(type, sanitizedTitle);
-          const emailHtml = generateEmailHtml(type, sanitizedTitle, sanitizedMessage, sanitizedRecipientName);
+          // Try DB template first, fall back to hardcoded HTML
+          const templateVars: Record<string, string> = {
+            user_name: sanitizedRecipientName || "there",
+            provider_name: sanitizedRecipientName || "Provider",
+            date: sanitizedMessage, // caller puts date info in message
+            reason: sanitizedMessage,
+          };
+
+          // Parse additional variables from the body if provided
+          if (body.template_variables && typeof body.template_variables === "object") {
+            for (const [k, v] of Object.entries(body.template_variables as Record<string, string>)) {
+              templateVars[sanitize(k)] = sanitize(String(v));
+            }
+          }
+
+          const dbTemplate = await fetchAndRenderTemplate(supabase, type, templateVars);
+
+          const emailSubject = dbTemplate?.subject || getEmailSubject(type, sanitizedTitle);
+          const emailHtml = dbTemplate?.htmlContent || generateEmailHtml(type, sanitizedTitle, sanitizedMessage, sanitizedRecipientName);
 
           const textContent = `${sanitizedRecipientName ? `Hi ${sanitizedRecipientName},` : "Hello,"}\n\n${sanitizedTitle}\n\n${sanitizedMessage}\n\n— BookEase`;
 

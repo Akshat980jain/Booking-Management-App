@@ -17,6 +17,7 @@ export interface Provider {
   video_enabled: boolean | null;
   video_consultation_fee: number | null;
   is_verified: boolean | null;
+  require_payment: boolean | null;
   profile?: {
     full_name: string;
     avatar_url: string | null;
@@ -52,6 +53,7 @@ const mapPublicInfoToProvider = (row: Record<string, unknown>): Provider => ({
   video_enabled: (row.video_enabled as boolean) || null,
   video_consultation_fee: (row.video_consultation_fee as number) || null,
   is_verified: (row.is_verified as boolean) || null,
+  require_payment: row.require_payment != null ? (row.require_payment as boolean) : true,
   profile: {
     full_name: (row.full_name as string) || "",
     avatar_url: (row.avatar_url as string) || null,
@@ -71,7 +73,7 @@ export const useProviders = (category?: string, searchQuery?: string) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase as any)
         .from("provider_public_info")
-        .select("provider_id, user_id, profession, specialty, bio, consultation_fee, location, years_of_experience, average_rating, total_reviews, video_enabled, video_consultation_fee, is_verified, full_name, avatar_url, city, country")
+        .select("provider_id, user_id, profession, specialty, bio, consultation_fee, location, years_of_experience, average_rating, total_reviews, video_enabled, video_consultation_fee, is_verified, require_payment, full_name, avatar_url, city, country")
         .limit(500);
 
       if (error) throw error;
@@ -124,7 +126,7 @@ export const useProvidersPaginated = (category?: string, searchQuery?: string) =
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let query = (supabase as any)
         .from("provider_public_info")
-        .select("provider_id, user_id, profession, specialty, bio, consultation_fee, location, years_of_experience, average_rating, total_reviews, video_enabled, video_consultation_fee, is_verified, full_name, avatar_url, city, country", { count: "exact" })
+        .select("provider_id, user_id, profession, specialty, bio, consultation_fee, location, years_of_experience, average_rating, total_reviews, video_enabled, video_consultation_fee, is_verified, require_payment, full_name, avatar_url, city, country", { count: "exact" })
         .range(pageParam * PAGE_SIZE, (pageParam + 1) * PAGE_SIZE - 1);
 
       if (category && category !== "all") {
@@ -174,7 +176,7 @@ export const useProvider = (providerId: string | undefined) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase as any)
         .from("provider_public_info")
-        .select("provider_id, user_id, profession, specialty, bio, consultation_fee, location, years_of_experience, average_rating, total_reviews, video_enabled, video_consultation_fee, is_verified, full_name, avatar_url, city, country")
+        .select("provider_id, user_id, profession, specialty, bio, consultation_fee, location, years_of_experience, average_rating, total_reviews, video_enabled, video_consultation_fee, is_verified, require_payment, full_name, avatar_url, city, country")
         .eq("provider_id", providerId)
         .maybeSingle();
 
@@ -224,6 +226,7 @@ export const useProvider = (providerId: string | undefined) => {
         video_enabled: ppData.video_enabled || null,
         video_consultation_fee: ppData.video_consultation_fee || null,
         is_verified: ppData.is_verified || null,
+        require_payment: ppData.require_payment ?? true,
         profile: {
           full_name: fullName,
           avatar_url: avatarUrl,

@@ -118,6 +118,7 @@ export const sendNotification = async (params: {
   recipient_email?: string;
   recipient_name?: string;
   send_email?: boolean;
+  template_variables?: Record<string, string>;
 }) => {
   try {
     const { data, error } = await supabase.functions.invoke("send-notification", {
