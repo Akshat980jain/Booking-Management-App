@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BookEase - Provider Registration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container": "#e7eff3",
+                        "tertiary-container": "#dbdafb",
+                        "outline": "#707d82",
+                        "on-secondary-container": "#445367",
+                        "inverse-primary": "#dee8ff",
+                        "surface-container-high": "#dfeaef",
+                        "primary-dim": "#495365",
+                        "secondary": "#516075",
+                        "background": "#f7fafc",
+                        "inverse-on-surface": "#9a9d9f",
+                        "surface-container-low": "#eff4f7",
+                        "on-primary-fixed": "#364051",
+                        "surface-bright": "#f7fafc",
+                        "surface-variant": "#d7e5eb",
+                        "tertiary-fixed-dim": "#cdccec",
+                        "on-error": "#fff7f6",
+                        "tertiary-dim": "#50516c",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#555f71",
+                        "primary-fixed": "#d9e3f9",
+                        "on-tertiary-fixed": "#393953",
+                        "primary-container": "#d9e3f9",
+                        "secondary-fixed-dim": "#c6d5ee",
+                        "on-secondary-fixed-variant": "#4e5d71",
+                        "on-primary": "#f6f7ff",
+                        "error-container": "#fe8983",
+                        "secondary-container": "#d4e4fc",
+                        "on-secondary-fixed": "#324054",
+                        "error-dim": "#4e0309",
+                        "on-secondary": "#f7f9ff",
+                        "primary": "#555f71",
+                        "outline-variant": "#a7b4ba",
+                        "on-surface-variant": "#546166",
+                        "on-error-container": "#752121",
+                        "inverse-surface": "#0b0f10",
+                        "on-tertiary": "#fbf7ff",
+                        "surface": "#f7fafc",
+                        "on-surface": "#283439",
+                        "surface-container-highest": "#d7e5eb",
+                        "on-tertiary-fixed-variant": "#555571",
+                        "on-background": "#283439",
+                        "surface-dim": "#ccdde4",
+                        "on-tertiary-container": "#4c4c67",
+                        "on-primary-fixed-variant": "#525c6e",
+                        "error": "#9f403d",
+                        "primary-fixed-dim": "#cbd5eb",
+                        "secondary-fixed": "#d4e4fc",
+                        "tertiary": "#5d5d78",
+                        "secondary-dim": "#455468",
+                        "on-primary-container": "#485264",
+                        "tertiary-fixed": "#dbdafb"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .signature-gradient {
+            background: linear-gradient(135deg, #555f71 0%, #495365 100%);
+        }
+        .ghost-border {
+            border: 1px solid rgba(167, 180, 186, 0.15);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body min-h-screen pb-20">
+<!-- TopAppBar - Suppressed Navigation Shell for Task Focus -->
+<header class="bg-[#F7FAFC]/90 dark:bg-[#1A202C]/90 backdrop-blur-xl docked full-width top-0 sticky z-50 shadow-[0_8px_24px_rgba(40,52,57,0.04)] flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-4">
+<button class="text-[#555F71] p-2 hover:bg-[#EFF4F7] transition-colors rounded-full">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-['Manrope'] font-semibold tracking-[-0.02em] text-[#283439]">Join as a Provider</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden">
+<img alt="Placeholder user" class="w-full h-full object-cover" data-alt="Close-up studio portrait of a professional man in business casual attire with a friendly expression and soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoiztc13BpCv_ylj5eXJ32bMGMwyHCPDkzKTDZPmpvV2kn3DXkMwcydQh3kLtAryAwGIP59dl49kFi7y4a6MOpHmdL3oVl_USldAh59HmIF2-ZzO07RRlvw5a2-YJ6d8LPj6m5cK7SzLu0mzwHcgeunAMHIK5k3929aGpSkPMKrmA1_x2i6ydOLmdGqQJUhkxIIrZXud3LAG7O3yiY28zLLxtjo0C2pBmGufwgVGEH7az-zFzQ8Pfmd9GoeHWCgtBzABUwTWCVVrg"/>
+</div>
+</header>
+<main class="px-6 mt-10">
+<!-- Progress Section -->
+<div class="mb-12">
+<div class="flex justify-between items-end mb-4">
+<div>
+<span class="text-on-surface-variant font-label text-sm font-semibold tracking-wider uppercase">Registration</span>
+<h2 class="text-3xl font-headline font-extrabold tracking-tighter mt-1">Professional Details</h2>
+</div>
+<div class="text-right">
+<span class="text-primary font-headline font-bold text-lg">Step 2 of 2</span>
+</div>
+</div>
+<div class="h-1.5 w-full bg-surface-container-low rounded-full overflow-hidden">
+<div class="h-full signature-gradient w-full rounded-full"></div>
+</div>
+</div>
+<!-- Form Section -->
+<div class="bg-surface-container-low p-6 rounded-[2rem] space-y-10">
+<div class="space-y-6">
+<!-- Phone Number -->
+<div class="space-y-2">
+<label class="block text-on-surface-variant font-label text-xs font-semibold ml-1">PHONE NUMBER</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-4 text-outline" data-icon="call">call</span>
+<input class="w-full pl-12 pr-4 py-4 bg-surface-container-lowest rounded-xl ghost-border focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-on-surface font-medium transition-all" placeholder="+1 (555) 000-0000" type="tel"/>
+</div>
+</div>
+<!-- Address Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="block text-on-surface-variant font-label text-xs font-semibold ml-1">OFFICE ADDRESS</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-4 text-outline" data-icon="location_on">location_on</span>
+<input class="w-full pl-12 pr-4 py-4 bg-surface-container-lowest rounded-xl ghost-border focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-on-surface font-medium transition-all" placeholder="123 Business Way" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="block text-on-surface-variant font-label text-xs font-semibold ml-1">CITY</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-4 text-outline" data-icon="apartment">apartment</span>
+<input class="w-full pl-12 pr-4 py-4 bg-surface-container-lowest rounded-xl ghost-border focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-on-surface font-medium transition-all" placeholder="San Francisco" type="text"/>
+</div>
+</div>
+</div>
+<!-- Profession & Specialty -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="block text-on-surface-variant font-label text-xs font-semibold ml-1">PROFESSION</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-4 text-outline" data-icon="work">work</span>
+<select class="w-full pl-12 pr-10 py-4 bg-surface-container-lowest rounded-xl ghost-border focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-on-surface font-medium transition-all appearance-none">
+<option disabled="" selected="" value="">Select Profession</option>
+<option>Healthcare Provider</option>
+<option>Real Estate Agent</option>
+<option>Financial Consultant</option>
+<option>Creative Professional</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 text-outline pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<div class="space-y-2">
+<label class="block text-on-surface-variant font-label text-xs font-semibold ml-1">SPECIALTY</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-4 text-outline" data-icon="verified">verified</span>
+<input class="w-full pl-12 pr-4 py-4 bg-surface-container-lowest rounded-xl ghost-border focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-on-surface font-medium transition-all" placeholder="e.g. Sports Therapy" type="text"/>
+</div>
+</div>
+</div>
+<!-- Experience -->
+<div class="space-y-2">
+<label class="block text-on-surface-variant font-label text-xs font-semibold ml-1">YEARS OF EXPERIENCE</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-4 text-outline" data-icon="history">history</span>
+<input class="w-full pl-12 pr-4 py-4 bg-surface-container-lowest rounded-xl ghost-border focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-on-surface font-medium transition-all" placeholder="5" type="number"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Terms Policy Note -->
+<p class="mt-8 text-center text-on-surface-variant text-sm font-label px-4 leading-relaxed">
+            By continuing, you agree to our <span class="text-primary font-semibold">Service Terms</span> and confirm your information is accurate for professional verification.
+        </p>
+<!-- CTA Action -->
+<div class="mt-12 mb-10">
+<button class="w-full signature-gradient text-on-primary font-label font-bold text-sm tracking-[0.05em] uppercase py-5 rounded-full shadow-[0_8px_24px_rgba(40,52,57,0.06)] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                Create Account
+                <span class="material-symbols-outlined text-lg" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<!-- Supporting Card (Bento Style Asymmetry) -->
+<div class="bg-secondary-container p-6 rounded-[2rem] flex items-center gap-5">
+<div class="w-12 h-12 bg-surface-container-lowest rounded-2xl flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-primary" data-icon="shield_checked" style="font-variation-settings: 'FILL' 1;">shield</span>
+</div>
+<div>
+<h4 class="font-headline font-bold text-on-secondary-fixed tracking-tight">Enterprise Security</h4>
+<p class="text-on-secondary-fixed-variant text-sm font-label leading-snug">Your professional data is encrypted and stored according to global compliance standards.</p>
+</div>
+</div>
+</main>
+<!-- Navigation suppressed per rules: Linear/Transactional journey (Onboarding/Registration) -->
+</body></html>

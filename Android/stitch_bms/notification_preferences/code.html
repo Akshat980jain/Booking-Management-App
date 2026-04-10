@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b4252',
+                        'background-light': '#f4f7f9',
+                        'background-dark': '#1e293b',
+                        'card-light': '#ffffff',
+                        'card-dark': '#0f172a',
+                        'text-primary-light': '#1e293b',
+                        'text-secondary-light': '#64748b',
+                        'text-primary-dark': '#f8fafc',
+                        'text-secondary-dark': '#cbd5e1',
+                        'border-light': '#e2e8f0',
+                        'border-dark': '#334155'
+                    },
+                    fontFamily: {
+                        display: ['Inter', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        DEFAULT: '0.5rem',
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-text-primary-light dark:text-text-primary-dark antialiased">
+<div class="max-w-md mx-auto min-h-screen pb-8">
+<header class="bg-card-light dark:bg-card-dark border-b border-border-light dark:border-border-dark px-4 py-4 flex items-center gap-4 sticky top-0 z-10">
+<button class="text-text-secondary-light dark:text-text-secondary-dark">
+<span class="material-icons">arrow_back</span>
+</button>
+<div>
+<h1 class="text-xl font-bold">Settings</h1>
+</div>
+</header>
+<main class="p-4 space-y-6">
+<section class="bg-card-light dark:bg-card-dark rounded border border-border-light dark:border-border-dark p-4 shadow-sm">
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-icons text-text-secondary-light dark:text-text-secondary-dark">notifications</span>
+<h2 class="text-lg font-semibold">Notification Preferences</h2>
+</div>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">Choose how you want to receive updates about your appointments</p>
+</div>
+<div class="space-y-4 mb-6">
+<h3 class="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark border-b border-border-light dark:border-border-dark pb-2">Notification Channels</h3>
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="material-icons text-sm text-text-secondary-light dark:text-text-secondary-dark">email</span>
+<h4 class="text-sm font-medium">Email Notifications</h4>
+</div>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">Receive notifications via email</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="material-icons text-sm text-text-secondary-light dark:text-text-secondary-dark">sms</span>
+<h4 class="text-sm font-medium">SMS Notifications</h4>
+</div>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">Receive text messages for urgent updates</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<div class="space-y-4">
+<h3 class="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark border-b border-border-light dark:border-border-dark pb-2">Notification Types</h3>
+<div class="flex items-start justify-between">
+<div class="pr-4">
+<h4 class="text-sm font-medium mb-1">Appointment Reminders</h4>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">Get reminded before upcoming appointments</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-start justify-between">
+<div class="pr-4">
+<h4 class="text-sm font-medium mb-1">New Booking Alerts</h4>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">Notify when a new booking request is received</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-start justify-between">
+<div class="pr-4">
+<h4 class="text-sm font-medium mb-1">Reschedule Requests</h4>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">Notify when a client requests to reschedule</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-start justify-between">
+<div class="pr-4">
+<h4 class="text-sm font-medium mb-1">New Reviews</h4>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">Notify when a client leaves a review</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<div class="mt-6 flex justify-end">
+<button class="bg-primary text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-2 hover:opacity-90 transition-opacity w-full justify-center">
+<span class="material-icons text-sm">check</span>
+                        Save Preferences
+                    </button>
+</div>
+</section>
+<section class="bg-card-light dark:bg-card-dark rounded border border-border-light dark:border-border-dark p-4 shadow-sm">
+<div class="mb-4">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-icons text-text-secondary-light dark:text-text-secondary-dark">calendar_today</span>
+<h2 class="text-lg font-semibold">Calendar Sync</h2>
+</div>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">Connect your calendar to automatically sync appointments</p>
+</div>
+<div class="bg-slate-100 dark:bg-slate-800 rounded p-4 flex flex-col gap-4">
+<div class="flex items-start gap-3">
+<div class="bg-white dark:bg-slate-700 p-2 rounded shrink-0 border border-border-light dark:border-border-dark">
+<span class="material-icons text-primary">calendar_month</span>
+</div>
+<div>
+<h3 class="text-sm font-semibold">Google Calendar</h3>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark mt-1">Connect to sync your appointments</p>
+</div>
+</div>
+<button class="bg-primary text-white px-4 py-2 rounded text-sm font-medium hover:opacity-90 transition-opacity w-full">
+                        Connect
+                    </button>
+</div>
+</section>
+</main>
+</div>
+
+</body></html>

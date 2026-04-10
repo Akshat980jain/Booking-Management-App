@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Provider Settings - Profile Visibility</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#334155",
+                        "background-light": "#f8fafc",
+                        "background-dark": "#0f172a",
+                        "card-light": "#ffffff",
+                        "card-dark": "#1e293b",
+                        "border-light": "#e2e8f0",
+                        "border-dark": "#334155",
+                        "text-light": "#0f172a",
+                        "text-dark": "#f8fafc",
+                        "text-muted-light": "#64748b",
+                        "text-muted-dark": "#94a3b8",
+                        "toggle-active": "#334155",
+                        "toggle-inactive-light": "#cbd5e1",
+                        "toggle-inactive-dark": "#475569"
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }.toggle-checkbox:checked {
+            right: 0;
+            border-color: #334155;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #334155;
+        }.dark .toggle-checkbox:checked {
+            border-color: #f8fafc;
+        }
+        .dark .toggle-checkbox:checked + .toggle-label {
+            background-color: #f8fafc;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark min-h-screen">
+<header class="bg-card-light dark:bg-card-dark border-b border-border-light dark:border-border-dark px-4 py-3 flex items-center justify-between sticky top-0 z-10">
+<div class="flex items-center gap-2">
+<span class="material-icons-outlined text-primary dark:text-text-dark">event_note</span>
+<span class="font-bold text-lg text-text-light dark:text-text-dark">BookEase</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-text-muted-light dark:text-text-muted-dark hover:text-text-light dark:hover:text-text-dark transition-colors">
+<span class="material-icons-outlined">light_mode</span>
+</button>
+<button class="text-text-muted-light dark:text-text-muted-dark hover:text-text-light dark:hover:text-text-dark transition-colors">
+<span class="material-icons-outlined">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-slate-300 dark:bg-slate-600 flex items-center justify-center text-sm font-semibold text-slate-700 dark:text-slate-200">
+                AJ
+            </div>
+</div>
+</header>
+<main class="p-4 max-w-md mx-auto space-y-6">
+<div class="flex items-center gap-3 pb-2 border-b border-border-light dark:border-border-dark">
+<button class="text-text-muted-light dark:text-text-muted-dark hover:text-text-light dark:hover:text-text-dark transition-colors">
+<span class="material-icons-outlined">arrow_back</span>
+</button>
+<div>
+<h1 class="text-xl font-bold">Provider Settings</h1>
+<p class="text-sm text-text-muted-light dark:text-text-muted-dark">Manage your profile visibility, notifications, and integrations</p>
+</div>
+</div>
+<section class="bg-card-light dark:bg-card-dark rounded border border-border-light dark:border-border-dark p-5 shadow-sm">
+<div class="mb-6">
+<h2 class="text-lg font-semibold flex items-center gap-2 mb-1">
+<span class="material-icons-outlined text-text-muted-light dark:text-text-muted-dark">language</span>
+                    Profile Visibility
+                </h2>
+<p class="text-sm text-text-muted-light dark:text-text-muted-dark">Control how your profile appears to potential clients</p>
+</div>
+<div class="space-y-6 divide-y divide-border-light dark:divide-border-dark">
+<div class="pt-4 first:pt-0 flex items-start justify-between gap-4">
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-icons-outlined text-sm text-text-muted-light dark:text-text-muted-dark">visibility</span>
+<span class="font-medium text-sm">Profile Active</span>
+</div>
+<p class="text-xs text-text-muted-light dark:text-text-muted-dark">When enabled, your profile is visible in search results and can receive bookings</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in mt-1">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 checked:right-0 right-6 border-toggle-inactive-light dark:border-toggle-inactive-dark transition-all duration-300" id="profile-active" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-toggle-inactive-light dark:bg-toggle-inactive-dark cursor-pointer transition-colors duration-300" for="profile-active"></label>
+</div>
+</div>
+<div class="pt-4 flex items-start justify-between gap-4">
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-icons-outlined text-sm text-text-muted-light dark:text-text-muted-dark">phone</span>
+<span class="font-medium text-sm">Show Phone Number</span>
+</div>
+<p class="text-xs text-text-muted-light dark:text-text-muted-dark">Display your phone number on your public profile</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in mt-1">
+<input class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 right-6 checked:right-0 border-toggle-inactive-light dark:border-toggle-inactive-dark transition-all duration-300" id="show-phone" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-toggle-inactive-light dark:bg-toggle-inactive-dark cursor-pointer transition-colors duration-300" for="show-phone"></label>
+</div>
+</div>
+<div class="pt-4 flex items-start justify-between gap-4">
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-icons-outlined text-sm text-text-muted-light dark:text-text-muted-dark">videocam</span>
+<span class="font-medium text-sm">Video Consultations</span>
+</div>
+<p class="text-xs text-text-muted-light dark:text-text-muted-dark">Allow clients to book video consultations with you</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in mt-1">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 checked:right-0 right-6 border-toggle-inactive-light dark:border-toggle-inactive-dark transition-all duration-300" id="video-consultations" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-toggle-inactive-light dark:bg-toggle-inactive-dark cursor-pointer transition-colors duration-300" for="video-consultations"></label>
+</div>
+</div>
+<div class="pt-4 flex items-start justify-between gap-4">
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-icons-outlined text-sm text-text-muted-light dark:text-text-muted-dark">payment</span>
+<span class="font-medium text-sm">Require Payment for Appointments</span>
+</div>
+<p class="text-xs text-text-muted-light dark:text-text-muted-dark">When disabled, clients can book without paying — "Free" badge will show on your profile</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in mt-1">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 checked:right-0 right-6 border-toggle-inactive-light dark:border-toggle-inactive-dark transition-all duration-300" id="payment-appointments" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-toggle-inactive-light dark:bg-toggle-inactive-dark cursor-pointer transition-colors duration-300" for="payment-appointments"></label>
+</div>
+</div>
+<div class="pt-4 flex items-start justify-between gap-4">
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-icons-outlined text-sm text-text-muted-light dark:text-text-muted-dark">payment</span>
+<span class="font-medium text-sm">Require Payment for Video Calls</span>
+</div>
+<p class="text-xs text-text-muted-light dark:text-text-muted-dark">When disabled, clients can join video consultations without paying</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in mt-1">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 checked:right-0 right-6 border-toggle-inactive-light dark:border-toggle-inactive-dark transition-all duration-300" id="payment-video" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-toggle-inactive-light dark:bg-toggle-inactive-dark cursor-pointer transition-colors duration-300" for="payment-video"></label>
+</div>
+</div>
+</div>
+<div class="mt-8 flex justify-end">
+<button class="bg-primary text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-2 hover:opacity-90 transition-opacity w-full sm:w-auto justify-center">
+<span class="material-icons-outlined text-sm">check</span>
+                    Save Changes
+                </button>
+</div>
+</section>
+</main>
+
+</body></html>

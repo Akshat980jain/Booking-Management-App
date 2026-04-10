@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Manage Availability - BookEase</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "error": "#9f403d",
+              "surface-container": "#e7eff3",
+              "inverse-on-surface": "#9a9d9f",
+              "inverse-primary": "#dee8ff",
+              "secondary-container": "#d4e4fc",
+              "surface-dim": "#ccdde4",
+              "error-container": "#fe8983",
+              "secondary-fixed": "#d4e4fc",
+              "inverse-surface": "#0b0f10",
+              "on-tertiary-fixed": "#393953",
+              "on-tertiary": "#fbf7ff",
+              "tertiary-fixed": "#dbdafb",
+              "secondary-fixed-dim": "#c6d5ee",
+              "background": "#f7fafc",
+              "surface-container-highest": "#d7e5eb",
+              "surface-variant": "#d7e5eb",
+              "on-surface-variant": "#546166",
+              "on-primary": "#f6f7ff",
+              "surface-bright": "#f7fafc",
+              "outline": "#707d82",
+              "primary-dim": "#495365",
+              "tertiary": "#5d5d78",
+              "on-tertiary-container": "#4c4c67",
+              "outline-variant": "#a7b4ba",
+              "tertiary-container": "#dbdafb",
+              "on-secondary-fixed-variant": "#4e5d71",
+              "on-background": "#283439",
+              "primary": "#555f71",
+              "primary-container": "#d9e3f9",
+              "tertiary-fixed-dim": "#cdccec",
+              "on-secondary": "#f7f9ff",
+              "tertiary-dim": "#50516c",
+              "on-primary-fixed-variant": "#525c6e",
+              "on-surface": "#283439",
+              "surface-container-low": "#eff4f7",
+              "on-secondary-fixed": "#324054",
+              "surface-container-high": "#dfeaef",
+              "on-error": "#fff7f6",
+              "on-secondary-container": "#445367",
+              "secondary-dim": "#455468",
+              "primary-fixed-dim": "#cbd5eb",
+              "secondary": "#516075",
+              "on-tertiary-fixed-variant": "#555571",
+              "on-primary-fixed": "#364051",
+              "on-primary-container": "#485264",
+              "surface-container-lowest": "#ffffff",
+              "surface": "#f7fafc",
+              "on-error-container": "#752121",
+              "primary-fixed": "#d9e3f9",
+              "surface-tint": "#555f71",
+              "error-dim": "#4e0309"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .signature-gradient {
+            background: linear-gradient(135deg, #555f71 0%, #495365 100%);
+        }
+        .ghost-border {
+            outline: 1px solid rgba(167, 180, 186, 0.15);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body text-on-surface min-h-screen pb-28">
+<!-- TopAppBar Shell -->
+<header class="bg-slate-50 dark:bg-slate-900 flex justify-between items-center px-6 py-4 w-full sticky top-0 z-40">
+<div class="flex items-center gap-4">
+<button class="text-slate-700 dark:text-slate-300 transition-colors duration-200 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 p-2 rounded-full">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="text-xl font-bold tracking-tighter text-slate-800 dark:text-slate-100 font-headline">BookEase</h1>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-high overflow-hidden ghost-border">
+<img class="w-full h-full object-cover" data-alt="Professional headshot of a service provider with a clean studio background and soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnkaaSbgd3PUCo8IJ4wsc_hwwnL2qRTdh6zchFLCrJ5NDhp7mFQ9WWzmsFoWyYoFxE1xuhQATcG7ha7iZoS8hS-Xsbjd9RBJVvvxVr4w3Go2LwcPFwO8Xjc0yZtUkNtb6MZ4ppIddJ2LivLOz9kGSeXie1CA-U8kOp5oAia-ehslqfVrF0F-vhVYSstiYv51C0ykzwJfoTxzd2ZTYA6Ilv-V_mEiOWTGWF-HTDVbUFCMrU7E5VBjESxugjpN1Ul3l7E--PObeSosE"/>
+</div>
+</div>
+</header>
+<main class="px-6 pt-8 max-w-md mx-auto">
+<!-- Page Header -->
+<section class="mb-10">
+<h2 class="font-headline text-3xl font-extrabold tracking-tight text-on-surface mb-2">Manage Availability</h2>
+<p class="text-on-surface-variant text-sm font-medium">Define your working hours and session rules.</p>
+</section>
+<!-- Appointment Settings: Slot Duration -->
+<section class="mb-12 bg-surface-container-low rounded-3xl p-6">
+<h3 class="font-headline text-lg font-bold text-on-surface mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">timer</span>
+                Appointment Settings
+            </h3>
+<div class="space-y-4">
+<label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant ml-1">Slot Duration</label>
+<div class="grid grid-cols-3 gap-3">
+<button class="bg-surface-container-lowest py-3 rounded-xl text-sm font-semibold text-primary ghost-border shadow-sm ring-2 ring-primary">30 min</button>
+<button class="bg-surface-container-lowest py-3 rounded-xl text-sm font-semibold text-on-surface-variant ghost-border hover:bg-surface-container-high transition-colors">45 min</button>
+<button class="bg-surface-container-lowest py-3 rounded-xl text-sm font-semibold text-on-surface-variant ghost-border hover:bg-surface-container-high transition-colors">60 min</button>
+</div>
+<div class="flex items-center justify-between mt-6 p-4 bg-surface-container-lowest rounded-2xl ghost-border">
+<div class="flex flex-col">
+<span class="text-sm font-bold text-on-surface">Buffer Time</span>
+<span class="text-xs text-on-surface-variant">Rest between sessions</span>
+</div>
+<span class="text-primary font-bold">15 min</span>
+</div>
+</div>
+</section>
+<!-- Weekly Schedule Section -->
+<section class="mb-12">
+<div class="flex justify-between items-end mb-8">
+<h3 class="font-headline text-lg font-bold text-on-surface">Weekly Schedule</h3>
+<span class="text-xs font-bold text-primary uppercase tracking-widest">Default Hours</span>
+</div>
+<div class="space-y-4">
+<!-- Day Card (Monday) -->
+<div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm ghost-border flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<span class="font-bold text-on-surface">Monday</span>
+<div class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex-1 bg-surface-container-low px-4 py-3 rounded-xl flex items-center justify-between">
+<span class="text-xs font-bold text-on-surface-variant uppercase">From</span>
+<span class="text-sm font-bold text-on-surface">09:00 AM</span>
+</div>
+<span class="text-on-surface-variant material-symbols-outlined">arrow_forward</span>
+<div class="flex-1 bg-surface-container-low px-4 py-3 rounded-xl flex items-center justify-between">
+<span class="text-xs font-bold text-on-surface-variant uppercase">To</span>
+<span class="text-sm font-bold text-on-surface">05:00 PM</span>
+</div>
+</div>
+</div>
+<!-- Day Card (Tuesday) -->
+<div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm ghost-border flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<span class="font-bold text-on-surface">Tuesday</span>
+<div class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex-1 bg-surface-container-low px-4 py-3 rounded-xl flex items-center justify-between">
+<span class="text-xs font-bold text-on-surface-variant uppercase">From</span>
+<span class="text-sm font-bold text-on-surface">09:00 AM</span>
+</div>
+<span class="text-on-surface-variant material-symbols-outlined">arrow_forward</span>
+<div class="flex-1 bg-surface-container-low px-4 py-3 rounded-xl flex items-center justify-between">
+<span class="text-xs font-bold text-on-surface-variant uppercase">To</span>
+<span class="text-sm font-bold text-on-surface">05:00 PM</span>
+</div>
+</div>
+</div>
+<!-- Day Card (Weekend/Off) -->
+<div class="bg-surface-container-low p-5 rounded-2xl ghost-border flex flex-col gap-2 opacity-60">
+<div class="flex items-center justify-between">
+<span class="font-bold text-on-surface-variant">Sunday</span>
+<div class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</div>
+</div>
+<span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Closed</span>
+</div>
+</div>
+</section>
+<!-- Block Specific Dates Section -->
+<section class="mb-16">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-headline text-lg font-bold text-on-surface">Block Specific Dates</h3>
+<button class="text-primary p-2 hover:bg-primary-container rounded-full transition-colors">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+</div>
+<!-- Mini Calendar View -->
+<div class="bg-surface-container-lowest rounded-3xl p-6 shadow-sm ghost-border">
+<div class="flex items-center justify-between mb-6">
+<span class="font-bold text-on-surface">October 2024</span>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">chevron_left</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">chevron_right</span>
+</div>
+</div>
+<div class="grid grid-cols-7 gap-y-4 text-center">
+<div class="text-[10px] font-bold text-on-surface-variant uppercase">S</div>
+<div class="text-[10px] font-bold text-on-surface-variant uppercase">M</div>
+<div class="text-[10px] font-bold text-on-surface-variant uppercase">T</div>
+<div class="text-[10px] font-bold text-on-surface-variant uppercase">W</div>
+<div class="text-[10px] font-bold text-on-surface-variant uppercase">T</div>
+<div class="text-[10px] font-bold text-on-surface-variant uppercase">F</div>
+<div class="text-[10px] font-bold text-on-surface-variant uppercase">S</div>
+<div class="text-sm font-medium text-on-surface-variant py-2">29</div>
+<div class="text-sm font-medium text-on-surface-variant py-2">30</div>
+<div class="text-sm font-medium py-2">1</div>
+<div class="text-sm font-medium py-2">2</div>
+<div class="text-sm font-medium py-2">3</div>
+<div class="text-sm font-medium py-2">4</div>
+<div class="text-sm font-medium py-2">5</div>
+<div class="text-sm font-medium py-2">6</div>
+<div class="text-sm font-medium py-2">7</div>
+<div class="text-sm font-bold bg-error text-white rounded-xl py-2 shadow-md">8</div>
+<div class="text-sm font-medium py-2">9</div>
+<div class="text-sm font-medium py-2">10</div>
+<div class="text-sm font-medium py-2">11</div>
+<div class="text-sm font-medium py-2">12</div>
+</div>
+<div class="mt-8 pt-6 border-t border-surface-container-low flex items-center gap-4">
+<div class="w-12 h-12 bg-error-container rounded-2xl flex items-center justify-center text-on-error-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">block</span>
+</div>
+<div class="flex-1">
+<span class="block text-sm font-bold text-on-surface">Oct 8 - Staff Training</span>
+<span class="block text-xs text-on-surface-variant">All day • Full unavailability</span>
+</div>
+<button class="text-on-surface-variant">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Save Button -->
+<div class="fixed bottom-24 left-0 w-full px-6 flex justify-center pointer-events-none">
+<button class="pointer-events-auto signature-gradient text-on-primary font-label font-bold uppercase tracking-wider px-10 py-4 rounded-full shadow-2xl transition-transform active:scale-95 w-full max-w-xs">
+                Update Schedule
+            </button>
+</div>
+</main>
+<!-- BottomNavBar Shell -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md z-50 rounded-t-3xl shadow-[0_-8px_24px_rgba(40,52,57,0.06)]">
+<div class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-slate-800 dark:hover:text-slate-200 transition-transform duration-200 active:scale-90">
+<span class="material-symbols-outlined">home</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-slate-800 dark:hover:text-slate-200 transition-transform duration-200 active:scale-90">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Schedule</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-slate-800 dark:hover:text-slate-200 transition-transform duration-200 active:scale-90">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Providers</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl px-5 py-2 transition-transform duration-200 scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Settings</span>
+</div>
+</nav>
+</body></html>

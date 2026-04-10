@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Professional Information</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#334155", // slate-700
+                        "background-light": "#f8fafc", // slate-50
+                        "background-dark": "#0f172a", // slate-900
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1e293b", // slate-800
+                        "text-main-light": "#0f172a",
+                        "text-main-dark": "#f8fafc",
+                        "text-muted-light": "#64748b",
+                        "text-muted-dark": "#94a3b8",
+                        "border-light": "#e2e8f0",
+                        "border-dark": "#334155",
+                        "input-bg-light": "#f1f5f9",
+                        "input-bg-dark": "#0f172a",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                    },
+                },
+            },
+        };
+    </script>
+<style>.toggle-checkbox:checked {
+            right: 0;
+            border-color: #334155;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #334155;
+        }
+        .dark .toggle-checkbox:checked {
+            border-color: #94a3b8;
+        }
+        .dark .toggle-checkbox:checked + .toggle-label {
+            background-color: #94a3b8;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display bg-background-light dark:bg-background-dark text-text-main-light dark:text-text-main-dark antialiased">
+<header class="sticky top-0 z-10 bg-surface-light dark:bg-surface-dark border-b border-border-light dark:border-border-dark px-4 py-3 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<button class="p-1 rounded-full text-text-muted-light dark:text-text-muted-dark hover:bg-input-bg-light dark:hover:bg-input-bg-dark transition-colors">
+<span class="material-icons text-xl">arrow_back</span>
+</button>
+<h1 class="text-lg font-semibold">Professional Info</h1>
+</div>
+<button class="p-2 rounded-full text-text-muted-light dark:text-text-muted-dark hover:bg-input-bg-light dark:hover:bg-input-bg-dark transition-colors" id="theme-toggle">
+<span class="material-icons text-xl dark:hidden">dark_mode</span>
+<span class="material-icons text-xl hidden dark:block">light_mode</span>
+</button>
+</header>
+<main class="p-4 max-w-md mx-auto">
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-sm mb-6">
+<div class="p-5 border-b border-border-light dark:border-border-dark">
+<h2 class="text-xl font-bold mb-1">Professional Information</h2>
+<p class="text-sm text-text-muted-light dark:text-text-muted-dark">Provide details about your services and expertise</p>
+</div>
+<div class="p-5 space-y-6">
+<div class="space-y-4">
+<div>
+<label class="block text-sm font-medium mb-1.5 text-text-main-light dark:text-text-main-dark" for="profession">Profession</label>
+<div class="relative">
+<select class="w-full bg-input-bg-light dark:bg-input-bg-dark border border-border-light dark:border-border-dark rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary dark:focus:ring-primary appearance-none pr-10" id="profession">
+<option>General Physician</option>
+<option>Specialist</option>
+<option>Therapist</option>
+</select>
+<span class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-text-muted-light dark:text-text-muted-dark pointer-events-none text-xl">expand_more</span>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium mb-1.5 text-text-main-light dark:text-text-main-dark" for="specialty">Specialty</label>
+<input class="w-full bg-input-bg-light dark:bg-input-bg-dark border border-border-light dark:border-border-dark rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary dark:focus:ring-primary" id="specialty" type="text" value="Cardiologist"/>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium mb-1.5 text-text-main-light dark:text-text-main-dark" for="bio">Bio</label>
+<textarea class="w-full bg-input-bg-light dark:bg-input-bg-dark border border-border-light dark:border-border-dark rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary dark:focus:ring-primary resize-y" id="bio" placeholder="Tell potential clients about yourself, your experience, and what makes you unique..." rows="4"></textarea>
+</div>
+<hr class="border-border-light dark:border-border-dark"/>
+<div class="grid grid-cols-2 gap-4">
+<div class="col-span-2">
+<label class="block text-sm font-medium mb-1.5 text-text-main-light dark:text-text-main-dark" for="fee">Consultation Fee (₹)</label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted-light dark:text-text-muted-dark">$</span>
+<input class="w-full bg-input-bg-light dark:bg-input-bg-dark border border-border-light dark:border-border-dark rounded-lg pl-8 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary dark:focus:ring-primary" id="fee" type="number" value="50"/>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium mb-1.5 text-text-main-light dark:text-text-main-dark" for="experience">Years of Experience</label>
+<div class="relative">
+<span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-text-muted-light dark:text-text-muted-dark text-[18px]">work_outline</span>
+<input class="w-full bg-input-bg-light dark:bg-input-bg-dark border border-border-light dark:border-border-dark rounded-lg pl-9 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary dark:focus:ring-primary" id="experience" type="number" value="5"/>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium mb-1.5 text-text-main-light dark:text-text-main-dark" for="location">Location</label>
+<div class="relative">
+<span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-text-muted-light dark:text-text-muted-dark text-[18px]">location_on</span>
+<input class="w-full bg-input-bg-light dark:bg-input-bg-dark border border-border-light dark:border-border-dark rounded-lg pl-9 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary dark:focus:ring-primary" id="location" type="text" value="Muzaffarnagar"/>
+</div>
+</div>
+</div>
+<hr class="border-border-light dark:border-border-dark"/>
+<div class="space-y-5">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-icons text-text-muted-light dark:text-text-muted-dark text-[20px]">videocam</span>
+<h3 class="font-medium">Video Consultation Settings</h3>
+</div>
+<div class="flex items-start justify-between gap-4">
+<div>
+<h4 class="text-sm font-medium text-text-main-light dark:text-text-main-dark">Enable Video Consultations</h4>
+<p class="text-xs text-text-muted-light dark:text-text-muted-dark mt-0.5">Allow patients to book video appointments with you</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in mt-1">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 transition-all duration-300" id="toggle1" name="toggle1" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-600 cursor-pointer transition-colors duration-300" for="toggle1"></label>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium mb-1.5 text-text-main-light dark:text-text-main-dark" for="video-fee">Video Consultation Fee (₹)</label>
+<div class="relative mb-1.5">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted-light dark:text-text-muted-dark">$</span>
+<input class="w-full bg-input-bg-light dark:bg-input-bg-dark border border-border-light dark:border-border-dark rounded-lg pl-8 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-primary dark:focus:ring-primary" id="video-fee" placeholder="Leave empty to use regular fee" type="text"/>
+</div>
+<p class="text-xs text-text-muted-light dark:text-text-muted-dark">Set a different fee for video consultations, or leave empty to use your regular consultation fee</p>
+</div>
+<div class="flex items-start justify-between gap-4 pt-2">
+<div>
+<h4 class="text-sm font-medium text-text-main-light dark:text-text-main-dark">Available for Bookings</h4>
+<p class="text-xs text-text-muted-light dark:text-text-muted-dark mt-0.5">Toggle off to temporarily pause receiving new appointment requests</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in mt-1">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 transition-all duration-300" id="toggle2" name="toggle2" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-600 cursor-pointer transition-colors duration-300" for="toggle2"></label>
+</div>
+</div>
+</div>
+</div>
+<div class="p-5 border-t border-border-light dark:border-border-dark bg-input-bg-light/50 dark:bg-input-bg-dark/50 rounded-b-xl">
+<button class="w-full bg-primary hover:bg-opacity-90 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors">
+<span class="material-icons text-[20px]">save</span>
+                    Save Professional Info
+                </button>
+</div>
+</div>
+</main>
+<script>
+        // Simple dark mode toggle for demonstration
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+        });
+    </script>
+
+</body></html>

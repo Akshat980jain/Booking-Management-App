@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BookEase Provider Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "error": "#9f403d",
+                        "surface-container": "#e7eff3",
+                        "inverse-on-surface": "#9a9d9f",
+                        "inverse-primary": "#dee8ff",
+                        "secondary-container": "#d4e4fc",
+                        "surface-dim": "#ccdde4",
+                        "error-container": "#fe8983",
+                        "secondary-fixed": "#d4e4fc",
+                        "inverse-surface": "#0b0f10",
+                        "on-tertiary-fixed": "#393953",
+                        "on-tertiary": "#fbf7ff",
+                        "tertiary-fixed": "#dbdafb",
+                        "secondary-fixed-dim": "#c6d5ee",
+                        "background": "#f7fafc",
+                        "surface-container-highest": "#d7e5eb",
+                        "surface-variant": "#d7e5eb",
+                        "on-surface-variant": "#546166",
+                        "on-primary": "#f6f7ff",
+                        "surface-bright": "#f7fafc",
+                        "outline": "#707d82",
+                        "primary-dim": "#495365",
+                        "tertiary": "#5d5d78",
+                        "on-tertiary-container": "#4c4c67",
+                        "outline-variant": "#a7b4ba",
+                        "tertiary-container": "#dbdafb",
+                        "on-secondary-fixed-variant": "#4e5d71",
+                        "on-background": "#283439",
+                        "primary": "#555f71",
+                        "primary-container": "#d9e3f9",
+                        "tertiary-fixed-dim": "#cdccec",
+                        "on-secondary": "#f7f9ff",
+                        "tertiary-dim": "#50516c",
+                        "on-primary-fixed-variant": "#525c6e",
+                        "on-surface": "#283439",
+                        "surface-container-low": "#eff4f7",
+                        "on-secondary-fixed": "#324054",
+                        "surface-container-high": "#dfeaef",
+                        "on-error": "#fff7f6",
+                        "on-secondary-container": "#445367",
+                        "secondary-dim": "#455468",
+                        "primary-fixed-dim": "#cbd5eb",
+                        "secondary": "#516075",
+                        "on-tertiary-fixed-variant": "#555571",
+                        "on-primary-fixed": "#364051",
+                        "on-primary-container": "#485264",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f7fafc",
+                        "on-error-container": "#752121",
+                        "primary-fixed": "#d9e3f9",
+                        "surface-tint": "#555f71",
+                        "error-dim": "#4e0309"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .signature-gradient {
+            background: linear-gradient(135deg, #555f71 0%, #495365 100%);
+        }
+        .glass-panel {
+            background: rgba(247, 250, 252, 0.9);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="bg-slate-50 dark:bg-slate-900 flex justify-between items-center px-6 py-4 w-full sticky top-0 z-40">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-slate-700 dark:text-slate-300">menu</span>
+<h1 class="text-xl font-bold tracking-tighter text-slate-800 dark:text-slate-100 font-headline">BookEase</h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-surface-container-high">
+<img class="w-full h-full object-cover" data-alt="professional male doctor with glasses smiling in a clinical setting, soft studio lighting, professional portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5HUCTOwp6NetLLUOMZnufLQMLVmgz6n9ZmF3ORohpSWrgLcRGD2Dg6AXG0OQQdaPF2ezX3DSMRPIDcd4QBsmcyqoQQgwxLhFgu6rb2GF2dQWsOqPRlAcFZjIfcTUmzvMWwQqe9xvMuNii2aZHcrUNyXR3PsE-gf_821gDXFj5vddssNotiX6IRJX7FmLB0HTPJDpcLsdp_d8jaVUNxIek5dbZ3KdLIW3LMGJ5cyVZWYGZmQPBcnWJhEH_XMbK4yjoAcU8Ht5tCic"/>
+</div>
+</div>
+</header>
+<main class="px-6 pt-8 max-w-md mx-auto">
+<!-- Editorial Header -->
+<section class="mb-10">
+<p class="text-on-surface-variant font-medium tracking-wide body-sm mb-1 uppercase">Overview</p>
+<h2 class="text-4xl font-extrabold font-headline tracking-tight text-on-surface leading-tight">Welcome back, Dr. Miller</h2>
+</section>
+<!-- Bento Grid Metrics -->
+<section class="grid grid-cols-2 gap-4 mb-12">
+<!-- Today's Appointments -->
+<div class="bg-surface-container-lowest p-5 rounded-xl shadow-[0_8px_24px_rgba(40,52,57,0.06)] flex flex-col justify-between h-36 relative overflow-hidden">
+<div class="flex justify-end">
+<span class="material-symbols-outlined text-primary opacity-20 text-4xl">event_available</span>
+</div>
+<div>
+<p class="text-on-surface-variant text-xs font-semibold uppercase tracking-wider mb-1">Today's Appts</p>
+<p class="text-3xl font-bold font-headline text-on-surface">12</p>
+</div>
+</div>
+<!-- Pending Requests -->
+<div class="bg-surface-container-low p-5 rounded-xl flex flex-col justify-between h-36 border border-white/50">
+<div class="flex justify-end">
+<span class="material-symbols-outlined text-secondary opacity-40 text-4xl">pending_actions</span>
+</div>
+<div>
+<p class="text-on-surface-variant text-xs font-semibold uppercase tracking-wider mb-1">Pending</p>
+<p class="text-3xl font-bold font-headline text-on-surface">04</p>
+</div>
+</div>
+<!-- Total Patients -->
+<div class="bg-surface-container-low p-5 rounded-xl flex flex-col justify-between h-36 border border-white/50">
+<div class="flex justify-end">
+<span class="material-symbols-outlined text-primary opacity-40 text-4xl">groups</span>
+</div>
+<div>
+<p class="text-on-surface-variant text-xs font-semibold uppercase tracking-wider mb-1">Patients</p>
+<p class="text-3xl font-bold font-headline text-on-surface">842</p>
+</div>
+</div>
+<!-- Video Calls -->
+<div class="bg-secondary-container p-5 rounded-xl flex flex-col justify-between h-36">
+<div class="flex justify-end">
+<span class="material-symbols-outlined text-on-secondary-container opacity-50 text-4xl">videocam</span>
+</div>
+<div>
+<p class="text-on-secondary-container text-xs font-semibold uppercase tracking-wider mb-1">Video Calls</p>
+<p class="text-3xl font-bold font-headline text-on-secondary-container">03</p>
+</div>
+</div>
+</section>
+<!-- Action Button -->
+<button class="w-full signature-gradient text-on-primary font-bold py-4 px-6 rounded-full flex items-center justify-between mb-12 shadow-lg active:scale-[0.98] transition-transform">
+<span class="font-label uppercase tracking-widest text-sm">Manage Availability</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<!-- Today's Schedule (Asymmetric Layout) -->
+<section class="mb-12">
+<div class="flex justify-between items-end mb-6">
+<h3 class="text-2xl font-bold font-headline text-on-surface tracking-tight">Today's Schedule</h3>
+<p class="text-primary font-semibold text-sm">View Calendar</p>
+</div>
+<div class="space-y-4">
+<!-- Appointment Item 1 -->
+<div class="group flex gap-4">
+<div class="flex flex-col items-center pt-1">
+<span class="text-xs font-bold text-on-surface-variant">09:30</span>
+<div class="w-px h-full bg-surface-container-highest my-2"></div>
+</div>
+<div class="flex-1 bg-surface-container-lowest p-4 rounded-xl shadow-[0_4px_12px_rgba(40,52,57,0.03)] border border-transparent hover:border-outline-variant/20 transition-all">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-bold text-on-surface">Sarah Jenkins</h4>
+<span class="bg-primary-container text-on-primary-container text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Check-up</span>
+</div>
+<p class="text-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-base">location_on</span> Room 402, North Wing
+                        </p>
+</div>
+</div>
+<!-- Appointment Item 2 (Active/Video) -->
+<div class="group flex gap-4">
+<div class="flex flex-col items-center pt-1">
+<span class="text-xs font-bold text-primary">10:15</span>
+<div class="w-px h-full bg-primary/20 my-2"></div>
+</div>
+<div class="flex-1 bg-surface-container-high p-4 rounded-xl border-l-4 border-primary">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-bold text-on-surface">Robert Fox</h4>
+<span class="bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Video Call</span>
+</div>
+<div class="flex items-center justify-between mt-4">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full bg-primary-dim border border-white"></div>
+<div class="w-6 h-6 rounded-full bg-slate-400 border border-white"></div>
+</div>
+<button class="text-xs font-bold text-primary underline">Join Meeting</button>
+</div>
+</div>
+</div>
+<!-- Appointment Item 3 -->
+<div class="group flex gap-4">
+<div class="flex flex-col items-center pt-1">
+<span class="text-xs font-bold text-on-surface-variant">11:00</span>
+<div class="w-px h-full bg-surface-container-highest my-2"></div>
+</div>
+<div class="flex-1 bg-surface-container-lowest p-4 rounded-xl shadow-[0_4px_12px_rgba(40,52,57,0.03)]">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-bold text-on-surface">Amelie Dubois</h4>
+<span class="bg-surface-container-highest text-on-surface-variant text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Follow-up</span>
+</div>
+<p class="text-sm text-on-surface-variant">Review MRI results from Tuesday</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Upcoming (Horizontal Scroll Section) -->
+<section class="mb-12 overflow-hidden -mx-6">
+<h3 class="text-2xl font-bold font-headline text-on-surface tracking-tight px-6 mb-6">Upcoming</h3>
+<div class="flex gap-4 overflow-x-auto pb-4 px-6 no-scrollbar">
+<div class="min-w-[240px] bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/10 shadow-sm">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-full bg-tertiary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-tertiary-container">person</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Marcus Thorne</p>
+<p class="text-xs text-on-surface-variant">Monday, Oct 24</p>
+</div>
+</div>
+<p class="text-sm font-medium text-on-surface mb-3">Post-op Consultation</p>
+<div class="h-1 w-full bg-surface-container-low rounded-full overflow-hidden">
+<div class="h-full bg-primary w-2/3"></div>
+</div>
+</div>
+<div class="min-w-[240px] bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/10 shadow-sm">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container">lab_research</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Elena Rodriguez</p>
+<p class="text-xs text-on-surface-variant">Tuesday, Oct 25</p>
+</div>
+</div>
+<p class="text-sm font-medium text-on-surface mb-3">Diagnostic Lab Review</p>
+<div class="h-1 w-full bg-surface-container-low rounded-full overflow-hidden">
+<div class="h-full bg-primary w-1/4"></div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md z-50 rounded-t-3xl shadow-[0_-8px_24px_rgba(40,52,57,0.06)]">
+<!-- Home -->
+<div class="flex flex-col items-center justify-center bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl px-5 py-2 scale-95 active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Home</span>
+</div>
+<!-- Schedule -->
+<div class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-slate-800 dark:hover:text-slate-200 scale-95 active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Schedule</span>
+</div>
+<!-- Providers (Patients context for Provider view) -->
+<div class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-slate-800 dark:hover:text-slate-200 scale-95 active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Providers</span>
+</div>
+<!-- Settings -->
+<div class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-slate-800 dark:hover:text-slate-200 scale-95 active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-inter text-[11px] font-medium tracking-wide">Settings</span>
+</div>
+</nav>
+<!-- Custom styling for hide scrollbar -->
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</body></html>
