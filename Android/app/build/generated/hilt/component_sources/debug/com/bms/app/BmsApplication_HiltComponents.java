@@ -11,6 +11,7 @@ import com.bms.app.ui.chat.InboxViewModel_HiltModules;
 import com.bms.app.ui.chat.SupportViewModel_HiltModules;
 import com.bms.app.ui.dashboard.AdminViewModel_HiltModules;
 import com.bms.app.ui.dashboard.DashboardViewModel_HiltModules;
+import com.bms.app.ui.dashboard.UserDashboardViewModel_HiltModules;
 import com.bms.app.ui.schedule.AvailabilityViewModel_HiltModules;
 import com.bms.app.ui.settings.viewmodel.ProfessionalInfoViewModel_HiltModules;
 import com.bms.app.ui.settings.viewmodel.SettingsViewModel_HiltModules;
@@ -182,6 +183,7 @@ public final class BmsApplication_HiltComponents {
           ProfessionalInfoViewModel_HiltModules.KeyModule.class,
           SettingsViewModel_HiltModules.KeyModule.class,
           SupportViewModel_HiltModules.KeyModule.class,
+          UserDashboardViewModel_HiltModules.KeyModule.class,
           UserDetailViewModel_HiltModules.KeyModule.class,
           VisibilityViewModel_HiltModules.KeyModule.class
       }
@@ -230,6 +232,7 @@ public final class BmsApplication_HiltComponents {
           ProfessionalInfoViewModel_HiltModules.BindsModule.class,
           SettingsViewModel_HiltModules.BindsModule.class,
           SupportViewModel_HiltModules.BindsModule.class,
+          UserDashboardViewModel_HiltModules.BindsModule.class,
           UserDetailViewModel_HiltModules.BindsModule.class,
           VisibilityViewModel_HiltModules.BindsModule.class
       }

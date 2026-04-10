@@ -33,10 +33,14 @@ sealed class DashboardUiState {
         val totalRevenue: Double,
         val pendingRequests: Int,
         val todayAppointments: List<Appointment>,
+        val pendingAppointments: List<Appointment> = emptyList(),
+        val pendingUserProfiles: Map<String, UserProfile> = emptyMap(),
         val patientNames: Map<String, String> = emptyMap(),
         val patientRoles: Map<String, String> = emptyMap(),
         val userInitials: String = "PR",
-        val currencySymbol: String = "₹"
+        val currencySymbol: String = "₹",
+        val isActionLoading: String? = null,
+        val errorMessage: String? = null
     ) : DashboardUiState()
     object ProfileIncomplete : DashboardUiState()
     data class Error(val message: String) : DashboardUiState()
@@ -58,9 +62,11 @@ class DashboardViewModel @Inject constructor(
         loadDashboard()
     }
 
-    fun loadDashboard() {
+    fun loadDashboard(isRefresh: Boolean = false) {
         viewModelScope.launch {
-            _uiState.update { DashboardUiState.Loading }
+            if (!isRefresh) {
+                _uiState.update { DashboardUiState.Loading }
+            }
             
             // 1. Wait for Supabase to initialize
             try { 
@@ -148,8 +154,17 @@ class DashboardViewModel @Inject constructor(
                     "₹"
                 }
 
+                val pendingAppointments = allAppointments.filter { it.status == "pending" }
+                val pendingUserIds = pendingAppointments.map { it.userId }.distinct()
+                val pendingProfilesResult = profileRepository.getProfilesByIds(pendingUserIds)
+                val pendingProfilesMap = if (pendingProfilesResult.isSuccess) {
+                    pendingProfilesResult.getOrThrow().associateBy { it.userId }
+                } else {
+                    emptyMap()
+                }
+
                 // Fetch patient names for today's schedule
-                val patientIds = todayAppointments.map { it.userId }.distinct()
+                val patientIds = (todayAppointments.map { it.userId } + pendingUserIds).distinct()
                 val patientProfilesResult = profileRepository.getProfilesByIds(patientIds)
                 val patientNamesMap = if (patientProfilesResult.isSuccess) {
                     patientProfilesResult.getOrThrow().associate { it.userId to it.fullName }
@@ -177,23 +192,72 @@ class DashboardViewModel @Inject constructor(
                         else providerProfile.consultationFee 
                     }
 
-                _uiState.update {
-                    DashboardUiState.Success(
-                        userProfile = userProfile,
-                        totalAppointments = totalAppointments,
-                        newPatients = newPatients,
-                        totalRevenue = totalRevenue,
-                        pendingRequests = pendingRequests,
-                        todayAppointments = todayAppointments,
-                        patientNames = patientNamesMap,
-                        patientRoles = patientRolesMap,
-                        userInitials = com.bms.app.domain.util.NameUtils.getInitials(userProfile.fullName),
-                        currencySymbol = currencySymbol
-                    )
-                }
+                    _uiState.update {
+                        DashboardUiState.Success(
+                            userProfile = userProfile,
+                            totalAppointments = totalAppointments,
+                            newPatients = newPatients,
+                            totalRevenue = totalRevenue,
+                            pendingRequests = pendingRequests,
+                            todayAppointments = todayAppointments,
+                            pendingAppointments = pendingAppointments,
+                            pendingUserProfiles = pendingProfilesMap,
+                            patientNames = patientNamesMap,
+                            patientRoles = patientRolesMap,
+                            userInitials = com.bms.app.domain.util.NameUtils.getInitials(userProfile.fullName),
+                            currencySymbol = currencySymbol
+                        )
+                    }
             } else {
                 _uiState.update { DashboardUiState.Error("Connectivity Issue: Failed to load appointments") }
             }
+        }
+    }
+
+    fun confirmAppointment(appointmentId: String) {
+        val currentState = _uiState.value
+        if (currentState !is DashboardUiState.Success) return
+        
+        viewModelScope.launch {
+            _uiState.update { currentState.copy(isActionLoading = appointmentId) }
+            val result = appointmentRepository.confirmAppointment(appointmentId)
+            if (result.isSuccess) {
+                loadDashboard(isRefresh = true)
+            } else {
+                val errorMsg = result.exceptionOrNull()?.message ?: "Unknown error"
+                val displayMsg = if (errorMsg.contains("{")) "Database Update Failed (Check Permissions)" else errorMsg.take(50)
+                _uiState.update { currentState.copy(
+                    isActionLoading = null,
+                    errorMessage = "Failed to confirm: $displayMsg"
+                ) }
+            }
+        }
+    }
+
+    fun rejectAppointment(appointmentId: String) {
+        val currentState = _uiState.value
+        if (currentState !is DashboardUiState.Success) return
+        
+        viewModelScope.launch {
+            _uiState.update { currentState.copy(isActionLoading = appointmentId) }
+            val result = appointmentRepository.rejectAppointment(appointmentId, "Declined by provider")
+            if (result.isSuccess) {
+                loadDashboard(isRefresh = true)
+            } else {
+                val errorMsg = result.exceptionOrNull()?.message ?: "Unknown error"
+                val displayMsg = if (errorMsg.contains("{")) "Database Update Failed (Check Permissions)" else errorMsg.take(50)
+                _uiState.update { currentState.copy(
+                    isActionLoading = null,
+                    errorMessage = "Failed to decline: $displayMsg"
+                ) }
+            }
+        }
+    }
+
+    fun clearError() {
+        val currentState = _uiState.value
+        if (currentState is DashboardUiState.Success) {
+            _uiState.update { currentState.copy(errorMessage = null) }
         }
     }
 }

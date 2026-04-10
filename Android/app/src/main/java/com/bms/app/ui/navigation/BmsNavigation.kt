@@ -24,9 +24,12 @@ import com.bms.app.ui.chat.ChatScreen
 import com.bms.app.ui.chat.SupportScreen
 import com.bms.app.ui.dashboard.AdminDashboardScreen
 import com.bms.app.ui.dashboard.ProviderDashboardScreen
+import com.bms.app.ui.dashboard.UserDashboardScreen
 import com.bms.app.ui.schedule.AdminScheduleScreen
 import com.bms.app.ui.schedule.ManageAvailabilityScreen
 import com.bms.app.ui.settings.*
+import com.bms.app.ui.user.BrowseProvidersScreen
+import com.bms.app.ui.user.MyBookingsScreen
 
 sealed class Screen(val route: String) {
     object Auth : Screen("auth")
@@ -48,6 +51,10 @@ sealed class Screen(val route: String) {
     object BookService : Screen("book_service/{providerId}")
     object Support : Screen("support")
     object Inbox : Screen("inbox")
+    // ── User Screens ──────────────────────────────────────
+    object UserDashboard : Screen("user_dashboard")
+    object MyBookings : Screen("my_bookings")
+    object BrowseProviders : Screen("browse_providers")
 }
 
 @Composable
@@ -62,9 +69,10 @@ fun BmsNavigation(
 
     val startDestination = remember {
         when (sessionManager.getUserRole()) {
-            "ADMIN" -> Screen.AdminDashboard.route
-            "PROVIDER", "USER" -> Screen.ProviderDashboard.route
-            else -> Screen.Auth.route
+            "ADMIN"    -> Screen.AdminDashboard.route
+            "PROVIDER" -> Screen.ProviderDashboard.route
+            "USER"     -> Screen.UserDashboard.route
+            else       -> Screen.Auth.route
         }
     }
 
@@ -74,9 +82,13 @@ fun BmsNavigation(
             "home" -> {
                 // Always read the role fresh — never use a stale captured value
                 val currentRole = sessionManager.getUserRole()
-                val homeRoute = if (currentRole == "ADMIN") Screen.AdminDashboard.route else Screen.ProviderDashboard.route
+                val homeRoute = when (currentRole) {
+                    "ADMIN"    -> Screen.AdminDashboard.route
+                    "PROVIDER" -> Screen.ProviderDashboard.route
+                    "USER"     -> Screen.UserDashboard.route
+                    else       -> Screen.Auth.route
+                }
                 navController.navigate(homeRoute) {
-                    // Pop back to the home screen itself (or nothing), clearing the stack above it
                     popUpTo(homeRoute) { inclusive = false }
                     launchSingleTop = true
                 }
@@ -86,6 +98,23 @@ fun BmsNavigation(
                     launchSingleTop = true
                 }
             }
+            // ── User nav actions ─────────────────────────────────────────
+            "my_bookings" -> {
+                navController.navigate(Screen.MyBookings.route) {
+                    launchSingleTop = true
+                }
+            }
+            "browse_providers" -> {
+                navController.navigate(Screen.BrowseProviders.route) {
+                    launchSingleTop = true
+                }
+            }
+            "messages" -> {
+                navController.navigate(Screen.Inbox.route) {
+                    launchSingleTop = true
+                }
+            }
+            // ── Shared nav actions ───────────────────────────────────────
             "schedule" -> {
                 val currentRole = sessionManager.getUserRole()
                 val scheduleRoute = if (currentRole == "ADMIN") Screen.AdminSchedule.route else "provider_schedule"
@@ -133,9 +162,9 @@ fun BmsNavigation(
                 onLoginSuccess = { role ->
                     sessionManager.saveUserRole(role.name)
                     val destination = when (role) {
-                        AccessLevel.ADMIN -> Screen.AdminDashboard.route
+                        AccessLevel.ADMIN    -> Screen.AdminDashboard.route
                         AccessLevel.PROVIDER -> Screen.ProviderDashboard.route
-                        AccessLevel.USER -> Screen.ProviderDashboard.route
+                        AccessLevel.USER     -> Screen.UserDashboard.route
                     }
                     navController.navigate(destination) {
                         popUpTo(Screen.Auth.route) { inclusive = true }
@@ -304,12 +333,21 @@ fun BmsNavigation(
         // ── Book Service ──────────────────────
         composable(Screen.BookService.route) { backStackEntry ->
             val providerId = backStackEntry.arguments?.getString("providerId") ?: ""
+            val role = sessionManager.getUserRole()
             BookServiceScreen(
                 providerId = providerId,
                 onBack = { navController.popBackStack() },
                 onBookingSuccess = {
-                    navController.navigate(Screen.AdminSchedule.route) {
-                        popUpTo(Screen.AdminBooking.route) { inclusive = true }
+                    if (role == "USER") {
+                        // Take user to My Bookings so they can see the confirmed appointment
+                        navController.navigate(Screen.MyBookings.route) {
+                            popUpTo(Screen.BrowseProviders.route) { inclusive = true }
+                        }
+                    } else {
+                        // Admin/Provider flow — go to schedule
+                        navController.navigate(Screen.AdminSchedule.route) {
+                            popUpTo(Screen.AdminBooking.route) { inclusive = true }
+                        }
                     }
                 }
             )
@@ -334,6 +372,50 @@ fun BmsNavigation(
                 onBack = { navController.popBackStack() },
                 onOpenChat = { userId ->
                     navController.navigate("chat/$userId")
+                }
+            )
+        }
+
+        // ── User Dashboard ────────────────────────
+        composable(Screen.UserDashboard.route) {
+            UserDashboardScreen(
+                onNavigate = handleBottomNav,
+                onMessageProvider = { userId ->
+                    // Standardized: Always pass auth UUID (userId) to chat route
+                    navController.navigate("chat/$userId")
+                },
+                onBrowseProviders = {
+                    navController.navigate(Screen.BrowseProviders.route) {
+                        launchSingleTop = true
+                    }
+                },
+                onViewAllBookings = {
+                    navController.navigate(Screen.MyBookings.route) {
+                        launchSingleTop = true
+                    }
+                },
+                onInboxClick = { navController.navigate(Screen.Inbox.route) }
+            )
+        }
+
+        // ── My Bookings ───────────────────────────
+        composable(Screen.MyBookings.route) {
+            MyBookingsScreen(
+                onNavigate = handleBottomNav,
+                onBack = { navController.popBackStack() },
+                onMessageProvider = { userId ->
+                    navController.navigate("chat/$userId")
+                }
+            )
+        }
+
+        // ── Browse Providers ──────────────────────
+        composable(Screen.BrowseProviders.route) {
+            BrowseProvidersScreen(
+                onNavigate = handleBottomNav,
+                onBack = { navController.popBackStack() },
+                onBookProvider = { providerId ->
+                    navController.navigate("book_service/$providerId")
                 }
             )
         }

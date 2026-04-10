@@ -411,3 +411,59 @@ fun ScheduleSkeleton() {
         SkeletonBox(height = 56.dp, shape = RoundedCornerShape(12.dp))
     }
 }
+
+// ── User Dashboard Skeleton ───────────────────────────────────────────────────
+
+@Composable
+fun UserDashboardSkeleton() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 24.dp)
+    ) {
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Greeting label + name
+        SkeletonBox(height = 14.dp, width = 80.dp)
+        Spacer(modifier = Modifier.height(8.dp))
+        SkeletonBox(height = 36.dp, width = 220.dp)
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Stats grid row 1
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            SkeletonStatCard(modifier = Modifier.weight(1f))
+            SkeletonStatCard(modifier = Modifier.weight(1f))
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+        // Stats grid row 2
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            SkeletonStatCard(modifier = Modifier.weight(1f))
+            SkeletonStatCard(modifier = Modifier.weight(1f))
+        }
+
+        Spacer(modifier = Modifier.height(28.dp))
+
+        // Next appointment banner
+        SkeletonBox(height = 120.dp, shape = RoundedCornerShape(20.dp))
+
+        Spacer(modifier = Modifier.height(28.dp))
+
+        // Section header row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SkeletonBox(height = 20.dp, width = 140.dp)
+            SkeletonBox(height = 14.dp, width = 60.dp)
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Booking list cards
+        repeat(2) {
+            SkeletonAppointmentCard()
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+    }
+}

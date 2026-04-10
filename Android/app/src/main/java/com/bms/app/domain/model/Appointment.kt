@@ -15,6 +15,9 @@ data class Appointment(
     val notes: String? = null,
     @SerialName("cancellation_reason") val cancellationReason: String? = null,
     @SerialName("is_video_consultation") val isVideoConsultation: Boolean? = false,
+    @SerialName("payment_method") val paymentMethod: String? = null,
+    @SerialName("payment_status") val paymentStatus: String? = "pending",
+    @SerialName("payment_amount") val paymentAmount: Int? = null,
     @SerialName("created_at") val createdAt: String = "",
     @SerialName("updated_at") val updatedAt: String = ""
 )

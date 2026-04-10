@@ -55,6 +55,16 @@ val SettingsNavItems = listOf(
     NavItem("Account", Icons.Outlined.Person, Icons.Outlined.Person, "account")
 )
 
+// ── User (Customer) Navigation ─────────────────────────────────────────
+// 5 items → triggers NotchedBottomBarShape with floating + center button
+val UserNavItems = listOf(
+    NavItem("Home",     Icons.Filled.Home,                Icons.Outlined.Home,              "home"),
+    NavItem("Bookings", Icons.Outlined.CalendarMonth,     Icons.Outlined.CalendarMonth,     "my_bookings"),
+    NavItem("Book",     Icons.Outlined.Add,               Icons.Outlined.Add,               "browse_providers"), // center + action
+    NavItem("Messages", Icons.Outlined.ChatBubbleOutline, Icons.Outlined.ChatBubbleOutline, "messages"),
+    NavItem("Settings", Icons.Filled.Settings,            Icons.Outlined.Settings,          "settings")
+)
+
 class NotchedBottomBarShape(
     private val cutoutRadius: Float,
     private val cornerRadius: Float = 0f

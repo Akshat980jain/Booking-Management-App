@@ -16,6 +16,8 @@ data class ProviderProfile(
     @SerialName("consultation_fee") val consultationFee: Double = 0.0,
     @SerialName("video_consultation_fee") val videoConsultationFee: Double? = null,
     @SerialName("video_enabled") val videoEnabled: Boolean = false,
+    @SerialName("require_video_payment") val requireVideoPayment: Boolean = false,
+    @SerialName("require_in_person_payment") val requireInPersonPayment: Boolean = false,
     @SerialName("is_active") val isActive: Boolean = true,
     @SerialName("is_approved") val isApproved: Boolean = false,
     @SerialName("is_verified") val isVerified: Boolean = false,

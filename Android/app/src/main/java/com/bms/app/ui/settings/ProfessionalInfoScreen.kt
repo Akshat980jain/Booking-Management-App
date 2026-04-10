@@ -37,6 +37,8 @@ fun ProfessionalInfoScreen(
     var location by remember { mutableStateOf("") }
     var videoEnabled by remember { mutableStateOf(false) }
     var videoFee by remember { mutableStateOf("") }
+    var requireVideoPayment by remember { mutableStateOf(false) }
+    var requireInPersonPayment by remember { mutableStateOf(false) }
     var availableForBookings by remember { mutableStateOf(true) }
     var dropdownExpanded by remember { mutableStateOf(false) }
 
@@ -57,6 +59,8 @@ fun ProfessionalInfoScreen(
             location = profile.location ?: ""
             videoEnabled = profile.videoEnabled
             videoFee = profile.videoConsultationFee?.toInt()?.toString() ?: ""
+            requireVideoPayment = profile.requireVideoPayment
+            requireInPersonPayment = profile.requireInPersonPayment
             availableForBookings = profile.isActive
         }
     }
@@ -293,6 +297,38 @@ fun ProfessionalInfoScreen(
                                 modifier = Modifier.padding(top = 4.dp, start = 4.dp)
                             )
 
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            SettingsToggleRow(
+                                title = "Require Upfront Payment for Video",
+                                subtitle = "Patients must pay online before booking video sessions",
+                                checked = requireVideoPayment,
+                                onCheckedChange = { requireVideoPayment = it }
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+                            HorizontalDivider(color = GhostBorder)
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // ── In-Person Settings ────────────────
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Outlined.PersonPin, null, tint = Primary, modifier = Modifier.size(22.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    "In-Person Visit Settings",
+                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                                    color = OnSurface
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            SettingsToggleRow(
+                                title = "Require Upfront Payment",
+                                subtitle = "Force patients to pay online for in-person visits",
+                                checked = requireInPersonPayment,
+                                onCheckedChange = { requireInPersonPayment = it }
+                            )
+
                             Spacer(modifier = Modifier.height(12.dp))
 
                             SettingsToggleRow(
@@ -321,6 +357,8 @@ fun ProfessionalInfoScreen(
                                     location = location.ifBlank { null },
                                     videoEnabled = videoEnabled,
                                     videoConsultationFee = videoFee.toDoubleOrNull(),
+                                    requireVideoPayment = requireVideoPayment,
+                                    requireInPersonPayment = requireInPersonPayment,
                                     isActive = availableForBookings
                                 )
                             )

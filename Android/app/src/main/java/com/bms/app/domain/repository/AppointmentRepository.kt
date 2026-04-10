@@ -8,6 +8,8 @@ interface AppointmentRepository {
     suspend fun getAllAppointments(): Result<List<Appointment>>
     suspend fun getTodayAppointments(providerProfileId: String): Result<List<Appointment>>
     suspend fun createAppointment(appointment: Appointment): Result<Unit>
+    suspend fun confirmAppointment(appointmentId: String): Result<Unit>
+    suspend fun rejectAppointment(appointmentId: String, reason: String? = null): Result<Unit>
     suspend fun cancelAppointment(appointmentId: String, reason: String?): Result<Unit>
     suspend fun completeAppointment(appointmentId: String): Result<Unit>
 }

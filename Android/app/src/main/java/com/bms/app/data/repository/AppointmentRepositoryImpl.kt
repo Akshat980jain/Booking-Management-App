@@ -6,6 +6,17 @@ import io.github.jan.supabase.postgrest.Postgrest
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName
+
+@Serializable
+data class AppointmentStatusUpdate(val status: String)
+
+@Serializable
+data class AppointmentRejectUpdate(
+    val status: String,
+    @SerialName("cancellation_reason") val cancellationReason: String?
+)
 
 @Singleton
 class AppointmentRepositoryImpl @Inject constructor(
@@ -79,12 +90,37 @@ class AppointmentRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun confirmAppointment(appointmentId: String): Result<Unit> {
+        return try {
+            postgrest["appointments"].update(
+                AppointmentStatusUpdate(status = "approved")
+            ) {
+                filter { eq("id", appointmentId) }
+            }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun rejectAppointment(appointmentId: String, reason: String?): Result<Unit> {
+        return try {
+            postgrest["appointments"].update(
+                AppointmentRejectUpdate(status = "rejected", cancellationReason = reason)
+            ) {
+                filter { eq("id", appointmentId) }
+            }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override suspend fun cancelAppointment(appointmentId: String, reason: String?): Result<Unit> {
         return try {
-            postgrest["appointments"].update({
-                set("status", "cancelled")
-                set("cancellation_reason", reason)
-            }) {
+            postgrest["appointments"].update(
+                AppointmentRejectUpdate(status = "cancelled", cancellationReason = reason)
+            ) {
                 filter { eq("id", appointmentId) }
             }
             Result.success(Unit)
@@ -95,9 +131,9 @@ class AppointmentRepositoryImpl @Inject constructor(
 
     override suspend fun completeAppointment(appointmentId: String): Result<Unit> {
         return try {
-            postgrest["appointments"].update({
-                set("status", "completed")
-            }) {
+            postgrest["appointments"].update(
+                AppointmentStatusUpdate(status = "completed")
+            ) {
                 filter { eq("id", appointmentId) }
             }
             Result.success(Unit)

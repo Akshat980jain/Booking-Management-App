@@ -40,7 +40,7 @@ class ChatViewModel @Inject constructor(
             // 1. Load Recipient Profile
             val profileRes = profileRepository.getProfileById(otherUserId)
             if (profileRes.isFailure) {
-                _uiState.update { ChatUiState.Error("Failed to load recipient profile") }
+                _uiState.update { ChatUiState.Error("Failed to load recipient profile. Ensure you are passing a valid Auth UUID (not an internal PK) and that the user exists in the profiles table.") }
                 return@launch
             }
             val recipient = profileRes.getOrThrow()

@@ -34,7 +34,14 @@ sealed class BookingUiState {
         val providerProfile: ProviderProfile,
         val availableSlots: List<String>,
         val selectedDate: LocalDate,
-        val selectedSlot: String? = null
+        val selectedSlot: String? = null,
+        val isVideoSelected: Boolean = false,
+        val selectedPaymentMethod: String = "at_clinic", // "online" or "at_clinic"
+        val bookingNote: String = ""
+    ) : BookingUiState()
+    data class ProcessingPayment(
+        val amount: Int,
+        val method: String // "upi", "card", etc.
     ) : BookingUiState()
     data class Error(val message: String) : BookingUiState()
     object BookingConfirmed : BookingUiState()
@@ -118,12 +125,21 @@ class BookingViewModel @Inject constructor(
                 }
             }
 
+            val existingState = _uiState.value as? BookingUiState.Success
+            val isVideo = existingState?.isVideoSelected ?: false
+            val requireOnline = if (isVideo) providerProfile.requireVideoPayment else providerProfile.requireInPersonPayment
+            val paymentMethod = if (requireOnline) "online" else (existingState?.selectedPaymentMethod ?: "at_clinic")
+
             _uiState.update {
                 BookingUiState.Success(
                     provider = provider,
                     providerProfile = providerProfile,
                     availableSlots = availableTimes,
-                    selectedDate = date
+                    selectedDate = date,
+                    isVideoSelected = isVideo,
+                    selectedPaymentMethod = paymentMethod,
+                    bookingNote = existingState?.bookingNote ?: ""
+                    // We purposefully drop selectedSlot because changing the date resets the time selection
                 )
             }
         } else {
@@ -138,120 +154,138 @@ class BookingViewModel @Inject constructor(
         }
     }
 
-    fun confirmBooking() {
+    fun toggleVideoConsultation(enabled: Boolean) {
         val currentState = _uiState.value
-        if (currentState !is BookingUiState.Success || currentState.selectedSlot == null) return
+        if (currentState is BookingUiState.Success) {
+            val requireOnline = if (enabled) currentState.providerProfile.requireVideoPayment 
+                               else currentState.providerProfile.requireInPersonPayment
+            
+            _uiState.update { 
+                currentState.copy(
+                    isVideoSelected = enabled,
+                    selectedPaymentMethod = if (requireOnline) "online" else currentState.selectedPaymentMethod
+                ) 
+            }
+        }
+    }
+
+    fun setPaymentMethod(method: String) {
+        val currentState = _uiState.value
+        if (currentState is BookingUiState.Success) {
+            _uiState.update { currentState.copy(selectedPaymentMethod = method) }
+        }
+    }
+
+    fun setBookingNote(note: String) {
+        val currentState = _uiState.value
+        if (currentState is BookingUiState.Success) {
+            _uiState.update { currentState.copy(bookingNote = note) }
+        }
+    }
+
+    private var lastSuccessState: BookingUiState.Success? = null
+
+    fun startBookingFlow() {
+        val currentState = _uiState.value as? BookingUiState.Success ?: return
+        lastSuccessState = currentState // Save for post-payment
+        
+        if (currentState.selectedPaymentMethod == "online") {
+            val amount = if (currentState.isVideoSelected)
+                currentState.providerProfile.videoConsultationFee ?: currentState.providerProfile.consultationFee
+            else currentState.providerProfile.consultationFee
+            
+            _uiState.update { 
+                BookingUiState.ProcessingPayment(
+                    amount = amount.toInt(),
+                    method = "UPI / Card"
+                )
+            }
+        } else {
+            confirmBooking()
+        }
+    }
+
+    fun confirmBooking() {
+        // Retrieve state either from current or saved
+        val state = (_uiState.value as? BookingUiState.Success) ?: lastSuccessState ?: return
+        if (state.selectedSlot == null) return
 
         viewModelScope.launch {
             _uiState.update { BookingUiState.Loading }
 
-            // 1. Permanent Initialization Wait + Extended Timeout for Admins
+            // 1. Session Readiness
             try { 
                 auth.awaitInitialization() 
-                if (auth.sessionStatus.value is SessionStatus.LoadingFromStorage) {
-                    kotlinx.coroutines.withTimeoutOrNull(5000) {
-                        auth.sessionStatus.filter { it !is SessionStatus.LoadingFromStorage }.first()
-                    }
+                if (auth.sessionStatus.filter { it !is SessionStatus.LoadingFromStorage }.first() is SessionStatus.Authenticated) {
+                    // Good to go
                 }
             } catch (_: Exception) {}
 
-            // 2. Multi-Layer Identity Resolver + Rescue 2.0
+            // 2. Identity Resolution
             var currentUserId = resolveUserId()
             if (currentUserId == null) {
-                tryRescueSession() // Forceful manual import from storage
+                tryRescueSession()
                 currentUserId = resolveUserId()
             }
             
-            // 3. Fallback: If still null, try one last direct lookup from SessionManager
-            if (currentUserId == null) {
-                try {
-                    val manualSession = sessionManager.loadSession()
-                    if (manualSession != null) {
-                        auth.importSession(manualSession)
-                        currentUserId = manualSession.user?.id
-                        // Emergency double-check after import
-                        if (currentUserId == null) {
-                            currentUserId = auth.currentUserOrNull()?.id
-                        }
-                    }
-                } catch (_: Exception) {}
-            }
-
-            // 4. Final Emergency Force Identity Bypass
-            if (currentUserId == null) {
-                val status = auth.sessionStatus.value
-                if (status is SessionStatus.Authenticated) {
-                    currentUserId = status.session.user?.id
-                }
-            }
-            
-            // 5. Force Refresh if Identity is still missing but not signed out
-            if (currentUserId == null && auth.sessionStatus.value !is SessionStatus.NotAuthenticated) {
-                try {
-                    auth.refreshCurrentSession()
-                    currentUserId = resolveUserId()
-                } catch (_: Exception) {}
-            }
-
-            if (currentUserId == null) {
-                // If we reach here, we have a genuine identity failure
-                _uiState.update { BookingUiState.Error("Identity Verification Failed: Your login state couldn't be resolved. Please restart the app.") }
+            val userId = currentUserId ?: resolveUserId()
+            if (userId == null) {
+                _uiState.update { BookingUiState.Error("Identity Failure: Please log in again.") }
                 return@launch
             }
 
-            // Pre-flight: re-check that selected slot is still free to avoid duplicate constraint
-            val freshResult = appointmentRepository.getAppointmentsForProvider(currentState.providerProfile.userId)
+            // 3. Slot Availability Final Check
+            val freshResult = appointmentRepository.getAppointmentsForProvider(state.providerProfile.userId)
             if (freshResult.isSuccess) {
                 val alreadyBooked = freshResult.getOrThrow().any {
-                    it.appointmentDate == currentState.selectedDate.toString() &&
-                    it.startTime == currentState.selectedSlot &&
-                    it.status != "cancelled"
+                    it.appointmentDate == state.selectedDate.toString() &&
+                    it.startTime == state.selectedSlot &&
+                    it.status != "cancelled" && it.status != "rejected"
                 }
                 if (alreadyBooked) {
-                    // Refresh the slot list so the user can pick another
-                    fetchAvailableSlots(currentState.provider, currentState.providerProfile, currentState.selectedDate)
-                    _uiState.update { state ->
-                        if (state is BookingUiState.Success) state.copy(selectedSlot = null) else state
-                    }
-                    _uiState.update { BookingUiState.Error("That time slot was just taken. Please pick another.") }
+                    fetchAvailableSlots(state.provider, state.providerProfile, state.selectedDate)
+                    _uiState.update { BookingUiState.Error("That time slot is no longer available.") }
                     return@launch
                 }
             }
 
-            val startTime = LocalTime.parse(currentState.selectedSlot)
-            val endTime = startTime.plusMinutes(30L) // Default 30-min session
+            val startTime = LocalTime.parse(state.selectedSlot)
+            val endTime = startTime.plusMinutes(30L) 
 
+            val currentFee = if (state.isVideoSelected)
+                state.providerProfile.videoConsultationFee ?: state.providerProfile.consultationFee
+            else state.providerProfile.consultationFee
+
+            // 4. Create Appointment
             val appointment = Appointment(
-                userId = currentUserId,
-                providerId = currentState.providerProfile.id,
-                appointmentDate = currentState.selectedDate.toString(),
-                startTime = currentState.selectedSlot,
+                userId = userId,
+                providerId = state.providerProfile.id,
+                appointmentDate = state.selectedDate.toString(),
+                startTime = state.selectedSlot!!,
                 endTime = endTime.format(DateTimeFormatter.ofPattern("HH:mm")),
                 status = "pending",
-                createdAt = LocalDate.now().toString()
+                notes = state.bookingNote.ifBlank { null },
+                isVideoConsultation = state.isVideoSelected,
+                paymentMethod = state.selectedPaymentMethod,
+                paymentStatus = if (state.selectedPaymentMethod == "online") "paid" else "pending",
+                paymentAmount = currentFee.toInt()
             )
 
             val result = appointmentRepository.createAppointment(appointment)
             if (result.isSuccess) {
                 _uiState.update { BookingUiState.BookingConfirmed }
             } else {
-                // Never expose raw errors to users — they may contain auth tokens or server URLs
                 val rawMsg = result.exceptionOrNull()?.message.orEmpty()
+                val roleStr = try {
+                    if (auth.sessionStatus.value is SessionStatus.Authenticated) {
+                        (auth.sessionStatus.value as SessionStatus.Authenticated).session.user?.userMetadata?.get("role")?.toString() ?: "User"
+                    } else "User"
+                } catch (_: Exception) { "User" }
+
                 val friendlyMsg = when {
-                    rawMsg.contains("unique", ignoreCase = true) ||
-                    rawMsg.contains("duplicate", ignoreCase = true) ->
-                        "That time slot was just booked. Please choose another."
-                    rawMsg.contains("network", ignoreCase = true) ||
-                    rawMsg.contains("timeout", ignoreCase = true) ->
-                        "Network error. Check your connection and try again."
-                    rawMsg.contains("JWT", ignoreCase = true) ||
-                    rawMsg.contains("token", ignoreCase = true) ->
-                        "Session expired. Please log in again."
-                    rawMsg.contains("auth", ignoreCase = true) ||
-                    rawMsg.contains("permission", ignoreCase = true) ||
-                    rawMsg.contains("policy", ignoreCase = true) ->
-                        "Permission Denied: Your account (Admin) may not have rights to create bookings in this environment."
-                    else -> "Booking failed: $rawMsg" // Show raw error for diagnosis if it's not a common case
+                    rawMsg.contains("unique", ignoreCase = true) -> "Slot already taken."
+                    rawMsg.contains("permission", ignoreCase = true) -> "Database Permission Denied ($roleStr)."
+                    else -> "Booking failed: $rawMsg"
                 }
                 _uiState.update { BookingUiState.Error(friendlyMsg) }
             }
