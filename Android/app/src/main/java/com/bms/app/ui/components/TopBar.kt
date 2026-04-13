@@ -31,6 +31,7 @@ fun BmsTopBar(
     onAvatarClick: () -> Unit = {},
     onMessagesClick: () -> Unit = {},
     avatarInitials: String = "AJ",
+    unreadCount: Int = 0,
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
@@ -69,12 +70,25 @@ fun BmsTopBar(
         actions = {
             if (showAvatar) {
                 IconButton(onClick = onMessagesClick) {
-                    Icon(
-                        imageVector = Icons.Outlined.ChatBubbleOutline,
-                        contentDescription = "Messages",
-                        tint = Primary,
-                        modifier = Modifier.size(24.dp)
-                    )
+                    Box {
+                        Icon(
+                            imageVector = Icons.Outlined.ChatBubbleOutline,
+                            contentDescription = "Messages",
+                            tint = Primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        if (unreadCount > 0) {
+                            Surface(
+                                color = MaterialTheme.colorScheme.error,
+                                shape = CircleShape,
+                                modifier = Modifier
+                                    .size(12.dp)
+                                    .align(Alignment.TopEnd)
+                                    .offset(x = 2.dp, y = (-2).dp),
+                                border = androidx.compose.foundation.BorderStroke(1.5.dp, Background)
+                            ) {}
+                        }
+                    }
                 }
                 
                 Spacer(modifier = Modifier.width(8.dp))

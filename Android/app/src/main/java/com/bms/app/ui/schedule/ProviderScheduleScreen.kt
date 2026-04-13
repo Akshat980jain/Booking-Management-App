@@ -35,6 +35,13 @@ fun ProviderScheduleScreen(
     val tabs = listOf("Today's Agenda", "Availability")
     
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    
+    LaunchedEffect(Unit) {
+        viewModel.uiEvents.collect { message ->
+            snackbarHostState.showSnackbar(message)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -43,9 +50,11 @@ fun ProviderScheduleScreen(
                 isLoading = uiState is AvailabilityUiState.Loading,
                 avatarInitials = if (uiState is AvailabilityUiState.Success) {
                     (uiState as AvailabilityUiState.Success).providerInitials
-                } else "P"
+                } else "P",
+                unreadCount = 0
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             BmsBottomNavBar(
                 items = MainNavItems,
@@ -129,23 +138,54 @@ fun AgendaTab(uiState: AvailabilityUiState, viewModel: AvailabilityViewModel, on
                     )
                 }
 
-                val today = java.time.LocalDate.now().toString()
-                val todayAppts = state.appointments.filter { it.appointmentDate == today }
+                val todayDate = java.time.LocalDate.now()
+                val upcomingAppts = state.appointments
+                    .filter { it.status.lowercase() !in setOf("cancelled", "rejected") }
+                    .filter {
+                        runCatching { java.time.LocalDate.parse(it.appointmentDate) >= todayDate }.getOrElse { true }
+                    }
+                    .sortedWith(compareBy({ it.appointmentDate }, { it.startTime }))
 
-                if (todayAppts.isEmpty()) {
+                if (upcomingAppts.isEmpty()) {
                     item {
                         EmptyStatePlaceholder()
                     }
                 } else {
-                    items(todayAppts) { appointment ->
-                        ProviderAppointmentCard(
-                            appointment = appointment, 
-                            users = state.users, 
-                            currencySymbol = state.currencySymbol,
-                            physicalFee = state.physicalFee,
-                            videoFee = state.videoFee,
-                            onComplete = { viewModel.completeAppointment(appointment.id) }
-                        )
+                    // Group by date, sorted chronologically (present → future)
+                    val grouped = upcomingAppts.groupBy { it.appointmentDate }
+                    val sortedDateKeys = grouped.keys.sortedWith(compareBy {
+                        runCatching { java.time.LocalDate.parse(it) }.getOrElse { java.time.LocalDate.MAX }
+                    })
+                    sortedDateKeys.forEach { dateStr ->
+                        val appointments = grouped[dateStr] ?: return@forEach
+                        item {
+                            val label = runCatching {
+                                val d = java.time.LocalDate.parse(dateStr)
+                                when (d) {
+                                    todayDate -> "Today"
+                                    todayDate.plusDays(1) -> "Tomorrow"
+                                    else -> d.format(java.time.format.DateTimeFormatter.ofPattern("EEEE, d MMM"))
+                                }
+                            }.getOrElse { dateStr }
+                            
+                            Text(
+                                text = label,
+                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                                color = Primary,
+                                modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                            )
+                        }
+
+                        items(appointments) { appointment ->
+                            ProviderAppointmentCard(
+                                appointment = appointment, 
+                                users = state.users, 
+                                currencySymbol = state.currencySymbol,
+                                physicalFee = state.physicalFee,
+                                videoFee = state.videoFee,
+                                onComplete = { viewModel.completeAppointment(appointment.id) }
+                            )
+                        }
                     }
                 }
                 
@@ -172,11 +212,11 @@ fun DailyPulseHeader(state: AvailabilityUiState.Success) {
                         .background(Primary.copy(alpha = 0.1f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(Icons.Outlined.WavingHand, null, tint = Primary, modifier = Modifier.size(24.dp))
+                    Icon(Icons.Outlined.Schedule, null, tint = Primary, modifier = Modifier.size(24.dp))
                 }
                 Spacer(Modifier.width(12.dp))
                 Text(
-                    "Good Morning, ${state.providerName.split(" ").firstOrNull()}!",
+                    "Schedule Hub",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = OnSurface
@@ -273,6 +313,19 @@ fun ProviderAppointmentCard(
                     Column {
                         Text(clientName, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, color = OnSurface)
                         Row(verticalAlignment = Alignment.CenterVertically) {
+                            val today = java.time.LocalDate.now().toString()
+                            if (appointment.appointmentDate != today) {
+                                val dateLabel = runCatching {
+                                    java.time.LocalDate.parse(appointment.appointmentDate)
+                                        .format(java.time.format.DateTimeFormatter.ofPattern("d MMM"))
+                                }.getOrElse { appointment.appointmentDate }
+                                Text(
+                                    text = "$dateLabel • ",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Primary,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                             Icon(Icons.Outlined.Schedule, null, tint = OnSurfaceVariant, modifier = Modifier.size(14.dp))
                             Spacer(Modifier.width(4.dp))
                             Text("${appointment.startTime.take(5)} - ${appointment.endTime.take(5)}", style = MaterialTheme.typography.bodySmall, color = OnSurfaceVariant)
@@ -282,7 +335,12 @@ fun ProviderAppointmentCard(
                 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     StatusBadge(appointment.status)
-                    if (appointment.status.lowercase() != "completed" && appointment.status.lowercase() != "cancelled") {
+                    val isToday = runCatching { 
+                        java.time.LocalDate.parse(appointment.appointmentDate) == java.time.LocalDate.now() 
+                    }.getOrElse { 
+                        appointment.appointmentDate == java.time.LocalDate.now().toString() 
+                    }
+                    if (appointment.status.lowercase() != "completed" && appointment.status.lowercase() != "cancelled" && isToday) {
                         Spacer(Modifier.width(8.dp))
                         IconButton(
                             onClick = onComplete,
@@ -305,13 +363,12 @@ fun ProviderAppointmentCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    VibeTag("Regular", Color(0xFF10B981))
                     if (appointment.isVideoConsultation == true) {
-                        VibeTag("Video", Primary)
+                        VibeTag("Video Call", Primary)
+                    } else {
+                        VibeTag("At Office", Color(0xFF6366F1))
                     }
-                    if (clientName.length % 2 == 0) { // Demo badge
-                        VibeTag("VIP", Color(0xFF8B5CF6))
-                    }
+                    VibeTag("Regular", Color(0xFF10B981))
                 }
                 
                 val sessionFee = if (appointment.isVideoConsultation == true && videoFee > 0) videoFee else physicalFee

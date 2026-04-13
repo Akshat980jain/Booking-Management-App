@@ -87,4 +87,13 @@ class AuthRepositoryImpl @Inject constructor(
     override fun getCurrentUserId(): String? {
         return auth.currentSessionOrNull()?.user?.id
     }
+
+    override suspend fun resetPassword(email: String): Result<Unit> {
+        return try {
+            auth.resetPasswordForEmail(email)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

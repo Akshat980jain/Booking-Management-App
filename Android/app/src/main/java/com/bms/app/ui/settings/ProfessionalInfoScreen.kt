@@ -343,7 +343,7 @@ fun ProfessionalInfoScreen(
                     Spacer(modifier = Modifier.height(24.dp))
 
                     // ── Save Button ───────────────────────────
-                    BmsPrimaryButton(
+                    BmsButton(
                         text = "Save Professional Info",
                         onClick = {
                             val currentProfile = (uiState as ProfessionalInfoUiState.Success).profile

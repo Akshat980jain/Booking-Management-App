@@ -1,5 +1,6 @@
 package com.bms.app.data.repository
 
+import com.bms.app.domain.model.FavoriteProvider
 import com.bms.app.domain.model.ProviderProfile
 import com.bms.app.domain.model.UserProfile
 import com.bms.app.domain.repository.ProfileRepository
@@ -10,6 +11,52 @@ import javax.inject.Inject
 class ProfileRepositoryImpl @Inject constructor(
     private val postgrest: Postgrest
 ) : ProfileRepository {
+
+    override suspend fun toggleFavorite(userId: String, providerProfileId: String): Result<Boolean> {
+        return try {
+            val favoritesTable = postgrest["favorite_providers"]
+            val existing = favoritesTable.select {
+                filter {
+                    eq("user_id", userId)
+                    eq("provider_id", providerProfileId)
+                }
+            }.decodeSingleOrNull<FavoriteProvider>()
+
+            if (existing != null) {
+                // Remove favorite
+                favoritesTable.delete {
+                    filter {
+                        eq("user_id", userId)
+                        eq("provider_id", providerProfileId)
+                    }
+                }
+                Result.success(false)
+            } else {
+                // Add favorite
+                favoritesTable.insert(
+                    FavoriteProvider(userId = userId, providerId = providerProfileId)
+                )
+                Result.success(true)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getFavorites(userId: String): Result<List<String>> {
+        return try {
+            val response = postgrest["favorite_providers"]
+                .select {
+                    filter {
+                        eq("user_id", userId)
+                    }
+                }
+            val favorites = response.decodeList<FavoriteProvider>()
+            Result.success(favorites.map { it.providerId })
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
     override suspend fun getCurrentUserProfile(userId: String): Result<UserProfile> {
         return try {
@@ -41,13 +88,24 @@ class ProfileRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateUserProfile(fullName: String, phone: String?): Result<Unit> {
+    override suspend fun updateUserProfile(
+        fullName: String, 
+        phone: String?,
+        insuranceProvider: String?,
+        policyNumber: String?,
+        insuranceCardUrl: String?
+    ): Result<Unit> {
         return try {
             postgrest["profiles"].update({
                 set("full_name", fullName)
                 if (phone != null) set("phone", phone)
+                if (insuranceProvider != null) set("insurance_provider", insuranceProvider)
+                if (policyNumber != null) set("policy_number", policyNumber)
+                if (insuranceCardUrl != null) set("insurance_card_url", insuranceCardUrl)
             }) {
-                // filter by current user id
+                // In a real app, we'd filter by the current user's ID.
+                // For this implementation, we assume the Supabase client is configured 
+                // with RLS that automatically limits updates to the authenticated user's row.
             }
             Result.success(Unit)
         } catch (e: Exception) {

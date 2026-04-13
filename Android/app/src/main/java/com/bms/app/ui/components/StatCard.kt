@@ -1,6 +1,7 @@
 package com.bms.app.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -24,10 +25,11 @@ fun StatCard(
     badgeTextColor: Color = OnStatusActive,
     isHighlighted: Boolean = false,
     containerColor: Color = SurfaceContainerLowest,
-    contentColor: Color = OnSurface
+    contentColor: Color = OnSurface,
+    onClick: (() -> Unit)? = null
 ) {
     Surface(
-        modifier = modifier,
+        modifier = if (onClick != null) modifier.clickable(onClick = onClick) else modifier,
         color = if (isHighlighted) SurfaceContainerLow else containerColor,
         shape = CardShape,
         shadowElevation = 0.dp,

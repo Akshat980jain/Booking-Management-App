@@ -37,7 +37,9 @@ sealed class BookingUiState {
         val selectedSlot: String? = null,
         val isVideoSelected: Boolean = false,
         val selectedPaymentMethod: String = "at_clinic", // "online" or "at_clinic"
-        val bookingNote: String = ""
+        val bookingNote: String = "",
+        val isFeeWaived: Boolean = false,
+        val waivedAmount: Int = 0
     ) : BookingUiState()
     data class ProcessingPayment(
         val amount: Int,
@@ -60,8 +62,9 @@ class BookingViewModel @Inject constructor(
     val uiState: StateFlow<BookingUiState> = _uiState.asStateFlow()
 
     private var currentProviderId: String? = null
+    private var waivedOldAppointment: Appointment? = null
 
-    fun loadProviderBookingData(userId: String, date: LocalDate = LocalDate.now()) {
+    fun loadProviderBookingData(userId: String, waivedBy: String? = null, date: LocalDate = LocalDate.now()) {
         currentProviderId = userId
         viewModelScope.launch {
             _uiState.update { BookingUiState.Loading }
@@ -71,6 +74,23 @@ class BookingViewModel @Inject constructor(
                 auth.awaitInitialization() 
                 if (resolveUserId() == null) tryRescueSession() // Try rescue early
             } catch (_: Exception) {}
+
+            var isWaived = false
+            var wAmount = 0
+            if (waivedBy != null) {
+                val uid = resolveUserId()
+                if (uid != null) {
+                    try {
+                        val appts = appointmentRepository.getAppointmentsForUser(uid).getOrNull() ?: emptyList()
+                        val oldAppt = appts.find { it.id == waivedBy && it.paymentStatus == "paid" }
+                        if (oldAppt != null) {
+                            waivedOldAppointment = oldAppt
+                            isWaived = true
+                            wAmount = oldAppt.paymentAmount ?: 0
+                        }
+                    } catch (_: Exception) {}
+                }
+            }
 
             val profileResult = profileRepository.getProfileById(userId)
             val providerProfileResult = profileRepository.getProviderProfile(userId)
@@ -138,7 +158,9 @@ class BookingViewModel @Inject constructor(
                     selectedDate = date,
                     isVideoSelected = isVideo,
                     selectedPaymentMethod = paymentMethod,
-                    bookingNote = existingState?.bookingNote ?: ""
+                    bookingNote = existingState?.bookingNote ?: "",
+                    isFeeWaived = waivedOldAppointment != null,
+                    waivedAmount = waivedOldAppointment?.paymentAmount ?: 0
                     // We purposefully drop selectedSlot because changing the date resets the time selection
                 )
             }
@@ -188,6 +210,11 @@ class BookingViewModel @Inject constructor(
     fun startBookingFlow() {
         val currentState = _uiState.value as? BookingUiState.Success ?: return
         lastSuccessState = currentState // Save for post-payment
+        
+        if (currentState.isFeeWaived) {
+            confirmBooking()
+            return
+        }
         
         if (currentState.selectedPaymentMethod == "online") {
             val amount = if (currentState.isVideoSelected)
@@ -256,6 +283,12 @@ class BookingViewModel @Inject constructor(
                 state.providerProfile.videoConsultationFee ?: state.providerProfile.consultationFee
             else state.providerProfile.consultationFee
 
+            val finalPaymentStatus = if (state.isFeeWaived) "paid" 
+                else if (state.selectedPaymentMethod == "online") "paid" 
+                else "pending"
+                
+            val finalAmount = if (state.isFeeWaived) state.waivedAmount else currentFee.toInt()
+
             // 4. Create Appointment
             val appointment = Appointment(
                 userId = userId,
@@ -266,13 +299,18 @@ class BookingViewModel @Inject constructor(
                 status = "pending",
                 notes = state.bookingNote.ifBlank { null },
                 isVideoConsultation = state.isVideoSelected,
-                paymentMethod = state.selectedPaymentMethod,
-                paymentStatus = if (state.selectedPaymentMethod == "online") "paid" else "pending",
-                paymentAmount = currentFee.toInt()
+                paymentMethod = if (state.isFeeWaived) "carry_over" else state.selectedPaymentMethod,
+                paymentStatus = finalPaymentStatus,
+                paymentAmount = finalAmount
             )
 
             val result = appointmentRepository.createAppointment(appointment)
             if (result.isSuccess) {
+                if (state.isFeeWaived && waivedOldAppointment != null) {
+                    try {
+                        appointmentRepository.cancelAppointment(waivedOldAppointment!!.id, "Resolved: Rescheduled")
+                    } catch (e: Exception) {}
+                }
                 _uiState.update { BookingUiState.BookingConfirmed }
             } else {
                 val rawMsg = result.exceptionOrNull()?.message.orEmpty()

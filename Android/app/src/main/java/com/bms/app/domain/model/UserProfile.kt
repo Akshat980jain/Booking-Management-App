@@ -21,5 +21,8 @@ data class UserProfile(
     val timezone: String? = "UTC",
     @SerialName("created_at") val createdAt: String = "",
     @SerialName("updated_at") val updatedAt: String = "",
-    val status: String? = "active"
+    val status: String? = "active",
+    @SerialName("insurance_provider") val insuranceProvider: String? = null,
+    @SerialName("policy_number") val policyNumber: String? = null,
+    @SerialName("insurance_card_url") val insuranceCardUrl: String? = null
 )

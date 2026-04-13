@@ -61,7 +61,7 @@ val UserNavItems = listOf(
     NavItem("Home",     Icons.Filled.Home,                Icons.Outlined.Home,              "home"),
     NavItem("Bookings", Icons.Outlined.CalendarMonth,     Icons.Outlined.CalendarMonth,     "my_bookings"),
     NavItem("Book",     Icons.Outlined.Add,               Icons.Outlined.Add,               "browse_providers"), // center + action
-    NavItem("Messages", Icons.Outlined.ChatBubbleOutline, Icons.Outlined.ChatBubbleOutline, "messages"),
+    NavItem("Saved",    Icons.Outlined.Favorite,          Icons.Outlined.FavoriteBorder,    "favorites"),
     NavItem("Settings", Icons.Filled.Settings,            Icons.Outlined.Settings,          "settings")
 )
 

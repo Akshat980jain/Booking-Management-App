@@ -82,3 +82,5 @@ val StatusPending      = Color(0xFFFFF3E0)
 val OnStatusPending    = Color(0xFFE65100)
 val StatusInfo         = Color(0xFFE3F2FD)
 val OnStatusInfo       = Color(0xFF1565C0)
+
+val Gold               = Color(0xFFFFBF00)

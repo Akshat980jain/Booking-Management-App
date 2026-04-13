@@ -129,7 +129,7 @@ public abstract class BookingUiState {
         }
     }
     
-    @kotlin.Metadata(mv = {1, 9, 0}, k = 1, xi = 48, d1 = {"\u0000>\n\u0002\u0018\u0002\n\u0002\u0018\u0002\n\u0000\n\u0002\u0018\u0002\n\u0000\n\u0002\u0018\u0002\n\u0000\n\u0002\u0010 \n\u0002\u0010\u000e\n\u0000\n\u0002\u0018\u0002\n\u0002\b\u0002\n\u0002\u0010\u000b\n\u0002\b\u001b\n\u0002\u0010\u0000\n\u0000\n\u0002\u0010\b\n\u0002\b\u0002\b\u0086\b\u0018\u00002\u00020\u0001BU\u0012\u0006\u0010\u0002\u001a\u00020\u0003\u0012\u0006\u0010\u0004\u001a\u00020\u0005\u0012\f\u0010\u0006\u001a\b\u0012\u0004\u0012\u00020\b0\u0007\u0012\u0006\u0010\t\u001a\u00020\n\u0012\n\b\u0002\u0010\u000b\u001a\u0004\u0018\u00010\b\u0012\b\b\u0002\u0010\f\u001a\u00020\r\u0012\b\b\u0002\u0010\u000e\u001a\u00020\b\u0012\b\b\u0002\u0010\u000f\u001a\u00020\b\u00a2\u0006\u0002\u0010\u0010J\t\u0010\u001e\u001a\u00020\u0003H\u00c6\u0003J\t\u0010\u001f\u001a\u00020\u0005H\u00c6\u0003J\u000f\u0010 \u001a\b\u0012\u0004\u0012\u00020\b0\u0007H\u00c6\u0003J\t\u0010!\u001a\u00020\nH\u00c6\u0003J\u000b\u0010\"\u001a\u0004\u0018\u00010\bH\u00c6\u0003J\t\u0010#\u001a\u00020\rH\u00c6\u0003J\t\u0010$\u001a\u00020\bH\u00c6\u0003J\t\u0010%\u001a\u00020\bH\u00c6\u0003Ja\u0010&\u001a\u00020\u00002\b\b\u0002\u0010\u0002\u001a\u00020\u00032\b\b\u0002\u0010\u0004\u001a\u00020\u00052\u000e\b\u0002\u0010\u0006\u001a\b\u0012\u0004\u0012\u00020\b0\u00072\b\b\u0002\u0010\t\u001a\u00020\n2\n\b\u0002\u0010\u000b\u001a\u0004\u0018\u00010\b2\b\b\u0002\u0010\f\u001a\u00020\r2\b\b\u0002\u0010\u000e\u001a\u00020\b2\b\b\u0002\u0010\u000f\u001a\u00020\bH\u00c6\u0001J\u0013\u0010\'\u001a\u00020\r2\b\u0010(\u001a\u0004\u0018\u00010)H\u00d6\u0003J\t\u0010*\u001a\u00020+H\u00d6\u0001J\t\u0010,\u001a\u00020\bH\u00d6\u0001R\u0017\u0010\u0006\u001a\b\u0012\u0004\u0012\u00020\b0\u0007\u00a2\u0006\b\n\u0000\u001a\u0004\b\u0011\u0010\u0012R\u0011\u0010\u000f\u001a\u00020\b\u00a2\u0006\b\n\u0000\u001a\u0004\b\u0013\u0010\u0014R\u0011\u0010\f\u001a\u00020\r\u00a2\u0006\b\n\u0000\u001a\u0004\b\f\u0010\u0015R\u0011\u0010\u0002\u001a\u00020\u0003\u00a2\u0006\b\n\u0000\u001a\u0004\b\u0016\u0010\u0017R\u0011\u0010\u0004\u001a\u00020\u0005\u00a2\u0006\b\n\u0000\u001a\u0004\b\u0018\u0010\u0019R\u0011\u0010\t\u001a\u00020\n\u00a2\u0006\b\n\u0000\u001a\u0004\b\u001a\u0010\u001bR\u0011\u0010\u000e\u001a\u00020\b\u00a2\u0006\b\n\u0000\u001a\u0004\b\u001c\u0010\u0014R\u0013\u0010\u000b\u001a\u0004\u0018\u00010\b\u00a2\u0006\b\n\u0000\u001a\u0004\b\u001d\u0010\u0014\u00a8\u0006-"}, d2 = {"Lcom/bms/app/ui/admin/BookingUiState$Success;", "Lcom/bms/app/ui/admin/BookingUiState;", "provider", "Lcom/bms/app/domain/model/UserProfile;", "providerProfile", "Lcom/bms/app/domain/model/ProviderProfile;", "availableSlots", "", "", "selectedDate", "Ljava/time/LocalDate;", "selectedSlot", "isVideoSelected", "", "selectedPaymentMethod", "bookingNote", "(Lcom/bms/app/domain/model/UserProfile;Lcom/bms/app/domain/model/ProviderProfile;Ljava/util/List;Ljava/time/LocalDate;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;)V", "getAvailableSlots", "()Ljava/util/List;", "getBookingNote", "()Ljava/lang/String;", "()Z", "getProvider", "()Lcom/bms/app/domain/model/UserProfile;", "getProviderProfile", "()Lcom/bms/app/domain/model/ProviderProfile;", "getSelectedDate", "()Ljava/time/LocalDate;", "getSelectedPaymentMethod", "getSelectedSlot", "component1", "component2", "component3", "component4", "component5", "component6", "component7", "component8", "copy", "equals", "other", "", "hashCode", "", "toString", "app_debug"})
+    @kotlin.Metadata(mv = {1, 9, 0}, k = 1, xi = 48, d1 = {"\u0000@\n\u0002\u0018\u0002\n\u0002\u0018\u0002\n\u0000\n\u0002\u0018\u0002\n\u0000\n\u0002\u0018\u0002\n\u0000\n\u0002\u0010 \n\u0002\u0010\u000e\n\u0000\n\u0002\u0018\u0002\n\u0002\b\u0002\n\u0002\u0010\u000b\n\u0002\b\u0004\n\u0002\u0010\b\n\u0002\b\u001d\n\u0002\u0010\u0000\n\u0002\b\u0003\b\u0086\b\u0018\u00002\u00020\u0001Bi\u0012\u0006\u0010\u0002\u001a\u00020\u0003\u0012\u0006\u0010\u0004\u001a\u00020\u0005\u0012\f\u0010\u0006\u001a\b\u0012\u0004\u0012\u00020\b0\u0007\u0012\u0006\u0010\t\u001a\u00020\n\u0012\n\b\u0002\u0010\u000b\u001a\u0004\u0018\u00010\b\u0012\b\b\u0002\u0010\f\u001a\u00020\r\u0012\b\b\u0002\u0010\u000e\u001a\u00020\b\u0012\b\b\u0002\u0010\u000f\u001a\u00020\b\u0012\b\b\u0002\u0010\u0010\u001a\u00020\r\u0012\b\b\u0002\u0010\u0011\u001a\u00020\u0012\u00a2\u0006\u0002\u0010\u0013J\t\u0010#\u001a\u00020\u0003H\u00c6\u0003J\t\u0010$\u001a\u00020\u0012H\u00c6\u0003J\t\u0010%\u001a\u00020\u0005H\u00c6\u0003J\u000f\u0010&\u001a\b\u0012\u0004\u0012\u00020\b0\u0007H\u00c6\u0003J\t\u0010\'\u001a\u00020\nH\u00c6\u0003J\u000b\u0010(\u001a\u0004\u0018\u00010\bH\u00c6\u0003J\t\u0010)\u001a\u00020\rH\u00c6\u0003J\t\u0010*\u001a\u00020\bH\u00c6\u0003J\t\u0010+\u001a\u00020\bH\u00c6\u0003J\t\u0010,\u001a\u00020\rH\u00c6\u0003Ju\u0010-\u001a\u00020\u00002\b\b\u0002\u0010\u0002\u001a\u00020\u00032\b\b\u0002\u0010\u0004\u001a\u00020\u00052\u000e\b\u0002\u0010\u0006\u001a\b\u0012\u0004\u0012\u00020\b0\u00072\b\b\u0002\u0010\t\u001a\u00020\n2\n\b\u0002\u0010\u000b\u001a\u0004\u0018\u00010\b2\b\b\u0002\u0010\f\u001a\u00020\r2\b\b\u0002\u0010\u000e\u001a\u00020\b2\b\b\u0002\u0010\u000f\u001a\u00020\b2\b\b\u0002\u0010\u0010\u001a\u00020\r2\b\b\u0002\u0010\u0011\u001a\u00020\u0012H\u00c6\u0001J\u0013\u0010.\u001a\u00020\r2\b\u0010/\u001a\u0004\u0018\u000100H\u00d6\u0003J\t\u00101\u001a\u00020\u0012H\u00d6\u0001J\t\u00102\u001a\u00020\bH\u00d6\u0001R\u0017\u0010\u0006\u001a\b\u0012\u0004\u0012\u00020\b0\u0007\u00a2\u0006\b\n\u0000\u001a\u0004\b\u0014\u0010\u0015R\u0011\u0010\u000f\u001a\u00020\b\u00a2\u0006\b\n\u0000\u001a\u0004\b\u0016\u0010\u0017R\u0011\u0010\u0010\u001a\u00020\r\u00a2\u0006\b\n\u0000\u001a\u0004\b\u0010\u0010\u0018R\u0011\u0010\f\u001a\u00020\r\u00a2\u0006\b\n\u0000\u001a\u0004\b\f\u0010\u0018R\u0011\u0010\u0002\u001a\u00020\u0003\u00a2\u0006\b\n\u0000\u001a\u0004\b\u0019\u0010\u001aR\u0011\u0010\u0004\u001a\u00020\u0005\u00a2\u0006\b\n\u0000\u001a\u0004\b\u001b\u0010\u001cR\u0011\u0010\t\u001a\u00020\n\u00a2\u0006\b\n\u0000\u001a\u0004\b\u001d\u0010\u001eR\u0011\u0010\u000e\u001a\u00020\b\u00a2\u0006\b\n\u0000\u001a\u0004\b\u001f\u0010\u0017R\u0013\u0010\u000b\u001a\u0004\u0018\u00010\b\u00a2\u0006\b\n\u0000\u001a\u0004\b \u0010\u0017R\u0011\u0010\u0011\u001a\u00020\u0012\u00a2\u0006\b\n\u0000\u001a\u0004\b!\u0010\"\u00a8\u00063"}, d2 = {"Lcom/bms/app/ui/admin/BookingUiState$Success;", "Lcom/bms/app/ui/admin/BookingUiState;", "provider", "Lcom/bms/app/domain/model/UserProfile;", "providerProfile", "Lcom/bms/app/domain/model/ProviderProfile;", "availableSlots", "", "", "selectedDate", "Ljava/time/LocalDate;", "selectedSlot", "isVideoSelected", "", "selectedPaymentMethod", "bookingNote", "isFeeWaived", "waivedAmount", "", "(Lcom/bms/app/domain/model/UserProfile;Lcom/bms/app/domain/model/ProviderProfile;Ljava/util/List;Ljava/time/LocalDate;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;ZI)V", "getAvailableSlots", "()Ljava/util/List;", "getBookingNote", "()Ljava/lang/String;", "()Z", "getProvider", "()Lcom/bms/app/domain/model/UserProfile;", "getProviderProfile", "()Lcom/bms/app/domain/model/ProviderProfile;", "getSelectedDate", "()Ljava/time/LocalDate;", "getSelectedPaymentMethod", "getSelectedSlot", "getWaivedAmount", "()I", "component1", "component10", "component2", "component3", "component4", "component5", "component6", "component7", "component8", "component9", "copy", "equals", "other", "", "hashCode", "toString", "app_debug"})
     public static final class Success extends com.bms.app.ui.admin.BookingUiState {
         @org.jetbrains.annotations.NotNull()
         private final com.bms.app.domain.model.UserProfile provider = null;
@@ -146,6 +146,8 @@ public abstract class BookingUiState {
         private final java.lang.String selectedPaymentMethod = null;
         @org.jetbrains.annotations.NotNull()
         private final java.lang.String bookingNote = null;
+        private final boolean isFeeWaived = false;
+        private final int waivedAmount = 0;
         
         public Success(@org.jetbrains.annotations.NotNull()
         com.bms.app.domain.model.UserProfile provider, @org.jetbrains.annotations.NotNull()
@@ -154,7 +156,7 @@ public abstract class BookingUiState {
         java.time.LocalDate selectedDate, @org.jetbrains.annotations.Nullable()
         java.lang.String selectedSlot, boolean isVideoSelected, @org.jetbrains.annotations.NotNull()
         java.lang.String selectedPaymentMethod, @org.jetbrains.annotations.NotNull()
-        java.lang.String bookingNote) {
+        java.lang.String bookingNote, boolean isFeeWaived, int waivedAmount) {
         }
         
         @org.jetbrains.annotations.NotNull()
@@ -196,9 +198,21 @@ public abstract class BookingUiState {
             return null;
         }
         
+        public final boolean isFeeWaived() {
+            return false;
+        }
+        
+        public final int getWaivedAmount() {
+            return 0;
+        }
+        
         @org.jetbrains.annotations.NotNull()
         public final com.bms.app.domain.model.UserProfile component1() {
             return null;
+        }
+        
+        public final int component10() {
+            return 0;
         }
         
         @org.jetbrains.annotations.NotNull()
@@ -235,6 +249,10 @@ public abstract class BookingUiState {
             return null;
         }
         
+        public final boolean component9() {
+            return false;
+        }
+        
         @org.jetbrains.annotations.NotNull()
         public final com.bms.app.ui.admin.BookingUiState.Success copy(@org.jetbrains.annotations.NotNull()
         com.bms.app.domain.model.UserProfile provider, @org.jetbrains.annotations.NotNull()
@@ -243,7 +261,7 @@ public abstract class BookingUiState {
         java.time.LocalDate selectedDate, @org.jetbrains.annotations.Nullable()
         java.lang.String selectedSlot, boolean isVideoSelected, @org.jetbrains.annotations.NotNull()
         java.lang.String selectedPaymentMethod, @org.jetbrains.annotations.NotNull()
-        java.lang.String bookingNote) {
+        java.lang.String bookingNote, boolean isFeeWaived, int waivedAmount) {
             return null;
         }
         

@@ -39,6 +39,7 @@ import java.util.*
 @Composable
 fun BookServiceScreen(
     providerId: String,
+    waivedBy: String? = null,
     onBack: () -> Unit,
     onBookingSuccess: () -> Unit,
     viewModel: BookingViewModel = hiltViewModel()
@@ -47,7 +48,7 @@ fun BookServiceScreen(
     var showReviewSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(providerId) {
-        viewModel.loadProviderBookingData(providerId)
+        viewModel.loadProviderBookingData(providerId, waivedBy)
     }
 
     LaunchedEffect(uiState) {
@@ -109,21 +110,43 @@ fun BookServiceScreen(
                                 }
                             }
 
-                            // "Review booking" CTA — only active when slot is selected
                             Button(
-                                onClick = { showReviewSheet = true },
+                                onClick = {
+                                    if (state.selectedSlot.isNullOrBlank()) {
+                                        // Simple validate logic could go here
+                                    } else {
+                                        showReviewSheet = true
+                                    }
+                                },
                                 enabled = state.selectedSlot != null,
-                                shape = RoundedCornerShape(14.dp),
-                                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 14.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                contentPadding = PaddingValues(horizontal = 32.dp, vertical = 14.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = Primary)
                             ) {
-                                Icon(
-                                    Icons.Outlined.Assignment,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
                                 Text("Review Booking", fontWeight = FontWeight.SemiBold)
+                            }
+                        }
+                        
+                        if (state.isFeeWaived) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Surface(
+                                color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f),
+                                shape = RoundedCornerShape(8.dp),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f)),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(Icons.Outlined.CheckCircle, null, tint = MaterialTheme.colorScheme.tertiary, modifier = Modifier.size(16.dp))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "Your previous payment of ₹${state.waivedAmount} will automatically apply.",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                                    )
+                                }
                             }
                         }
                     }
@@ -344,7 +367,7 @@ private fun BookingReviewSheet(
                             Column {
                                 Text("Estimated Fee", style = MaterialTheme.typography.labelMedium, color = OnSurfaceVariant)
                                 Text(
-                                    "₹${currentFee.toInt()}",
+                                    if (state.isFeeWaived) "₹0 (Waived)" else "₹${currentFee.toInt()}",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = Primary
@@ -355,7 +378,7 @@ private fun BookingReviewSheet(
                                 shape = RoundedCornerShape(8.dp)
                             ) {
                                 Text(
-                                    if (state.selectedPaymentMethod == "online") "Paid Online" else "Pay at clinic",
+                                    if (state.isFeeWaived) "Carried Over" else if (state.selectedPaymentMethod == "online") "Pay Online" else "Pay at clinic",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = Primary,
                                     fontWeight = FontWeight.SemiBold,
@@ -431,9 +454,11 @@ private fun BookingReviewSheet(
                             colors = ButtonDefaults.buttonColors(containerColor = Primary),
                             contentPadding = PaddingValues(vertical = 14.dp)
                         ) {
-                            Icon(Icons.Outlined.CheckCircle, null, modifier = Modifier.size(18.dp))
+                            val ctaIcon = if (state.selectedPaymentMethod == "online") Icons.Outlined.Lock else Icons.Outlined.CheckCircle
+                            val ctaText = if (state.selectedPaymentMethod == "online") "Proceed to Secure Pay" else "Confirm Appointment"
+                            Icon(ctaIcon, null, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Confirm Appointment", fontWeight = FontWeight.Bold)
+                            Text(ctaText, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -517,8 +542,13 @@ private fun BookingContent(
                     color = OnSurfaceVariant
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Outlined.Star, null, modifier = Modifier.size(14.dp), tint = Primary)
-                    Text(" 4.9 (127 reviews)", style = MaterialTheme.typography.labelSmall, color = OnSurfaceVariant)
+                    Icon(Icons.Outlined.Star, null, modifier = Modifier.size(14.dp), tint = Gold)
+                    val ratingText = if ((state.providerProfile.totalReviews ?: 0) > 0) {
+                        " ${"%.1f".format(state.providerProfile.averageRating ?: 0.0)} (${state.providerProfile.totalReviews} reviews)"
+                    } else {
+                        " New Provider"
+                    }
+                    Text(ratingText, style = MaterialTheme.typography.labelSmall, color = OnSurfaceVariant)
                 }
             }
         }
@@ -581,44 +611,54 @@ private fun BookingContent(
         }
 
         // ── Payment Method ────────────────────────────────────────────────────
-        val requireOnline = if (state.isVideoSelected) state.providerProfile.requireVideoPayment 
-                           else state.providerProfile.requireInPersonPayment
+        if (!state.isFeeWaived) {
+            val requireOnline = if (state.isVideoSelected) state.providerProfile.requireVideoPayment 
+                               else state.providerProfile.requireInPersonPayment
 
-        Text("Payment Method", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(12.dp))
-        
-        if (requireOnline) {
-            Surface(
-                color = Primary.copy(alpha = 0.08f),
-                shape = RoundedCornerShape(14.dp),
-                border = BorderStroke(1.dp, Primary.copy(alpha = 0.2f)),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Outlined.Info, null, tint = Primary, modifier = Modifier.size(20.dp))
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(
-                        "This provider requires upfront payment for ${if (state.isVideoSelected) "video consultations" else "in-person visits"}.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = OnSurface
-                    )
-                }
-            }
+            Text("Payment Method", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(12.dp))
-        }
-
-        SegmentedControl(
-            items = if (requireOnline) listOf("Pay Online") else listOf("Pay at Clinic", "Pay Online"),
-            selectedIndex = if (state.selectedPaymentMethod == "online") (if (requireOnline) 0 else 1) else 0,
-            onItemSelected = { index ->
-                val method = if (requireOnline) "online" else if (index == 0) "at_clinic" else "online"
-                onPaymentMethodChanged(method)
+            
+            if (requireOnline) {
+                Surface(
+                    color = Primary.copy(alpha = 0.08f),
+                    shape = RoundedCornerShape(14.dp),
+                    border = BorderStroke(1.dp, Primary.copy(alpha = 0.2f)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Outlined.Lock, null, tint = Primary, modifier = Modifier.size(24.dp))
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                "Online Payment Required", 
+                                style = MaterialTheme.typography.titleMedium, 
+                                fontWeight = FontWeight.Bold, 
+                                color = Primary
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                "Secure payment will be collected in the next step to confirm your booking.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = OnSurface
+                            )
+                        }
+                    }
+                }
+            } else {
+                SegmentedControl(
+                    items = listOf("Pay at Clinic", "Pay Online"),
+                    selectedIndex = if (state.selectedPaymentMethod == "online") 1 else 0,
+                    onItemSelected = { index ->
+                        val method = if (index == 0) "at_clinic" else "online"
+                        onPaymentMethodChanged(method)
+                    }
+                )
             }
-        )
-        Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(32.dp))
+        }
 
         // ── Reason for Visit ──────────────────────────────────────────────────
         Spacer(modifier = Modifier.height(8.dp))

@@ -26,6 +26,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bms.app.domain.model.Appointment
 import com.bms.app.domain.model.UserProfile
@@ -52,6 +54,10 @@ fun ProviderDashboardScreen(
     val isExpanded by remember {
         derivedStateOf { scrollState.value == 0 }
     }
+
+    var reviewingAppointment by remember { mutableStateOf<Appointment?>(null) }
+    var reviewingUser by remember { mutableStateOf<UserProfile?>(null) }
+    var showRescheduleDialog by remember { mutableStateOf<Appointment?>(null) }
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -156,14 +162,16 @@ fun ProviderDashboardScreen(
                             appointments = state.pendingAppointments,
                             userProfiles = state.pendingUserProfiles,
                             isActionLoading = state.isActionLoading,
-                            onApprove = { viewModel.confirmAppointment(it) },
-                            onReject = { viewModel.rejectAppointment(it) }
+                            onClick = { appt, user ->
+                                reviewingAppointment = appt
+                                reviewingUser = user
+                            }
                         )
                         Spacer(modifier = Modifier.height(32.dp))
                     }
 
                     // ── Manage Availability CTA ───────────────
-                    BmsPrimaryButton(
+                    BmsButton(
                         text = "Manage Availability",
                         onClick = onManageAvailability,
                         trailingIcon = Icons.Outlined.ArrowForward
@@ -171,9 +179,10 @@ fun ProviderDashboardScreen(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // ── Today's Schedule ──────────────────────
+                    // ── Upcoming Bookings ─────────────────────
                     ScheduleSection(
                         todayAppointments = state.todayAppointments,
+                        allUpcomingAppointments = state.allUpcomingAppointments,
                         patientNames = state.patientNames,
                         patientRoles = state.patientRoles,
                         onMessagePatient = onMessagePatient
@@ -182,6 +191,44 @@ fun ProviderDashboardScreen(
                     Spacer(modifier = Modifier.height(32.dp))
                 }
             }
+        }
+    }
+
+    // ── Reschedule Dialog logic ──
+    showRescheduleDialog?.let { appt ->
+        RescheduleDialog(
+            onDismiss = { showRescheduleDialog = null },
+            onConfirm = { message ->
+                viewModel.suggestReschedule(appt.id, message)
+                showRescheduleDialog = null
+                reviewingAppointment = null
+            }
+        )
+    }
+
+    // ── Review Bottom Sheet ──
+    if (reviewingAppointment != null) {
+        val appt = reviewingAppointment!!
+        val isActionLoading = (uiState as? DashboardUiState.Success)?.isActionLoading == appt.id
+        
+        // Auto-dismiss if removed from pending
+        val isStillPending = (uiState as? DashboardUiState.Success)?.pendingAppointments?.any { it.id == appt.id } == true
+        if (!isStillPending && !isActionLoading) {
+            reviewingAppointment = null
+        } else {
+            AppointmentReviewSheet(
+                appointment = appt,
+                user = reviewingUser,
+                isLoading = isActionLoading,
+                currencySymbol = (uiState as? DashboardUiState.Success)?.currencySymbol ?: "₹",
+                onDismiss = { reviewingAppointment = null },
+                onConfirm = { viewModel.confirmAppointment(appt.id) },
+                onSuggestReschedule = { showRescheduleDialog = appt },
+                onDecline = {
+                    viewModel.rejectAppointment(appt.id)
+                    reviewingAppointment = null
+                }
+            )
         }
     }
 }
@@ -193,8 +240,7 @@ private fun PendingApprovalsSection(
     appointments: List<Appointment>,
     userProfiles: Map<String, UserProfile>,
     isActionLoading: String?,
-    onApprove: (String) -> Unit,
-    onReject: (String) -> Unit
+    onClick: (Appointment, UserProfile?) -> Unit
 ) {
     Column {
         Row(
@@ -227,12 +273,12 @@ private fun PendingApprovalsSection(
         ) {
             items(appointments) { appointment ->
                 val isLoading = isActionLoading == appointment.id
+                val user = userProfiles[appointment.userId]
                 PendingRequestCard(
                     appointment = appointment,
-                    user = userProfiles[appointment.userId],
+                    user = user,
                     isLoading = isLoading,
-                    onApprove = { if (isActionLoading == null) onApprove(appointment.id) },
-                    onReject = { if (isActionLoading == null) onReject(appointment.id) }
+                    onClick = { if (isActionLoading == null) onClick(appointment, user) }
                 )
             }
         }
@@ -244,8 +290,7 @@ private fun PendingRequestCard(
     appointment: Appointment,
     user: UserProfile?,
     isLoading: Boolean = false,
-    onApprove: () -> Unit,
-    onReject: () -> Unit
+    onClick: () -> Unit
 ) {
     val date = try {
         LocalDate.parse(appointment.appointmentDate)
@@ -256,7 +301,8 @@ private fun PendingRequestCard(
         color = SurfaceContainerLowest,
         shape = RoundedCornerShape(20.dp),
         shadowElevation = 2.dp,
-        modifier = Modifier.width(280.dp)
+        modifier = Modifier.width(280.dp),
+        onClick = onClick
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -317,36 +363,15 @@ private fun PendingRequestCard(
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
+            // Replacing immediate buttons with a subtle action prompt since the card is now clickable
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                horizontalArrangement = Arrangement.End
             ) {
-                OutlinedButton(
-                    onClick = onReject,
-                    enabled = !isLoading,
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.3f))
-                ) {
-                    Text("Decline", style = MaterialTheme.typography.labelMedium)
-                }
-                Button(
-                    onClick = onApprove,
-                    enabled = !isLoading,
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Primary)
-                ) {
-                    if (isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            color = OnPrimary,
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Text("Confirm", style = MaterialTheme.typography.labelMedium)
-                    }
+                if (isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Primary, strokeWidth = 2.dp)
+                } else {
+                    Text("Tap to review", style = MaterialTheme.typography.labelSmall, color = Primary, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -402,60 +427,107 @@ private fun StatsGrid(state: DashboardUiState.Success) {
 @Composable
 private fun ScheduleSection(
     todayAppointments: List<Appointment>,
+    allUpcomingAppointments: List<Appointment>,
     patientNames: Map<String, String>,
     patientRoles: Map<String, String>,
     onMessagePatient: (String) -> Unit
 ) {
+    // Only display active or pending upcoming appointments
+    val displayList = allUpcomingAppointments.filter { it.status.lowercase() in listOf("confirmed", "approved", "pending") }
+    val today = java.time.LocalDate.now()
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Today's Schedule",
+            text = "Upcoming Bookings",
             style = MaterialTheme.typography.headlineSmall,
             color = OnSurface
         )
-        TextButton(onClick = { }) {
-            Text(
-                "View Calendar",
-                style = MaterialTheme.typography.labelLarge,
-                color = Primary
-            )
+        if (displayList.isNotEmpty()) {
+            Surface(
+                color = Primary.copy(alpha = 0.12f),
+                shape = RoundedCornerShape(20.dp)
+            ) {
+                Text(
+                    "${displayList.size} total",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Primary,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                )
+            }
         }
     }
 
     Spacer(modifier = Modifier.height(16.dp))
 
-    if (todayAppointments.isEmpty()) {
-        Text("No appointments today.", color = OnSurfaceVariant)
-    } else {
-        todayAppointments.forEach { appointment ->
-            val isVideo = appointment.isVideoConsultation ?: false
-            val statusColor = when(appointment.status) {
-                "confirmed", "approved" -> StatusActive
-                "pending" -> StatusPending
-                "completed" -> StatusInfo
-                "cancelled", "rejected" -> MaterialTheme.colorScheme.error
-                else -> OnSurfaceVariant
+    if (displayList.isEmpty()) {
+        Surface(
+            color = SurfaceContainerLow,
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(Icons.Outlined.EventBusy, null, tint = OnSurfaceVariant, modifier = Modifier.size(36.dp))
+                Spacer(modifier = Modifier.height(12.dp))
+                Text("No upcoming bookings", style = MaterialTheme.typography.titleSmall, color = OnSurface, fontWeight = FontWeight.SemiBold)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text("Approved appointments will appear here.", style = MaterialTheme.typography.bodySmall, color = OnSurfaceVariant, textAlign = TextAlign.Center)
             }
-            
-            val badgeText = appointment.status.uppercase()
-            val patientName = patientNames[appointment.userId] ?: "Patient (${appointment.userId.take(4)})"
-            val patientRole = patientRoles[appointment.userId]
+        }
+    } else {
+        // Group by date for clarity
+        val grouped = displayList.groupBy { it.appointmentDate }
+        grouped.forEach { (dateStr, appointments) ->
+            val label = runCatching {
+                val d = java.time.LocalDate.parse(dateStr)
+                when (d) {
+                    today -> "Today"
+                    today.plusDays(1) -> "Tomorrow"
+                    else -> d.format(java.time.format.DateTimeFormatter.ofPattern("EEE, d MMM", java.util.Locale.getDefault()))
+                }
+            }.getOrElse { dateStr }
 
-            ScheduleItem(
-                time = appointment.startTime.take(5),
-                name = patientName,
-                patientRole = patientRole,
-                badge = badgeText,
-                detail = appointment.notes ?: "No notes",
-                badgeBg = statusColor.copy(alpha = 0.12f),
-                badgeText = statusColor,
-                showVideoIcon = isVideo,
-                onMessagePatient = { onMessagePatient(appointment.userId) }
+            // Date group header
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                color = Primary,
+                modifier = Modifier.padding(vertical = 8.dp)
             )
-            Spacer(modifier = Modifier.height(12.dp))
+
+            appointments.forEach { appointment ->
+                val isVideo = appointment.isVideoConsultation ?: false
+                val statusColor = when (appointment.status) {
+                    "confirmed", "approved" -> StatusActive
+                    "pending" -> StatusPending
+                    "completed" -> StatusInfo
+                    "cancelled", "rejected" -> MaterialTheme.colorScheme.error
+                    else -> OnSurfaceVariant
+                }
+                val badgeText = appointment.status.uppercase()
+                val patientName = patientNames[appointment.userId] ?: "Patient (${appointment.userId.take(4)})"
+                val patientRole = patientRoles[appointment.userId]
+
+                ScheduleItem(
+                    time = appointment.startTime.take(5),
+                    name = patientName,
+                    patientRole = patientRole,
+                    badge = badgeText,
+                    detail = appointment.notes ?: "No notes",
+                    badgeBg = statusColor.copy(alpha = 0.12f),
+                    badgeText = statusColor,
+                    showVideoIcon = isVideo,
+                    onMessagePatient = { onMessagePatient(appointment.userId) }
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+            }
         }
     }
 }
@@ -497,7 +569,7 @@ private fun ProfileIncompleteDisplay(onNavigate: (String) -> Unit) {
             modifier = Modifier.padding(horizontal = 16.dp)
         )
         Spacer(modifier = Modifier.height(32.dp))
-        BmsPrimaryButton(
+        BmsButton(
             text = "Finish Setup",
             onClick = { onNavigate("settings") }
         )
@@ -540,7 +612,7 @@ private fun ErrorDisplay(message: String, onRefresh: () -> Unit) {
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(32.dp))
-        BmsPrimaryButton(
+        BmsButton(
             text = "Refresh Dashboard",
             onClick = onRefresh,
             leadingIcon = Icons.Outlined.Refresh
@@ -734,6 +806,224 @@ private fun UpcomingCard(
                 color = Primary,
                 trackColor = SurfaceContainerHigh
             )
+        }
+    }
+}
+
+// ── Appointment Review Sheet ──────────────────────────────────────────────────
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AppointmentReviewSheet(
+    appointment: Appointment,
+    user: UserProfile?,
+    isLoading: Boolean,
+    currencySymbol: String,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+    onSuggestReschedule: () -> Unit,
+    onDecline: () -> Unit
+) {
+    val date = try {
+        java.time.LocalDate.parse(appointment.appointmentDate)
+            .format(java.time.format.DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy"))
+    } catch (_: Exception) { appointment.appointmentDate }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = SurfaceContainerLowest,
+        dragHandle = { BottomSheetDefaults.DragHandle() }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 32.dp)
+        ) {
+            Text(
+                "Review Request",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = OnSurface
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // User Info
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(CircleShape)
+                        .background(Primary),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = user?.fullName?.take(1)?.uppercase() ?: "P",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = OnPrimary,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Column {
+                    Text(
+                        text = user?.fullName ?: "Patient",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = OnSurface
+                    )
+                    Text(
+                        text = "New Patient",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = OnSurfaceVariant
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Details
+            Surface(
+                color = SurfaceContainerLow,
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row {
+                        Icon(Icons.Outlined.CalendarToday, null, tint = Primary, modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(date, style = MaterialTheme.typography.bodyMedium, color = OnSurface)
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Row {
+                        Icon(Icons.Outlined.AccessTime, null, tint = Primary, modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(appointment.startTime, style = MaterialTheme.typography.bodyMedium, color = OnSurface)
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Row {
+                        Icon(if (appointment.isVideoConsultation == true) Icons.Outlined.Videocam else Icons.Outlined.LocationOn, null, tint = Primary, modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(if (appointment.isVideoConsultation == true) "Video Consultation" else "In-Person Visit", style = MaterialTheme.typography.bodyMedium, color = OnSurface)
+                    }
+                }
+            }
+
+            if (!appointment.notes.isNullOrBlank()) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("Patient Notes", style = MaterialTheme.typography.labelMedium, color = OnSurfaceVariant)
+                Spacer(modifier = Modifier.height(8.dp))
+                Surface(
+                    color = SurfaceContainerLow,
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = appointment.notes,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(16.dp),
+                        color = OnSurface
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Actions
+            Button(
+                onClick = onConfirm,
+                enabled = !isLoading,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                contentPadding = PaddingValues(vertical = 14.dp)
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), color = OnPrimary, strokeWidth = 2.dp)
+                } else {
+                    Text("Approve Appointment", fontWeight = FontWeight.Bold)
+                }
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            OutlinedButton(
+                onClick = onSuggestReschedule,
+                enabled = !isLoading,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                contentPadding = PaddingValues(vertical = 14.dp)
+            ) {
+                Text("Suggest Change of Date")
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            TextButton(
+                onClick = onDecline,
+                enabled = !isLoading,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Decline Request", color = MaterialTheme.colorScheme.error)
+            }
+        }
+    }
+}
+
+// ── Reschedule Dialog ────────────────────────────────────────────────────────
+@Composable
+private fun RescheduleDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
+    var message by remember { mutableStateOf("") }
+    
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)
+                .wrapContentHeight(),
+            shape = RoundedCornerShape(20.dp),
+            color = SurfaceContainerLowest,
+            tonalElevation = 6.dp
+        ) {
+            Column(modifier = Modifier.padding(24.dp)) {
+                Text(
+                    "Suggest Reschedule",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    "This will decline the current request and prompt the patient to choose another date. Please include a message with your suggested availability.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = OnSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = message,
+                    onValueChange = { message = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    placeholder = { Text("e.g. Can you please book for tomorrow afternoon? I am unavailable today.") },
+                    minLines = 3
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Text("Cancel", color = OnSurfaceVariant)
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = { onConfirm(message.ifBlank { "Please select another date." }) },
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Primary)
+                    ) {
+                        Text("Send Request", fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
         }
     }
 }

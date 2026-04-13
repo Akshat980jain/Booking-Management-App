@@ -101,6 +101,27 @@ class AuthViewModel @Inject constructor(
         }
     }
 
+    fun resetPassword(email: String) {
+        if (email.isBlank()) {
+            emitError("Please enter your email address")
+            return
+        }
+        
+        _uiState.update { it.copy(isLoading = true, errorMsg = "") }
+        
+        viewModelScope.launch {
+            authRepository.resetPassword(email)
+                .onSuccess {
+                    _uiState.update { it.copy(isLoading = false) }
+                    _events.emit(AuthEvent.Error("Password reset email sent. Check your inbox.")) // Using Error event for simple toast-like feedback
+                }
+                .onFailure { err ->
+                    _uiState.update { it.copy(isLoading = false) }
+                    _events.emit(AuthEvent.Error(err.message ?: "Failed to send reset email"))
+                }
+        }
+    }
+
     private fun emitError(msg: String) {
         viewModelScope.launch {
             _events.emit(AuthEvent.Error(msg))

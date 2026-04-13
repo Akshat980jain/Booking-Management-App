@@ -12,12 +12,17 @@ import com.bms.app.data.repository.AppointmentRepositoryImpl;
 import com.bms.app.data.repository.AuthRepositoryImpl;
 import com.bms.app.data.repository.AvailabilityRepositoryImpl;
 import com.bms.app.data.repository.ChatRepositoryImpl;
+import com.bms.app.data.repository.LoyaltyRepositoryImpl;
+import com.bms.app.data.repository.NotificationRepositoryImpl;
 import com.bms.app.data.repository.ProfileRepositoryImpl;
+import com.bms.app.data.repository.ReviewRepositoryImpl;
 import com.bms.app.di.AppModule_ProvideSessionManagerFactory;
 import com.bms.app.di.NetworkModule_ProvideSessionManagerFactory;
 import com.bms.app.di.NetworkModule_ProvideSupabaseAuthFactory;
 import com.bms.app.di.NetworkModule_ProvideSupabaseClientFactory;
 import com.bms.app.di.NetworkModule_ProvideSupabasePostgrestFactory;
+import com.bms.app.di.NetworkModule_ProvideSupabaseRealtimeFactory;
+import com.bms.app.domain.repository.LoyaltyRepository;
 import com.bms.app.domain.repository.ProfileRepository;
 import com.bms.app.ui.admin.BookingViewModel;
 import com.bms.app.ui.admin.BookingViewModel_HiltModules_KeyModule_ProvideFactory;
@@ -45,6 +50,12 @@ import com.bms.app.ui.settings.viewmodel.SettingsViewModel;
 import com.bms.app.ui.settings.viewmodel.SettingsViewModel_HiltModules_KeyModule_ProvideFactory;
 import com.bms.app.ui.settings.viewmodel.VisibilityViewModel;
 import com.bms.app.ui.settings.viewmodel.VisibilityViewModel_HiltModules_KeyModule_ProvideFactory;
+import com.bms.app.ui.user.ProviderDetailViewModel;
+import com.bms.app.ui.user.ProviderDetailViewModel_HiltModules_KeyModule_ProvideFactory;
+import com.bms.app.ui.user.ReviewViewModel;
+import com.bms.app.ui.user.ReviewViewModel_HiltModules_KeyModule_ProvideFactory;
+import com.bms.app.ui.user.RewardsViewModel;
+import com.bms.app.ui.user.RewardsViewModel_HiltModules_KeyModule_ProvideFactory;
 import dagger.hilt.android.ActivityRetainedLifecycle;
 import dagger.hilt.android.ViewModelLifecycle;
 import dagger.hilt.android.internal.builders.ActivityComponentBuilder;
@@ -69,6 +80,7 @@ import dagger.internal.SetBuilder;
 import io.github.jan.supabase.SupabaseClient;
 import io.github.jan.supabase.gotrue.Auth;
 import io.github.jan.supabase.postgrest.Postgrest;
+import io.github.jan.supabase.realtime.Realtime;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -405,7 +417,7 @@ public final class DaggerBmsApplication_HiltComponents_SingletonC {
 
     @Override
     public Set<String> getViewModelKeys() {
-      return SetBuilder.<String>newSetBuilder(13).add(AdminViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(AuthViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(AvailabilityViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(BookingViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(ChatViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(DashboardViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(InboxViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(ProfessionalInfoViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(SettingsViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(SupportViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(UserDashboardViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(UserDetailViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(VisibilityViewModel_HiltModules_KeyModule_ProvideFactory.provide()).build();
+      return SetBuilder.<String>newSetBuilder(16).add(AdminViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(AuthViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(AvailabilityViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(BookingViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(ChatViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(DashboardViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(InboxViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(ProfessionalInfoViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(ProviderDetailViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(ReviewViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(RewardsViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(SettingsViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(SupportViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(UserDashboardViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(UserDetailViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(VisibilityViewModel_HiltModules_KeyModule_ProvideFactory.provide()).build();
     }
 
     @Override
@@ -447,6 +459,12 @@ public final class DaggerBmsApplication_HiltComponents_SingletonC {
 
     private Provider<ProfessionalInfoViewModel> professionalInfoViewModelProvider;
 
+    private Provider<ProviderDetailViewModel> providerDetailViewModelProvider;
+
+    private Provider<ReviewViewModel> reviewViewModelProvider;
+
+    private Provider<RewardsViewModel> rewardsViewModelProvider;
+
     private Provider<SettingsViewModel> settingsViewModelProvider;
 
     private Provider<SupportViewModel> supportViewModelProvider;
@@ -478,16 +496,19 @@ public final class DaggerBmsApplication_HiltComponents_SingletonC {
       this.dashboardViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 5);
       this.inboxViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 6);
       this.professionalInfoViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 7);
-      this.settingsViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 8);
-      this.supportViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 9);
-      this.userDashboardViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 10);
-      this.userDetailViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 11);
-      this.visibilityViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 12);
+      this.providerDetailViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 8);
+      this.reviewViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 9);
+      this.rewardsViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 10);
+      this.settingsViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 11);
+      this.supportViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 12);
+      this.userDashboardViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 13);
+      this.userDetailViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 14);
+      this.visibilityViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 15);
     }
 
     @Override
     public Map<String, javax.inject.Provider<ViewModel>> getHiltViewModelMap() {
-      return MapBuilder.<String, javax.inject.Provider<ViewModel>>newMapBuilder(13).put("com.bms.app.ui.dashboard.AdminViewModel", ((Provider) adminViewModelProvider)).put("com.bms.app.ui.auth.AuthViewModel", ((Provider) authViewModelProvider)).put("com.bms.app.ui.schedule.AvailabilityViewModel", ((Provider) availabilityViewModelProvider)).put("com.bms.app.ui.admin.BookingViewModel", ((Provider) bookingViewModelProvider)).put("com.bms.app.ui.chat.ChatViewModel", ((Provider) chatViewModelProvider)).put("com.bms.app.ui.dashboard.DashboardViewModel", ((Provider) dashboardViewModelProvider)).put("com.bms.app.ui.chat.InboxViewModel", ((Provider) inboxViewModelProvider)).put("com.bms.app.ui.settings.viewmodel.ProfessionalInfoViewModel", ((Provider) professionalInfoViewModelProvider)).put("com.bms.app.ui.settings.viewmodel.SettingsViewModel", ((Provider) settingsViewModelProvider)).put("com.bms.app.ui.chat.SupportViewModel", ((Provider) supportViewModelProvider)).put("com.bms.app.ui.dashboard.UserDashboardViewModel", ((Provider) userDashboardViewModelProvider)).put("com.bms.app.ui.admin.UserDetailViewModel", ((Provider) userDetailViewModelProvider)).put("com.bms.app.ui.settings.viewmodel.VisibilityViewModel", ((Provider) visibilityViewModelProvider)).build();
+      return MapBuilder.<String, javax.inject.Provider<ViewModel>>newMapBuilder(16).put("com.bms.app.ui.dashboard.AdminViewModel", ((Provider) adminViewModelProvider)).put("com.bms.app.ui.auth.AuthViewModel", ((Provider) authViewModelProvider)).put("com.bms.app.ui.schedule.AvailabilityViewModel", ((Provider) availabilityViewModelProvider)).put("com.bms.app.ui.admin.BookingViewModel", ((Provider) bookingViewModelProvider)).put("com.bms.app.ui.chat.ChatViewModel", ((Provider) chatViewModelProvider)).put("com.bms.app.ui.dashboard.DashboardViewModel", ((Provider) dashboardViewModelProvider)).put("com.bms.app.ui.chat.InboxViewModel", ((Provider) inboxViewModelProvider)).put("com.bms.app.ui.settings.viewmodel.ProfessionalInfoViewModel", ((Provider) professionalInfoViewModelProvider)).put("com.bms.app.ui.user.ProviderDetailViewModel", ((Provider) providerDetailViewModelProvider)).put("com.bms.app.ui.user.ReviewViewModel", ((Provider) reviewViewModelProvider)).put("com.bms.app.ui.user.RewardsViewModel", ((Provider) rewardsViewModelProvider)).put("com.bms.app.ui.settings.viewmodel.SettingsViewModel", ((Provider) settingsViewModelProvider)).put("com.bms.app.ui.chat.SupportViewModel", ((Provider) supportViewModelProvider)).put("com.bms.app.ui.dashboard.UserDashboardViewModel", ((Provider) userDashboardViewModelProvider)).put("com.bms.app.ui.admin.UserDetailViewModel", ((Provider) userDetailViewModelProvider)).put("com.bms.app.ui.settings.viewmodel.VisibilityViewModel", ((Provider) visibilityViewModelProvider)).build();
     }
 
     @Override
@@ -540,19 +561,28 @@ public final class DaggerBmsApplication_HiltComponents_SingletonC {
           case 7: // com.bms.app.ui.settings.viewmodel.ProfessionalInfoViewModel 
           return (T) new ProfessionalInfoViewModel(singletonCImpl.bindProfileRepositoryProvider.get(), singletonCImpl.provideSupabaseAuthProvider.get());
 
-          case 8: // com.bms.app.ui.settings.viewmodel.SettingsViewModel 
+          case 8: // com.bms.app.ui.user.ProviderDetailViewModel 
+          return (T) new ProviderDetailViewModel(singletonCImpl.bindProfileRepositoryProvider.get(), singletonCImpl.reviewRepositoryImplProvider.get());
+
+          case 9: // com.bms.app.ui.user.ReviewViewModel 
+          return (T) new ReviewViewModel(singletonCImpl.reviewRepositoryImplProvider.get(), singletonCImpl.authRepositoryImplProvider.get());
+
+          case 10: // com.bms.app.ui.user.RewardsViewModel 
+          return (T) new RewardsViewModel(singletonCImpl.bindLoyaltyRepositoryProvider.get(), singletonCImpl.provideSupabaseAuthProvider.get());
+
+          case 11: // com.bms.app.ui.settings.viewmodel.SettingsViewModel 
           return (T) new SettingsViewModel(singletonCImpl.bindProfileRepositoryProvider.get(), singletonCImpl.provideSessionManagerProvider2.get(), singletonCImpl.provideSupabaseAuthProvider.get());
 
-          case 9: // com.bms.app.ui.chat.SupportViewModel 
+          case 12: // com.bms.app.ui.chat.SupportViewModel 
           return (T) new SupportViewModel(singletonCImpl.bindProfileRepositoryProvider.get());
 
-          case 10: // com.bms.app.ui.dashboard.UserDashboardViewModel 
-          return (T) new UserDashboardViewModel(singletonCImpl.bindProfileRepositoryProvider.get(), singletonCImpl.appointmentRepositoryImplProvider.get(), singletonCImpl.provideSupabaseAuthProvider.get(), singletonCImpl.provideSessionManagerProvider.get());
+          case 13: // com.bms.app.ui.dashboard.UserDashboardViewModel 
+          return (T) new UserDashboardViewModel(singletonCImpl.bindProfileRepositoryProvider.get(), singletonCImpl.appointmentRepositoryImplProvider.get(), singletonCImpl.provideSupabaseAuthProvider.get(), singletonCImpl.provideSessionManagerProvider.get(), singletonCImpl.notificationRepositoryImplProvider.get());
 
-          case 11: // com.bms.app.ui.admin.UserDetailViewModel 
+          case 14: // com.bms.app.ui.admin.UserDetailViewModel 
           return (T) new UserDetailViewModel(singletonCImpl.bindProfileRepositoryProvider.get());
 
-          case 12: // com.bms.app.ui.settings.viewmodel.VisibilityViewModel 
+          case 15: // com.bms.app.ui.settings.viewmodel.VisibilityViewModel 
           return (T) new VisibilityViewModel(singletonCImpl.bindProfileRepositoryProvider.get(), singletonCImpl.provideSupabaseAuthProvider.get());
 
           default: throw new AssertionError(id);
@@ -655,7 +685,17 @@ public final class DaggerBmsApplication_HiltComponents_SingletonC {
 
     private Provider<ChatRepositoryImpl> chatRepositoryImplProvider;
 
+    private Provider<ReviewRepositoryImpl> reviewRepositoryImplProvider;
+
+    private Provider<LoyaltyRepositoryImpl> loyaltyRepositoryImplProvider;
+
+    private Provider<LoyaltyRepository> bindLoyaltyRepositoryProvider;
+
     private Provider<SessionManager> provideSessionManagerProvider2;
+
+    private Provider<Realtime> provideSupabaseRealtimeProvider;
+
+    private Provider<NotificationRepositoryImpl> notificationRepositoryImplProvider;
 
     private SingletonCImpl(ApplicationContextModule applicationContextModuleParam) {
       this.applicationContextModule = applicationContextModuleParam;
@@ -675,11 +715,16 @@ public final class DaggerBmsApplication_HiltComponents_SingletonC {
       this.authRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<AuthRepositoryImpl>(singletonCImpl, 6));
       this.availabilityRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<AvailabilityRepositoryImpl>(singletonCImpl, 7));
       this.chatRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<ChatRepositoryImpl>(singletonCImpl, 8));
-      this.provideSessionManagerProvider2 = DoubleCheck.provider(new SwitchingProvider<SessionManager>(singletonCImpl, 9));
+      this.reviewRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<ReviewRepositoryImpl>(singletonCImpl, 9));
+      this.loyaltyRepositoryImplProvider = new SwitchingProvider<>(singletonCImpl, 10);
+      this.bindLoyaltyRepositoryProvider = DoubleCheck.provider((Provider) loyaltyRepositoryImplProvider);
+      this.provideSessionManagerProvider2 = DoubleCheck.provider(new SwitchingProvider<SessionManager>(singletonCImpl, 11));
+      this.provideSupabaseRealtimeProvider = DoubleCheck.provider(new SwitchingProvider<Realtime>(singletonCImpl, 13));
+      this.notificationRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<NotificationRepositoryImpl>(singletonCImpl, 12));
     }
 
     @Override
-    public void injectBmsApplication(BmsApplication bmsApplication) {
+    public void injectBmsApplication(BmsApplication arg0) {
     }
 
     @Override
@@ -738,8 +783,20 @@ public final class DaggerBmsApplication_HiltComponents_SingletonC {
           case 8: // com.bms.app.data.repository.ChatRepositoryImpl 
           return (T) new ChatRepositoryImpl(singletonCImpl.provideSupabaseAuthProvider.get(), singletonCImpl.provideSupabasePostgrestProvider.get());
 
-          case 9: // com.bms.app.data.local.SessionManager 
+          case 9: // com.bms.app.data.repository.ReviewRepositoryImpl 
+          return (T) new ReviewRepositoryImpl(singletonCImpl.provideSupabasePostgrestProvider.get());
+
+          case 10: // com.bms.app.data.repository.LoyaltyRepositoryImpl 
+          return (T) new LoyaltyRepositoryImpl(singletonCImpl.provideSupabasePostgrestProvider.get());
+
+          case 11: // com.bms.app.data.local.SessionManager 
           return (T) AppModule_ProvideSessionManagerFactory.provideSessionManager(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+
+          case 12: // com.bms.app.data.repository.NotificationRepositoryImpl 
+          return (T) new NotificationRepositoryImpl(singletonCImpl.provideSupabasePostgrestProvider.get(), singletonCImpl.provideSupabaseRealtimeProvider.get());
+
+          case 13: // io.github.jan.supabase.realtime.Realtime 
+          return (T) NetworkModule_ProvideSupabaseRealtimeFactory.provideSupabaseRealtime(singletonCImpl.provideSupabaseClientProvider.get());
 
           default: throw new AssertionError(id);
         }

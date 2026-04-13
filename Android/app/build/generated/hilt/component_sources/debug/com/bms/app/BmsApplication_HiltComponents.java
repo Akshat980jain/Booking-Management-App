@@ -16,6 +16,9 @@ import com.bms.app.ui.schedule.AvailabilityViewModel_HiltModules;
 import com.bms.app.ui.settings.viewmodel.ProfessionalInfoViewModel_HiltModules;
 import com.bms.app.ui.settings.viewmodel.SettingsViewModel_HiltModules;
 import com.bms.app.ui.settings.viewmodel.VisibilityViewModel_HiltModules;
+import com.bms.app.ui.user.ProviderDetailViewModel_HiltModules;
+import com.bms.app.ui.user.ReviewViewModel_HiltModules;
+import com.bms.app.ui.user.RewardsViewModel_HiltModules;
 import dagger.Binds;
 import dagger.Component;
 import dagger.Module;
@@ -181,6 +184,9 @@ public final class BmsApplication_HiltComponents {
           HiltWrapper_SavedStateHandleModule.class,
           InboxViewModel_HiltModules.KeyModule.class,
           ProfessionalInfoViewModel_HiltModules.KeyModule.class,
+          ProviderDetailViewModel_HiltModules.KeyModule.class,
+          ReviewViewModel_HiltModules.KeyModule.class,
+          RewardsViewModel_HiltModules.KeyModule.class,
           SettingsViewModel_HiltModules.KeyModule.class,
           SupportViewModel_HiltModules.KeyModule.class,
           UserDashboardViewModel_HiltModules.KeyModule.class,
@@ -230,6 +236,9 @@ public final class BmsApplication_HiltComponents {
           HiltWrapper_HiltViewModelFactory_ViewModelModule.class,
           InboxViewModel_HiltModules.BindsModule.class,
           ProfessionalInfoViewModel_HiltModules.BindsModule.class,
+          ProviderDetailViewModel_HiltModules.BindsModule.class,
+          ReviewViewModel_HiltModules.BindsModule.class,
+          RewardsViewModel_HiltModules.BindsModule.class,
           SettingsViewModel_HiltModules.BindsModule.class,
           SupportViewModel_HiltModules.BindsModule.class,
           UserDashboardViewModel_HiltModules.BindsModule.class,

@@ -1,15 +1,7 @@
 package com.bms.app.di
 
-import com.bms.app.data.repository.AuthRepositoryImpl
-import com.bms.app.data.repository.ProfileRepositoryImpl
-import com.bms.app.data.repository.AppointmentRepositoryImpl
-import com.bms.app.data.repository.AvailabilityRepositoryImpl
-import com.bms.app.data.repository.ChatRepositoryImpl
-import com.bms.app.domain.repository.AuthRepository
-import com.bms.app.domain.repository.ProfileRepository
-import com.bms.app.domain.repository.AppointmentRepository
-import com.bms.app.domain.repository.AvailabilityRepository
-import com.bms.app.domain.repository.ChatRepository
+import com.bms.app.data.repository.*
+import com.bms.app.domain.repository.*
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -49,4 +41,22 @@ abstract class RepositoryModule {
     abstract fun bindChatRepository(
         chatRepositoryImpl: ChatRepositoryImpl
     ): ChatRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindLoyaltyRepository(
+        loyaltyRepositoryImpl: LoyaltyRepositoryImpl
+    ): LoyaltyRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindReviewRepository(
+        reviewRepositoryImpl: ReviewRepositoryImpl
+    ): ReviewRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindNotificationRepository(
+        notificationRepositoryImpl: NotificationRepositoryImpl
+    ): NotificationRepository
 }

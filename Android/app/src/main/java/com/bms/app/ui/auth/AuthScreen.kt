@@ -26,7 +26,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.bms.app.ui.components.BmsPrimaryButton
 import com.bms.app.ui.components.BmsTextField
 import com.bms.app.ui.components.*
 import com.bms.app.ui.theme.*
@@ -38,6 +37,7 @@ enum class AccessLevel { ADMIN, PROVIDER, USER }
 fun AuthScreen(
     onLoginSuccess: (AccessLevel) -> Unit,
     onJoinAsProvider: () -> Unit = {},
+    onForgotPassword: () -> Unit = {},
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -226,6 +226,22 @@ fun AuthScreen(
                     passwordVisible = uiState.passwordVisible,
                     onPasswordVisibilityToggle = { viewModel.togglePasswordVisibility() }
                 )
+                
+                if (uiState.selectedTab == AuthTab.LOGIN) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        contentAlignment = Alignment.CenterEnd
+                    ) {
+                        Text(
+                            text = "Forgot Password?",
+                            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
+                            color = Primary,
+                            modifier = Modifier.clickable { onForgotPassword() }
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(40.dp))
 
@@ -233,7 +249,7 @@ fun AuthScreen(
                 if (uiState.isLoading) {
                     SkeletonBox(height = 52.dp, shape = PillShape)
                 } else {
-                    BmsPrimaryButton(
+                    BmsButton(
                         text = if (uiState.selectedTab == AuthTab.LOGIN) "Log In" else "Continue",
                         onClick = { viewModel.authenticate() },
                         trailingIcon = Icons.Outlined.ArrowForward

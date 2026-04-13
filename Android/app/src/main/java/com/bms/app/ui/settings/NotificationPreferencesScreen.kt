@@ -141,7 +141,7 @@ fun NotificationPreferencesScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    BmsPrimaryButton(
+                    BmsButton(
                         text = "Save Preferences",
                         onClick = { },
                         leadingIcon = Icons.Outlined.Check

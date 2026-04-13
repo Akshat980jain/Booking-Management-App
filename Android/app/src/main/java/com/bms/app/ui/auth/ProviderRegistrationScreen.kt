@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.bms.app.ui.components.BmsPrimaryButton
+import com.bms.app.ui.components.BmsButton
 import com.bms.app.ui.components.BmsTextField
 import com.bms.app.ui.theme.*
 
@@ -241,7 +241,7 @@ fun ProviderRegistrationScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // ── CTA ────────────────────────────────────
-            BmsPrimaryButton(
+            BmsButton(
                 text = "Create Account",
                 onClick = onCreateAccount,
                 trailingIcon = Icons.Outlined.ArrowForward

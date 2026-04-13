@@ -16,7 +16,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
 sealed class AvailabilityUiState {
@@ -53,9 +57,23 @@ class AvailabilityViewModel @Inject constructor(
     val uiState: StateFlow<AvailabilityUiState> = _uiState.asStateFlow()
 
     private var providerId: String? = null
+    
+    // UI Events channel (e.g., for showing SnackBar messages)
+    private val _uiEvents = Channel<String>(Channel.BUFFERED)
+    val uiEvents = _uiEvents.receiveAsFlow()
 
     init {
         loadAvailability()
+        startPolling()
+    }
+
+    private fun startPolling() {
+        viewModelScope.launch {
+            while (isActive) {
+                delay(10_000L) // Poll every 10 seconds for "dynamic" feel
+                loadAvailability()
+            }
+        }
     }
 
     fun loadAvailability() {
@@ -184,8 +202,22 @@ class AvailabilityViewModel @Inject constructor(
 
     fun completeAppointment(id: String) {
         viewModelScope.launch {
+            val currentState = _uiState.value
+            if (currentState is AvailabilityUiState.Success) {
+                val appt = currentState.appointments.find { it.id == id }
+                val today = java.time.LocalDate.now()
+                
+                if (appt != null) {
+                    val apptDate = try { java.time.LocalDate.parse(appt.appointmentDate) } catch (e: Exception) { null }
+                    if (apptDate != null && !apptDate.isEqual(today)) {
+                        _uiEvents.send("Can only complete appointments scheduled for today.")
+                        return@launch
+                    }
+                }
+            }
             appointmentRepository.completeAppointment(id)
             loadAvailability()
+            _uiEvents.send("Appointment marked as completed")
         }
     }
 }

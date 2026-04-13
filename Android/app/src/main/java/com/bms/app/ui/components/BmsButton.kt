@@ -16,17 +16,18 @@ import androidx.compose.ui.unit.sp
 import com.bms.app.ui.theme.*
 
 @Composable
-fun BmsPrimaryButton(
+fun BmsButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     trailingIcon: ImageVector? = null,
     leadingIcon: ImageVector? = null,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    isLoading: Boolean = false
 ) {
     Button(
         onClick = onClick,
-        enabled = enabled,
+        enabled = enabled && !isLoading,
         shape = PillShape,
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Transparent,
@@ -52,36 +53,44 @@ fun BmsPrimaryButton(
                 ),
             contentAlignment = Alignment.Center
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                if (leadingIcon != null) {
-                    Icon(
-                        imageVector = leadingIcon,
-                        contentDescription = null,
-                        tint = OnPrimary,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
-                Text(
-                    text = text.uppercase(),
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 2.sp
-                    ),
-                    color = OnPrimary
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = OnPrimary,
+                    strokeWidth = 2.dp
                 )
-                if (trailingIcon != null) {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Icon(
-                        imageVector = trailingIcon,
-                        contentDescription = null,
-                        tint = OnPrimary,
-                        modifier = Modifier.size(18.dp)
+            } else {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    if (leadingIcon != null) {
+                        Icon(
+                            imageVector = leadingIcon,
+                            contentDescription = null,
+                            tint = OnPrimary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                    Text(
+                        text = text.uppercase(),
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 2.sp
+                        ),
+                        color = OnPrimary
                     )
+                    if (trailingIcon != null) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Icon(
+                            imageVector = trailingIcon,
+                            contentDescription = null,
+                            tint = OnPrimary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
                 }
             }
         }

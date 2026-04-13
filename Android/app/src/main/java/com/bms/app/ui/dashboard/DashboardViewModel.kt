@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -33,6 +34,7 @@ sealed class DashboardUiState {
         val totalRevenue: Double,
         val pendingRequests: Int,
         val todayAppointments: List<Appointment>,
+        val allUpcomingAppointments: List<Appointment> = emptyList(),
         val pendingAppointments: List<Appointment> = emptyList(),
         val pendingUserProfiles: Map<String, UserProfile> = emptyMap(),
         val patientNames: Map<String, String> = emptyMap(),
@@ -60,6 +62,16 @@ class DashboardViewModel @Inject constructor(
 
     init {
         loadDashboard()
+        startPolling()
+    }
+
+    private fun startPolling() {
+        viewModelScope.launch {
+            while (isActive) {
+                delay(10_000L) // Poll every 10 seconds for "dynamic" feel
+                loadDashboard(isRefresh = true)
+            }
+        }
     }
 
     fun loadDashboard(isRefresh: Boolean = false) {
@@ -141,11 +153,10 @@ class DashboardViewModel @Inject constructor(
             val providerProfile = providerResult.getOrThrow()
             
             val appointmentsResult = appointmentRepository.getAppointmentsForProvider(providerProfile.id)
-            val todayResult = appointmentRepository.getTodayAppointments(providerProfile.id)
 
-            if (appointmentsResult.isSuccess && todayResult.isSuccess) {
+            if (appointmentsResult.isSuccess) {
+                val today = java.time.LocalDate.now()
                 val allAppointments = appointmentsResult.getOrThrow()
-                val todayAppointments = todayResult.getOrThrow()
                 
                 val currencyCode = userProfile.preferredCurrency ?: "INR"
                 val currencySymbol = try {
@@ -155,6 +166,20 @@ class DashboardViewModel @Inject constructor(
                 }
 
                 val pendingAppointments = allAppointments.filter { it.status == "pending" }
+
+                // All upcoming = confirmed/approved/pending, today or future
+                val allUpcomingAppointments = allAppointments
+                    .filter { it.status.lowercase() in listOf("confirmed", "approved", "pending") }
+                    .filter {
+                        runCatching { java.time.LocalDate.parse(it.appointmentDate) >= today }.getOrElse { true }
+                    }
+                    .sortedWith(compareBy({ it.appointmentDate }, { it.startTime }))
+
+                val todayStr = today.toString()
+                val todayAppointments = allUpcomingAppointments
+                    .filter { it.status.lowercase() != "pending" }
+                    .filter { it.appointmentDate == todayStr }
+
                 val pendingUserIds = pendingAppointments.map { it.userId }.distinct()
                 val pendingProfilesResult = profileRepository.getProfilesByIds(pendingUserIds)
                 val pendingProfilesMap = if (pendingProfilesResult.isSuccess) {
@@ -163,8 +188,8 @@ class DashboardViewModel @Inject constructor(
                     emptyMap()
                 }
 
-                // Fetch patient names for today's schedule
-                val patientIds = (todayAppointments.map { it.userId } + pendingUserIds).distinct()
+                // Fetch patient names for all upcoming + today
+                val patientIds = (allUpcomingAppointments.map { it.userId } + todayAppointments.map { it.userId } + pendingUserIds).distinct()
                 val patientProfilesResult = profileRepository.getProfilesByIds(patientIds)
                 val patientNamesMap = if (patientProfilesResult.isSuccess) {
                     patientProfilesResult.getOrThrow().associate { it.userId to it.fullName }
@@ -200,6 +225,7 @@ class DashboardViewModel @Inject constructor(
                             totalRevenue = totalRevenue,
                             pendingRequests = pendingRequests,
                             todayAppointments = todayAppointments,
+                            allUpcomingAppointments = allUpcomingAppointments,
                             pendingAppointments = pendingAppointments,
                             pendingUserProfiles = pendingProfilesMap,
                             patientNames = patientNamesMap,
@@ -234,13 +260,13 @@ class DashboardViewModel @Inject constructor(
         }
     }
 
-    fun rejectAppointment(appointmentId: String) {
+    fun rejectAppointment(appointmentId: String, reason: String = "Declined by provider") {
         val currentState = _uiState.value
         if (currentState !is DashboardUiState.Success) return
         
         viewModelScope.launch {
             _uiState.update { currentState.copy(isActionLoading = appointmentId) }
-            val result = appointmentRepository.rejectAppointment(appointmentId, "Declined by provider")
+            val result = appointmentRepository.rejectAppointment(appointmentId, reason)
             if (result.isSuccess) {
                 loadDashboard(isRefresh = true)
             } else {
@@ -252,6 +278,11 @@ class DashboardViewModel @Inject constructor(
                 ) }
             }
         }
+    }
+
+    fun suggestReschedule(appointmentId: String, customMessage: String) {
+        val reason = "Reschedule Requested: $customMessage"
+        rejectAppointment(appointmentId, reason)
     }
 
     fun clearError() {

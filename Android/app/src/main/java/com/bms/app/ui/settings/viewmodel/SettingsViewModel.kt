@@ -139,6 +139,29 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun updatePersonalInfo(fullName: String, phone: String) {
+        viewModelScope.launch {
+            repository.updateUserProfile(fullName, phone).onSuccess {
+                fetchProfile()
+            }
+        }
+    }
+
+    fun updateInsurance(provider: String, policyNumber: String, cardUrl: String? = null) {
+        viewModelScope.launch {
+            val successState = _uiState.value as? ProfileUiState.Success ?: return@launch
+            repository.updateUserProfile(
+                fullName = successState.userProfile.fullName,
+                phone = successState.userProfile.phone,
+                insuranceProvider = provider,
+                policyNumber = policyNumber,
+                insuranceCardUrl = cardUrl
+            ).onSuccess {
+                fetchProfile()
+            }
+        }
+    }
+
     private fun getCurrencyForCountry(country: String): String {
         return when (country.trim().lowercase()) {
             "india" -> "INR"

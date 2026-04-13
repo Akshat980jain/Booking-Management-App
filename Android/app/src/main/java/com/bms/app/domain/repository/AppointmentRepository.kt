@@ -12,4 +12,7 @@ interface AppointmentRepository {
     suspend fun rejectAppointment(appointmentId: String, reason: String? = null): Result<Unit>
     suspend fun cancelAppointment(appointmentId: String, reason: String?): Result<Unit>
     suspend fun completeAppointment(appointmentId: String): Result<Unit>
+    suspend fun rescheduleAppointment(appointmentId: String, newDate: String, newStartTime: String, newEndTime: String, reason: String): Result<Unit>
+    suspend fun acceptReschedule(appointmentId: String): Result<Unit>
+    suspend fun declineReschedule(appointmentId: String): Result<Unit>
 }

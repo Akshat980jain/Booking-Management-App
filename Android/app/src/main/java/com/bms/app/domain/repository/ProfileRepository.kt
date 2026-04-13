@@ -6,7 +6,13 @@ import com.bms.app.domain.model.UserProfile
 interface ProfileRepository {
     suspend fun getCurrentUserProfile(userId: String): Result<UserProfile>
     suspend fun getProviderProfile(userId: String): Result<ProviderProfile>
-    suspend fun updateUserProfile(fullName: String, phone: String?): Result<Unit>
+    suspend fun updateUserProfile(
+        fullName: String, 
+        phone: String? = null,
+        insuranceProvider: String? = null,
+        policyNumber: String? = null,
+        insuranceCardUrl: String? = null
+    ): Result<Unit>
     suspend fun updateProviderProfile(profile: ProviderProfile): Result<Unit>
     suspend fun getAllProfiles(): Result<List<UserProfile>>
     suspend fun getAllProviderProfiles(): Result<List<ProviderProfile>>
@@ -20,5 +26,9 @@ interface ProfileRepository {
     suspend fun getProfilesByIds(userIds: List<String>): Result<List<UserProfile>>
     /** Returns the userId of the first user whose role is ADMIN. */
     suspend fun findAdminUserId(): Result<String>
+    
+    // ── Favorites ──────────────────────────────────────
+    suspend fun toggleFavorite(userId: String, providerProfileId: String): Result<Boolean>
+    suspend fun getFavorites(userId: String): Result<List<String>>
 }
 

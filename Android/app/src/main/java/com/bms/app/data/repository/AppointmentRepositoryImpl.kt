@@ -18,6 +18,15 @@ data class AppointmentRejectUpdate(
     @SerialName("cancellation_reason") val cancellationReason: String?
 )
 
+@Serializable
+data class RescheduleUpdate(
+    val status: String,
+    @SerialName("appointment_date") val appointmentDate: String,
+    @SerialName("start_time") val startTime: String,
+    @SerialName("end_time") val endTime: String,
+    @SerialName("cancellation_reason") val cancellationReason: String
+)
+
 @Singleton
 class AppointmentRepositoryImpl @Inject constructor(
     private val postgrest: Postgrest
@@ -133,6 +142,58 @@ class AppointmentRepositoryImpl @Inject constructor(
         return try {
             postgrest["appointments"].update(
                 AppointmentStatusUpdate(status = "completed")
+            ) {
+                filter { eq("id", appointmentId) }
+            }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun rescheduleAppointment(
+        appointmentId: String,
+        newDate: String,
+        newStartTime: String,
+        newEndTime: String,
+        reason: String
+    ): Result<Unit> {
+        return try {
+            postgrest["appointments"].update(
+                RescheduleUpdate(
+                    status = "rejected", // "rejected" with a "reschedule" reason is the chosen state workflow
+                    appointmentDate = newDate,
+                    startTime = newStartTime,
+                    endTime = newEndTime,
+                    cancellationReason = "reschedule: $reason"
+                )
+            ) {
+                filter { eq("id", appointmentId) }
+            }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun acceptReschedule(appointmentId: String): Result<Unit> {
+        return try {
+            // Remove the rejection and change it to pending or confirmed
+            postgrest["appointments"].update(
+                AppointmentRejectUpdate(status = "confirmed", cancellationReason = null)
+            ) {
+                filter { eq("id", appointmentId) }
+            }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun declineReschedule(appointmentId: String): Result<Unit> {
+        return try {
+            postgrest["appointments"].update(
+                AppointmentRejectUpdate(status = "cancelled", cancellationReason = "Reschedule Request Declined")
             ) {
                 filter { eq("id", appointmentId) }
             }

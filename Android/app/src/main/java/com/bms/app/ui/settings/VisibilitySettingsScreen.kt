@@ -186,7 +186,7 @@ fun VisibilitySettingsScreen(
 
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            BmsPrimaryButton(
+                            BmsButton(
                                 text = "Save Changes",
                                 onClick = {
                                     val currentProfile = (uiState as VisibilityUiState.Success).profile

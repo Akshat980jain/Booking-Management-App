@@ -40,6 +40,7 @@ fun MyBookingsScreen(
     onNavigate: (String) -> Unit = {},
     onBack: () -> Unit = {},
     onMessageProvider: (providerId: String) -> Unit = {},
+    onRateProvider: (appointmentId: String, providerId: String, providerName: String) -> Unit = { _, _, _ -> },
     viewModel: UserDashboardViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -174,7 +175,12 @@ fun MyBookingsScreen(
                                     appointment = appointment,
                                     providerName = displayName,
                                     providerSpecialty = subtitle,
-                                    onMessage = { provider?.userId?.let { onMessageProvider(it) } }
+                                    onMessage = { provider?.userId?.let { onMessageProvider(it) } },
+                                    onRate = { 
+                                        if (provider != null) {
+                                            onRateProvider(appointment.id, provider.userId, displayName)
+                                        }
+                                    }
                                 )
                             }
                         }

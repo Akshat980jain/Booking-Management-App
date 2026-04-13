@@ -55,6 +55,12 @@ sealed class Screen(val route: String) {
     object UserDashboard : Screen("user_dashboard")
     object MyBookings : Screen("my_bookings")
     object BrowseProviders : Screen("browse_providers")
+    object ForgotPassword : Screen("forgot_password")
+    object Favorites : Screen("favorites")
+    object CompareProviders : Screen("compare_providers")
+    object Rewards : Screen("rewards")
+    object ProviderDetail : Screen("provider_detail/{userId}")
+    object ReviewSubmission : Screen("review_submission/{appointmentId}/{providerId}/{providerName}")
 }
 
 @Composable
@@ -106,6 +112,16 @@ fun BmsNavigation(
             }
             "browse_providers" -> {
                 navController.navigate(Screen.BrowseProviders.route) {
+                    launchSingleTop = true
+                }
+            }
+            "favorites" -> {
+                navController.navigate(Screen.Favorites.route) {
+                    launchSingleTop = true
+                }
+            }
+            "rewards" -> {
+                navController.navigate(Screen.Rewards.route) {
                     launchSingleTop = true
                 }
             }
@@ -172,7 +188,17 @@ fun BmsNavigation(
                 },
                 onJoinAsProvider = {
                     navController.navigate(Screen.ProviderRegistration.route)
+                },
+                onForgotPassword = {
+                    navController.navigate(Screen.ForgotPassword.route)
                 }
+            )
+        }
+
+        // ── Forgot Password ───────────────────────
+        composable(Screen.ForgotPassword.route) {
+            com.bms.app.ui.auth.ForgotPasswordScreen(
+                onBack = { navController.popBackStack() }
             )
         }
 
@@ -331,11 +357,19 @@ fun BmsNavigation(
         }
 
         // ── Book Service ──────────────────────
-        composable(Screen.BookService.route) { backStackEntry ->
+        composable(
+            route = "book_service/{providerId}?waivedBy={waivedBy}",
+            arguments = listOf(
+                androidx.navigation.navArgument("providerId") { type = androidx.navigation.NavType.StringType },
+                androidx.navigation.navArgument("waivedBy") { type = androidx.navigation.NavType.StringType; nullable = true }
+            )
+        ) { backStackEntry ->
             val providerId = backStackEntry.arguments?.getString("providerId") ?: ""
+            val waivedBy = backStackEntry.arguments?.getString("waivedBy")
             val role = sessionManager.getUserRole()
             BookServiceScreen(
                 providerId = providerId,
+                waivedBy = waivedBy,
                 onBack = { navController.popBackStack() },
                 onBookingSuccess = {
                     if (role == "USER") {
@@ -384,6 +418,11 @@ fun BmsNavigation(
                     // Standardized: Always pass auth UUID (userId) to chat route
                     navController.navigate("chat/$userId")
                 },
+                onRebookProvider = { providerId, oldAppointmentId ->
+                    navController.navigate("book_service/$providerId?waivedBy=$oldAppointmentId") {
+                        launchSingleTop = true
+                    }
+                },
                 onBrowseProviders = {
                     navController.navigate(Screen.BrowseProviders.route) {
                         launchSingleTop = true
@@ -398,13 +437,16 @@ fun BmsNavigation(
             )
         }
 
-        // ── My Bookings ───────────────────────────
+        // ── My Bookings ──────────────────────────
         composable(Screen.MyBookings.route) {
-            MyBookingsScreen(
+            com.bms.app.ui.user.MyBookingsScreen(
                 onNavigate = handleBottomNav,
                 onBack = { navController.popBackStack() },
-                onMessageProvider = { userId ->
-                    navController.navigate("chat/$userId")
+                onMessageProvider = { providerUserId ->
+                    navController.navigate("chat/$providerUserId")
+                },
+                onRateProvider = { appointmentId, providerId, providerName ->
+                    navController.navigate("review_submission/$appointmentId/$providerId/$providerName")
                 }
             )
         }
@@ -414,8 +456,67 @@ fun BmsNavigation(
             BrowseProvidersScreen(
                 onNavigate = handleBottomNav,
                 onBack = { navController.popBackStack() },
+                onBookProvider = { providerUserId ->
+                    navController.navigate("provider_detail/$providerUserId")
+                }
+            )
+        }
+
+        // ── Provider Detail ───────────────────────
+        composable(Screen.ProviderDetail.route) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId") ?: ""
+            com.bms.app.ui.user.ProviderDetailScreen(
+                providerUserId = userId,
+                onBack = { navController.popBackStack() },
+                onBook = { uid ->
+                    navController.navigate("book_service/$uid")
+                }
+            )
+        }
+
+        // ── Favorites ─────────────────────────────
+        composable(Screen.Favorites.route) {
+            com.bms.app.ui.user.FavoritesScreen(
+                onNavigate = handleBottomNav,
+                onBack = { navController.popBackStack() },
                 onBookProvider = { providerId ->
-                    navController.navigate("book_service/$providerId")
+                    navController.navigate("provider_detail/$providerId")
+                }
+            )
+        }
+
+        // ── Compare Providers ─────────────────────
+        composable(Screen.CompareProviders.route) {
+            com.bms.app.ui.user.CompareProvidersScreen(
+                onNavigate = handleBottomNav,
+                onBack = { navController.popBackStack() },
+                onBookProvider = { providerId ->
+                    navController.navigate("provider_detail/$providerId")
+                }
+            )
+        }
+
+        // ── Rewards ───────────────────────────────
+        composable(Screen.Rewards.route) {
+            com.bms.app.ui.user.RewardsScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        // ── Review Submission ─────────────────────
+        composable(Screen.ReviewSubmission.route) { backStackEntry ->
+            val appointmentId = backStackEntry.arguments?.getString("appointmentId") ?: ""
+            val providerId = backStackEntry.arguments?.getString("providerId") ?: ""
+            val providerName = backStackEntry.arguments?.getString("providerName") ?: ""
+            
+            com.bms.app.ui.user.ReviewSubmissionScreen(
+                appointmentId = appointmentId,
+                providerId = providerId,
+                providerName = providerName,
+                onBack = { navController.popBackStack() },
+                onSuccess = { 
+                    navController.popBackStack()
+                    // Optionally show a toast or snackbar
                 }
             )
         }

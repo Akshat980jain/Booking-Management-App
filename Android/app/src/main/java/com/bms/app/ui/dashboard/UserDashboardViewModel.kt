@@ -34,14 +34,28 @@ sealed class UserDashboardUiState {
         val nextAppointment: Appointment?,
         val upcomingBookings: List<Appointment>,
         val pastBookings: List<Appointment>,
+        val cancelledBookings: List<Appointment>,
+        val paidAppointments: List<Appointment>,
+        val allAppointments: List<Appointment>,
         /** Maps providerId (provider_profiles.id) -> ProviderProfile */
         val providerMap: Map<String, ProviderProfile>,
-        /** Maps userId (profiles.user_id) -> UserProfile — so we can show real names */
         val userProfileMap: Map<String, UserProfile>,
         val totalBookings: Int,
         val upcomingCount: Int,
         val completedCount: Int,
-        val cancelledCount: Int
+        val cancelledCount: Int,
+        val rescheduleRequests: List<Appointment> = emptyList(),
+        /** List of provider ids (provider_profiles.id) */
+        val favoriteProviderIds: Set<String> = emptySet(),
+        /** List of provider ids currently selected for comparison */
+        val selectedComparisonIds: Set<String> = emptySet(),
+        /** Filtering */
+        val selectedProfession: String? = null,
+        val minRating: Float = 0f,
+        val showVideoOnly: Boolean = false,
+        /** Real-time Notifications */
+        val notifications: List<com.bms.app.domain.model.Notification> = emptyList(),
+        val unreadNotificationCount: Int = 0
     ) : UserDashboardUiState()
 
     data class Error(val message: String) : UserDashboardUiState()
@@ -54,7 +68,8 @@ class UserDashboardViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val appointmentRepository: AppointmentRepository,
     private val auth: Auth,
-    private val sessionManager: SupabaseSessionManager
+    private val sessionManager: SupabaseSessionManager,
+    private val notificationRepository: com.bms.app.domain.repository.NotificationRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UserDashboardUiState>(UserDashboardUiState.Loading)
@@ -133,15 +148,26 @@ class UserDashboardViewModel @Inject constructor(
                     .associateBy { it.userId }
             } catch (_: Exception) { emptyMap() }
 
-            // ── 7. Derive stats ───────────────────────────────────────────
+            // ── 7. Fetch favorites ────────────────────────────────────────
+            val favoriteProviderIds = profileRepository.getFavorites(userId).getOrNull()?.toSet() ?: emptySet()
+
+            // ── 8. Derive stats ───────────────────────────────────────────
             val today = java.time.LocalDate.now()
 
             val upcomingBookings = allAppointments
                 .filter { it.status == "confirmed" || it.status == "approved" || it.status == "pending" }
                 .sortedWith(compareBy({ it.appointmentDate }, { it.startTime }))
 
+            val cancelledBookings = allAppointments
+                .filter { it.status == "cancelled" || it.status == "rejected" }
+                .sortedByDescending { it.appointmentDate }
+
             val pastBookings = allAppointments
-                .filter { it.status == "completed" || it.status == "cancelled" || it.status == "rejected" }
+                .filter { it.status == "completed" }
+                .sortedByDescending { it.appointmentDate }
+
+            val paidBookings = allAppointments
+                .filter { it.paymentStatus == "paid" || it.paymentStatus == "waived" }
                 .sortedByDescending { it.appointmentDate }
 
             val nextAppointment = upcomingBookings.firstOrNull {
@@ -150,20 +176,89 @@ class UserDashboardViewModel @Inject constructor(
                 }.getOrElse { true }
             }
 
-            _uiState.update {
-                UserDashboardUiState.Success(
-                    userProfile       = userProfile,
-                    userInitials      = NameUtils.getInitials(userProfile.fullName),
-                    nextAppointment   = nextAppointment,
-                    upcomingBookings  = upcomingBookings,
-                    pastBookings      = pastBookings,
-                    providerMap       = providerMap,
-                    userProfileMap    = userProfileMap,
-                    totalBookings     = allAppointments.size,
-                    upcomingCount     = upcomingBookings.size,
-                    completedCount    = allAppointments.count { it.status == "completed" },
-                    cancelledCount    = allAppointments.count { it.status == "cancelled" || it.status == "rejected" }
-                )
+            // Identify active reschedule requests: rejected with matching reason and date >= today
+            val rescheduleRequests = allAppointments.filter {
+                it.status == "rejected" &&
+                it.cancellationReason?.lowercase()?.contains("reschedule") == true &&
+                runCatching { java.time.LocalDate.parse(it.appointmentDate) >= today.minusDays(1) }.getOrElse { true }
+            }.sortedByDescending { it.appointmentDate }
+
+                // ── 8.5. Proximity Sort (Simulated) ─────────────────────────
+                // We sort providers who share the same city as the user to the top
+                val sortedProviders = providerProfiles.sortedByDescending { 
+                    it.location?.contains(userProfile.city ?: "", ignoreCase = true) == true
+                }
+                val sortedProviderMap = sortedProviders.associateBy { it.id }
+
+                _uiState.update {
+                    UserDashboardUiState.Success(
+                        userProfile       = userProfile,
+                        userInitials      = NameUtils.getInitials(userProfile.fullName),
+                        nextAppointment   = nextAppointment,
+                        upcomingBookings  = upcomingBookings,
+                        pastBookings      = pastBookings,
+                        cancelledBookings = cancelledBookings,
+                        paidAppointments  = paidBookings,
+                        allAppointments   = allAppointments,
+                        providerMap       = sortedProviderMap,
+                        userProfileMap    = userProfileMap,
+                        totalBookings     = allAppointments.size,
+                        upcomingCount     = upcomingBookings.size,
+                        completedCount    = allAppointments.count { it.status == "completed" },
+                        cancelledCount    = cancelledBookings.size,
+                        rescheduleRequests = rescheduleRequests,
+                        favoriteProviderIds = favoriteProviderIds,
+                        selectedComparisonIds = emptySet()
+                    )
+                }
+            
+            // ── 9. Start Notifications Listener ──────────────────────────
+            startNotificationsListener(userId)
+        }
+    }
+
+    private fun startNotificationsListener(userId: String) {
+        viewModelScope.launch {
+            notificationRepository.getNotificationsFlow(userId).collect { list ->
+                _uiState.update { state ->
+                    if (state is UserDashboardUiState.Success) {
+                        state.copy(
+                            notifications = list,
+                            unreadNotificationCount = list.count { !it.isRead }
+                        )
+                    } else state
+                }
+            }
+        }
+    }
+
+    fun markNotificationAsRead(notificationId: String) {
+        viewModelScope.launch {
+            notificationRepository.markAsRead(notificationId)
+        }
+    }
+
+    /** Toggles favorite status for a provider and updates local state. */
+    fun toggleFavorite(providerProfileId: String) {
+        val currentState = uiState.value
+        if (currentState !is UserDashboardUiState.Success) return
+
+        val userId = auth.currentSessionOrNull()?.user?.id ?: return
+
+        viewModelScope.launch {
+            val result = profileRepository.toggleFavorite(userId, providerProfileId)
+            if (result.isSuccess) {
+                val isNowFavorite = result.getOrThrow()
+                _uiState.update { state ->
+                    if (state is UserDashboardUiState.Success) {
+                        val newFavorites = if (isNowFavorite) {
+                            state.favoriteProviderIds + providerProfileId
+                        } else {
+                            state.favoriteProviderIds - providerProfileId
+                        }
+                        state.copy(favoriteProviderIds = newFavorites)
+                    } else state
+                }
             }
         }
     }
@@ -172,6 +267,74 @@ class UserDashboardViewModel @Inject constructor(
     fun cancelBooking(appointmentId: String, reason: String = "Cancelled by user") {
         viewModelScope.launch {
             appointmentRepository.cancelAppointment(appointmentId, reason)
+            loadDashboard()
+        }
+    }
+
+    /** Toggles selection for comparison (max 3) */
+    fun toggleComparisonSelection(providerId: String) {
+        _uiState.update { state ->
+            if (state is UserDashboardUiState.Success) {
+                val current = state.selectedComparisonIds
+                val newSelection = if (current.contains(providerId)) {
+                    current - providerId
+                } else {
+                    if (current.size >= 3) current else current + providerId
+                }
+                state.copy(selectedComparisonIds = newSelection)
+            } else state
+        }
+    }
+
+    fun clearComparison() {
+        _uiState.update { state ->
+            if (state is UserDashboardUiState.Success) {
+                state.copy(selectedComparisonIds = emptySet())
+            } else state
+        }
+    }
+
+    fun updateFilters(
+        profession: String?,
+        minRating: Float,
+        showVideoOnly: Boolean
+    ) {
+        _uiState.update { state ->
+            if (state is UserDashboardUiState.Success) {
+                state.copy(
+                    selectedProfession = profession,
+                    minRating = minRating,
+                    showVideoOnly = showVideoOnly
+                )
+            } else state
+        }
+    }
+
+    fun acceptReschedule(appointmentId: String) {
+        viewModelScope.launch {
+            appointmentRepository.acceptReschedule(appointmentId)
+            loadDashboard()
+        }
+    }
+
+    fun declineReschedule(appointmentId: String) {
+        viewModelScope.launch {
+            appointmentRepository.declineReschedule(appointmentId)
+            loadDashboard()
+        }
+    }
+
+    fun requestReschedule(
+        appointmentId: String,
+        newDate: String,
+        newStartTime: String,
+        newEndTime: String,
+        reason: String
+    ) {
+        viewModelScope.launch {
+            appointmentRepository.rescheduleAppointment(
+                appointmentId, newDate, newStartTime, newEndTime, reason
+            )
             loadDashboard()
         }
     }

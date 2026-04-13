@@ -94,7 +94,7 @@ fun AdminScheduleScreen(
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Spacer(Modifier.height(12.dp))
-                        BmsPrimaryButton(text = "Retry", onClick = { viewModel.loadAdminDashboard() })
+                        BmsButton(text = "Retry", onClick = { viewModel.loadAdminDashboard() })
                     }
                 }
                 is AdminUiState.Success -> {

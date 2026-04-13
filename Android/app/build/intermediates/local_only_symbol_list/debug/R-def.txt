@@ -2,4 +2,27 @@ R_DEF: Internal format may change without notice
 local
 mipmap ic_launcher
 string app_name
+string compare_now
+string current_balance
+string email_label
+string filter_rating
+string filter_video
+string forgot_password
+string login_subtitle
+string login_title
+string member_tier
+string nav_book
+string nav_bookings
+string nav_home
+string nav_saved
+string nav_settings
+string password_label
+string recent_activity
+string reset_password
+string rewards_title
+string search_hint
+string stat_completed
+string stat_loyalty
+string stat_total
+string stat_upcoming
 style Theme.BmsApp

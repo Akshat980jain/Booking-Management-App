@@ -31,7 +31,8 @@ fun BmsTextField(
     passwordVisible: Boolean = false,
     onPasswordVisibilityToggle: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
-    singleLine: Boolean = true
+    singleLine: Boolean = true,
+    errorMessage: String? = null
 ) {
     var isFocused by remember { mutableStateOf(false) }
 
@@ -46,6 +47,7 @@ fun BmsTextField(
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
+            isError = errorMessage != null,
             placeholder = {
                 Text(
                     placeholder,
@@ -90,6 +92,15 @@ fun BmsTextField(
                 .fillMaxWidth()
                 .onFocusChanged { isFocused = it.isFocused }
         )
+
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+            )
+        }
     }
 }
 

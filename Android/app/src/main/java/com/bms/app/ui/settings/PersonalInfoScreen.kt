@@ -33,8 +33,10 @@ fun PersonalInfoScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     
-    var fullName by remember { mutableStateOf("Loading...") }
-    var phone by remember { mutableStateOf("Loading...") }
+    var fullName by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+    var insProvider by remember { mutableStateOf("") }
+    var policyNum by remember { mutableStateOf("") }
 
     // Update local state when profile loads
     LaunchedEffect(uiState) {
@@ -42,6 +44,8 @@ fun PersonalInfoScreen(
             val userProfile = (uiState as ProfileUiState.Success).userProfile
             fullName = userProfile.fullName
             phone = userProfile.phone ?: ""
+            insProvider = userProfile.insuranceProvider ?: ""
+            policyNum = userProfile.policyNumber ?: ""
         }
     }
 
@@ -75,7 +79,7 @@ fun PersonalInfoScreen(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                "Manage your public-facing identity and\nsecure contact channels.",
+                "Manage your data, insurance details,\nand secure contact channels.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = OnSurfaceVariant
             )
@@ -112,7 +116,7 @@ fun PersonalInfoScreen(
 
                         Column {
                             Text(
-                                "PROVIDER IDENTITY",
+                                "USER IDENTITY",
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     letterSpacing = 2.sp,
                                     fontWeight = FontWeight.Bold
@@ -121,7 +125,7 @@ fun PersonalInfoScreen(
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                fullName.replace(" ", "\n"),
+                                fullName.ifBlank { "Unset" },
                                 style = MaterialTheme.typography.headlineSmall,
                                 color = OnSurface
                             )
@@ -153,7 +157,73 @@ fun PersonalInfoScreen(
 
                     BmsSecondaryButton(
                         text = "Save Personal Info",
-                        onClick = { }
+                        onClick = { viewModel.updatePersonalInfo(fullName, phone) }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // ── Insurance Information ─────────────────
+            Surface(
+                color = SurfaceContainerLowest,
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Text(
+                        "INSURANCE INFORMATION",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            letterSpacing = 2.sp,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = OnSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    BmsTextField(
+                        value = insProvider,
+                        onValueChange = { insProvider = it },
+                        label = "INSURANCE PROVIDER",
+                        placeholder = "e.g. Blue Cross Blue Shield",
+                        leadingIcon = Icons.Outlined.Assignment
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    BmsTextField(
+                        value = policyNum,
+                        onValueChange = { policyNum = it },
+                        label = "POLICY NUMBER",
+                        placeholder = "e.g. ABC123456789",
+                        leadingIcon = Icons.Outlined.Numbers
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Insurance Card Upload Placeholder
+                    Surface(
+                        color = Background,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, OutlineVariant)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(Icons.Outlined.CloudUpload, null, tint = OnSurfaceVariant)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text("Click to upload insurance card", style = MaterialTheme.typography.bodySmall, color = OnSurfaceVariant)
+                            Text("JPEG, PNG, or PDF (Max 5MB)", style = MaterialTheme.typography.labelSmall, color = OnSurfaceVariant.copy(alpha = 0.6f))
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    BmsSecondaryButton(
+                        text = "Save Insurance Info",
+                        onClick = { viewModel.updateInsurance(insProvider, policyNum) }
                     )
                 }
             }

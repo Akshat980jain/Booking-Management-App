@@ -514,7 +514,7 @@ fun ManageAvailabilityContent(
                     Spacer(modifier = Modifier.height(24.dp))
 
                     // ── Update Button ─────────────────────────
-                    BmsPrimaryButton(
+                    BmsButton(
                         text = "Update Schedule",
                         onClick = {
                             val newSlots = localSchedule.values.map {
