@@ -1,16 +1,16 @@
 package com.bms.app.data.repository;
 
 @kotlinx.serialization.Serializable()
-@kotlin.Metadata(mv = {1, 9, 0}, k = 1, xi = 48, d1 = {"\u0000>\n\u0002\u0018\u0002\n\u0002\u0010\u0000\n\u0000\n\u0002\u0010\b\n\u0000\n\u0002\u0010\u000e\n\u0002\b\u0005\n\u0002\u0018\u0002\n\u0002\b\u0014\n\u0002\u0010\u000b\n\u0002\b\u0004\n\u0002\u0010\u0002\n\u0002\b\u0002\n\u0002\u0018\u0002\n\u0000\n\u0002\u0018\u0002\n\u0002\b\u0004\b\u0087\b\u0018\u0000 -2\u00020\u0001:\u0002,-BS\b\u0011\u0012\u0006\u0010\u0002\u001a\u00020\u0003\u0012\b\u0010\u0004\u001a\u0004\u0018\u00010\u0005\u0012\n\b\u0001\u0010\u0006\u001a\u0004\u0018\u00010\u0005\u0012\n\b\u0001\u0010\u0007\u001a\u0004\u0018\u00010\u0005\u0012\n\b\u0001\u0010\b\u001a\u0004\u0018\u00010\u0005\u0012\n\b\u0001\u0010\t\u001a\u0004\u0018\u00010\u0005\u0012\b\u0010\n\u001a\u0004\u0018\u00010\u000b\u00a2\u0006\u0002\u0010\fB-\u0012\u0006\u0010\u0004\u001a\u00020\u0005\u0012\u0006\u0010\u0006\u001a\u00020\u0005\u0012\u0006\u0010\u0007\u001a\u00020\u0005\u0012\u0006\u0010\b\u001a\u00020\u0005\u0012\u0006\u0010\t\u001a\u00020\u0005\u00a2\u0006\u0002\u0010\rJ\t\u0010\u0019\u001a\u00020\u0005H\u00c6\u0003J\t\u0010\u001a\u001a\u00020\u0005H\u00c6\u0003J\t\u0010\u001b\u001a\u00020\u0005H\u00c6\u0003J\t\u0010\u001c\u001a\u00020\u0005H\u00c6\u0003J\t\u0010\u001d\u001a\u00020\u0005H\u00c6\u0003J;\u0010\u001e\u001a\u00020\u00002\b\b\u0002\u0010\u0004\u001a\u00020\u00052\b\b\u0002\u0010\u0006\u001a\u00020\u00052\b\b\u0002\u0010\u0007\u001a\u00020\u00052\b\b\u0002\u0010\b\u001a\u00020\u00052\b\b\u0002\u0010\t\u001a\u00020\u0005H\u00c6\u0001J\u0013\u0010\u001f\u001a\u00020 2\b\u0010!\u001a\u0004\u0018\u00010\u0001H\u00d6\u0003J\t\u0010\"\u001a\u00020\u0003H\u00d6\u0001J\t\u0010#\u001a\u00020\u0005H\u00d6\u0001J&\u0010$\u001a\u00020%2\u0006\u0010&\u001a\u00020\u00002\u0006\u0010\'\u001a\u00020(2\u0006\u0010)\u001a\u00020*H\u00c1\u0001\u00a2\u0006\u0002\b+R\u001c\u0010\u0006\u001a\u00020\u00058\u0006X\u0087\u0004\u00a2\u0006\u000e\n\u0000\u0012\u0004\b\u000e\u0010\u000f\u001a\u0004\b\u0010\u0010\u0011R\u001c\u0010\t\u001a\u00020\u00058\u0006X\u0087\u0004\u00a2\u0006\u000e\n\u0000\u0012\u0004\b\u0012\u0010\u000f\u001a\u0004\b\u0013\u0010\u0011R\u001c\u0010\b\u001a\u00020\u00058\u0006X\u0087\u0004\u00a2\u0006\u000e\n\u0000\u0012\u0004\b\u0014\u0010\u000f\u001a\u0004\b\u0015\u0010\u0011R\u001c\u0010\u0007\u001a\u00020\u00058\u0006X\u0087\u0004\u00a2\u0006\u000e\n\u0000\u0012\u0004\b\u0016\u0010\u000f\u001a\u0004\b\u0017\u0010\u0011R\u0011\u0010\u0004\u001a\u00020\u0005\u00a2\u0006\b\n\u0000\u001a\u0004\b\u0018\u0010\u0011\u00a8\u0006."}, d2 = {"Lcom/bms/app/data/repository/RescheduleUpdate;", "", "seen1", "", "status", "", "appointmentDate", "startTime", "endTime", "cancellationReason", "serializationConstructorMarker", "Lkotlinx/serialization/internal/SerializationConstructorMarker;", "(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlinx/serialization/internal/SerializationConstructorMarker;)V", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V", "getAppointmentDate$annotations", "()V", "getAppointmentDate", "()Ljava/lang/String;", "getCancellationReason$annotations", "getCancellationReason", "getEndTime$annotations", "getEndTime", "getStartTime$annotations", "getStartTime", "getStatus", "component1", "component2", "component3", "component4", "component5", "copy", "equals", "", "other", "hashCode", "toString", "write$Self", "", "self", "output", "Lkotlinx/serialization/encoding/CompositeEncoder;", "serialDesc", "Lkotlinx/serialization/descriptors/SerialDescriptor;", "write$Self$app_debug", "$serializer", "Companion", "app_debug"})
+@kotlin.Metadata(mv = {1, 9, 0}, k = 1, xi = 48, d1 = {"\u0000>\n\u0002\u0018\u0002\n\u0002\u0010\u0000\n\u0000\n\u0002\u0010\b\n\u0000\n\u0002\u0010\u000e\n\u0002\b\u0005\n\u0002\u0018\u0002\n\u0002\b\u0014\n\u0002\u0010\u000b\n\u0002\b\u0004\n\u0002\u0010\u0002\n\u0002\b\u0002\n\u0002\u0018\u0002\n\u0000\n\u0002\u0018\u0002\n\u0002\b\u0004\b\u0087\b\u0018\u0000 -2\u00020\u0001:\u0002,-BS\b\u0011\u0012\u0006\u0010\u0002\u001a\u00020\u0003\u0012\b\u0010\u0004\u001a\u0004\u0018\u00010\u0005\u0012\n\b\u0001\u0010\u0006\u001a\u0004\u0018\u00010\u0005\u0012\n\b\u0001\u0010\u0007\u001a\u0004\u0018\u00010\u0005\u0012\n\b\u0001\u0010\b\u001a\u0004\u0018\u00010\u0005\u0012\n\b\u0001\u0010\t\u001a\u0004\u0018\u00010\u0005\u0012\b\u0010\n\u001a\u0004\u0018\u00010\u000b\u00a2\u0006\u0002\u0010\fB-\u0012\u0006\u0010\u0004\u001a\u00020\u0005\u0012\u0006\u0010\u0006\u001a\u00020\u0005\u0012\u0006\u0010\u0007\u001a\u00020\u0005\u0012\u0006\u0010\b\u001a\u00020\u0005\u0012\u0006\u0010\t\u001a\u00020\u0005\u00a2\u0006\u0002\u0010\rJ\t\u0010\u0019\u001a\u00020\u0005H\u00c6\u0003J\t\u0010\u001a\u001a\u00020\u0005H\u00c6\u0003J\t\u0010\u001b\u001a\u00020\u0005H\u00c6\u0003J\t\u0010\u001c\u001a\u00020\u0005H\u00c6\u0003J\t\u0010\u001d\u001a\u00020\u0005H\u00c6\u0003J;\u0010\u001e\u001a\u00020\u00002\b\b\u0002\u0010\u0004\u001a\u00020\u00052\b\b\u0002\u0010\u0006\u001a\u00020\u00052\b\b\u0002\u0010\u0007\u001a\u00020\u00052\b\b\u0002\u0010\b\u001a\u00020\u00052\b\b\u0002\u0010\t\u001a\u00020\u0005H\u00c6\u0001J\u0013\u0010\u001f\u001a\u00020 2\b\u0010!\u001a\u0004\u0018\u00010\u0001H\u00d6\u0003J\t\u0010\"\u001a\u00020\u0003H\u00d6\u0001J\t\u0010#\u001a\u00020\u0005H\u00d6\u0001J&\u0010$\u001a\u00020%2\u0006\u0010&\u001a\u00020\u00002\u0006\u0010\'\u001a\u00020(2\u0006\u0010)\u001a\u00020*H\u00c1\u0001\u00a2\u0006\u0002\b+R\u001c\u0010\t\u001a\u00020\u00058\u0006X\u0087\u0004\u00a2\u0006\u000e\n\u0000\u0012\u0004\b\u000e\u0010\u000f\u001a\u0004\b\u0010\u0010\u0011R\u001c\u0010\u0006\u001a\u00020\u00058\u0006X\u0087\u0004\u00a2\u0006\u000e\n\u0000\u0012\u0004\b\u0012\u0010\u000f\u001a\u0004\b\u0013\u0010\u0011R\u001c\u0010\b\u001a\u00020\u00058\u0006X\u0087\u0004\u00a2\u0006\u000e\n\u0000\u0012\u0004\b\u0014\u0010\u000f\u001a\u0004\b\u0015\u0010\u0011R\u001c\u0010\u0007\u001a\u00020\u00058\u0006X\u0087\u0004\u00a2\u0006\u000e\n\u0000\u0012\u0004\b\u0016\u0010\u000f\u001a\u0004\b\u0017\u0010\u0011R\u0011\u0010\u0004\u001a\u00020\u0005\u00a2\u0006\b\n\u0000\u001a\u0004\b\u0018\u0010\u0011\u00a8\u0006."}, d2 = {"Lcom/bms/app/data/repository/RescheduleUpdate;", "", "seen1", "", "status", "", "requestedDate", "requestedStartTime", "requestedEndTime", "cancellationReason", "serializationConstructorMarker", "Lkotlinx/serialization/internal/SerializationConstructorMarker;", "(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlinx/serialization/internal/SerializationConstructorMarker;)V", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V", "getCancellationReason$annotations", "()V", "getCancellationReason", "()Ljava/lang/String;", "getRequestedDate$annotations", "getRequestedDate", "getRequestedEndTime$annotations", "getRequestedEndTime", "getRequestedStartTime$annotations", "getRequestedStartTime", "getStatus", "component1", "component2", "component3", "component4", "component5", "copy", "equals", "", "other", "hashCode", "toString", "write$Self", "", "self", "output", "Lkotlinx/serialization/encoding/CompositeEncoder;", "serialDesc", "Lkotlinx/serialization/descriptors/SerialDescriptor;", "write$Self$app_debug", "$serializer", "Companion", "app_debug"})
 public final class RescheduleUpdate {
     @org.jetbrains.annotations.NotNull()
     private final java.lang.String status = null;
     @org.jetbrains.annotations.NotNull()
-    private final java.lang.String appointmentDate = null;
+    private final java.lang.String requestedDate = null;
     @org.jetbrains.annotations.NotNull()
-    private final java.lang.String startTime = null;
+    private final java.lang.String requestedStartTime = null;
     @org.jetbrains.annotations.NotNull()
-    private final java.lang.String endTime = null;
+    private final java.lang.String requestedEndTime = null;
     @org.jetbrains.annotations.NotNull()
     private final java.lang.String cancellationReason = null;
     @org.jetbrains.annotations.NotNull()
@@ -18,9 +18,9 @@ public final class RescheduleUpdate {
     
     public RescheduleUpdate(@org.jetbrains.annotations.NotNull()
     java.lang.String status, @org.jetbrains.annotations.NotNull()
-    java.lang.String appointmentDate, @org.jetbrains.annotations.NotNull()
-    java.lang.String startTime, @org.jetbrains.annotations.NotNull()
-    java.lang.String endTime, @org.jetbrains.annotations.NotNull()
+    java.lang.String requestedDate, @org.jetbrains.annotations.NotNull()
+    java.lang.String requestedStartTime, @org.jetbrains.annotations.NotNull()
+    java.lang.String requestedEndTime, @org.jetbrains.annotations.NotNull()
     java.lang.String cancellationReason) {
         super();
     }
@@ -31,33 +31,33 @@ public final class RescheduleUpdate {
     }
     
     @org.jetbrains.annotations.NotNull()
-    public final java.lang.String getAppointmentDate() {
+    public final java.lang.String getRequestedDate() {
         return null;
     }
     
-    @kotlinx.serialization.SerialName(value = "appointment_date")
+    @kotlinx.serialization.SerialName(value = "reschedule_requested_date")
     @java.lang.Deprecated()
-    public static void getAppointmentDate$annotations() {
+    public static void getRequestedDate$annotations() {
     }
     
     @org.jetbrains.annotations.NotNull()
-    public final java.lang.String getStartTime() {
+    public final java.lang.String getRequestedStartTime() {
         return null;
     }
     
-    @kotlinx.serialization.SerialName(value = "start_time")
+    @kotlinx.serialization.SerialName(value = "reschedule_requested_start_time")
     @java.lang.Deprecated()
-    public static void getStartTime$annotations() {
+    public static void getRequestedStartTime$annotations() {
     }
     
     @org.jetbrains.annotations.NotNull()
-    public final java.lang.String getEndTime() {
+    public final java.lang.String getRequestedEndTime() {
         return null;
     }
     
-    @kotlinx.serialization.SerialName(value = "end_time")
+    @kotlinx.serialization.SerialName(value = "reschedule_requested_end_time")
     @java.lang.Deprecated()
-    public static void getEndTime$annotations() {
+    public static void getRequestedEndTime$annotations() {
     }
     
     @org.jetbrains.annotations.NotNull()
@@ -98,9 +98,9 @@ public final class RescheduleUpdate {
     @org.jetbrains.annotations.NotNull()
     public final com.bms.app.data.repository.RescheduleUpdate copy(@org.jetbrains.annotations.NotNull()
     java.lang.String status, @org.jetbrains.annotations.NotNull()
-    java.lang.String appointmentDate, @org.jetbrains.annotations.NotNull()
-    java.lang.String startTime, @org.jetbrains.annotations.NotNull()
-    java.lang.String endTime, @org.jetbrains.annotations.NotNull()
+    java.lang.String requestedDate, @org.jetbrains.annotations.NotNull()
+    java.lang.String requestedStartTime, @org.jetbrains.annotations.NotNull()
+    java.lang.String requestedEndTime, @org.jetbrains.annotations.NotNull()
     java.lang.String cancellationReason) {
         return null;
     }

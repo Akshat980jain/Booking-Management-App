@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -140,6 +141,7 @@ fun BrowseProvidersScreen(
                 is UserDashboardUiState.Success -> {
                     // ── Filtering Logic ───────────────────────────────────────
                     val providers = state.providerMap.values
+                        .distinctBy { it.id } // deduplicate: map has both id and userId keys
                         .filter { it.isActive }
                         .filter { provider ->
                             val matchesQuery = if (query.isBlank()) true
@@ -169,7 +171,11 @@ fun BrowseProvidersScreen(
                         ) {
                             var showProfessionMenu by remember { mutableStateOf(false) }
                             val professions = remember(state.providerMap) {
-                                state.providerMap.values.map { it.profession }.distinct().sorted()
+                                state.providerMap.values
+                                    .distinctBy { it.id }
+                                    .map { it.profession }
+                                    .distinct()
+                                    .sorted()
                             }
 
                             Box {
@@ -229,27 +235,33 @@ fun BrowseProvidersScreen(
                         }
 
                         if (providers.isEmpty()) {
+                            val totalProviders = state.providerMap.values.count { it.isActive } // Should be 0 since providers is empty
+                            val anyProvidersAtAll = state.providerMap.isNotEmpty()
+
                             Box(
                                 modifier = Modifier.fillMaxSize().padding(32.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Icon(
-                                        Icons.Outlined.SearchOff,
+                                        if (anyProvidersAtAll) Icons.Outlined.WifiOff else Icons.Outlined.SearchOff,
                                         contentDescription = null,
                                         tint = OnSurfaceVariant,
                                         modifier = Modifier.size(48.dp)
                                     )
                                     Spacer(modifier = Modifier.height(12.dp))
                                     Text(
-                                        if (query.isBlank()) "No providers available yet"
-                                        else "No providers match \"$query\"",
+                                        text = when {
+                                            query.isNotBlank() -> "No providers match \"$query\""
+                                            anyProvidersAtAll -> "All providers are currently offline. Please check back later."
+                                            else -> "No providers available yet. We're working on bringing more on board!"
+                                        },
                                         style = MaterialTheme.typography.titleSmall,
+                                        textAlign = TextAlign.Center,
                                         color = OnSurface
                                     )
                                 }
                             }
-
                         } else {
                             Text(
                                 text = "${providers.size} provider${if (providers.size == 1) "" else "s"} found",

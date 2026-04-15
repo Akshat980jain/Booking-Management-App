@@ -21,10 +21,22 @@ data class AppointmentRejectUpdate(
 @Serializable
 data class RescheduleUpdate(
     val status: String,
-    @SerialName("appointment_date") val appointmentDate: String,
-    @SerialName("start_time") val startTime: String,
-    @SerialName("end_time") val endTime: String,
+    @SerialName("reschedule_requested_date") val requestedDate: String,
+    @SerialName("reschedule_requested_start_time") val requestedStartTime: String,
+    @SerialName("reschedule_requested_end_time") val requestedEndTime: String,
     @SerialName("cancellation_reason") val cancellationReason: String
+)
+
+@Serializable
+data class AcceptRescheduleUpdate(
+    val status: String,
+    @SerialName("appointment_date") val appointmentDate: String?,
+    @SerialName("start_time") val startTime: String?,
+    @SerialName("end_time") val endTime: String?,
+    @SerialName("reschedule_requested_date") val requestedDate: String? = null,
+    @SerialName("reschedule_requested_start_time") val requestedStartTime: String? = null,
+    @SerialName("reschedule_requested_end_time") val requestedEndTime: String? = null,
+    @SerialName("cancellation_reason") val cancellationReason: String? = null
 )
 
 @Singleton
@@ -161,11 +173,11 @@ class AppointmentRepositoryImpl @Inject constructor(
         return try {
             postgrest["appointments"].update(
                 RescheduleUpdate(
-                    status = "rejected", // "rejected" with a "reschedule" reason is the chosen state workflow
-                    appointmentDate = newDate,
-                    startTime = newStartTime,
-                    endTime = newEndTime,
-                    cancellationReason = "reschedule: $reason"
+                    status = "rescheduling",
+                    requestedDate = newDate,
+                    requestedStartTime = newStartTime,
+                    requestedEndTime = newEndTime,
+                    cancellationReason = reasoning(reason)
                 )
             ) {
                 filter { eq("id", appointmentId) }
@@ -176,11 +188,28 @@ class AppointmentRepositoryImpl @Inject constructor(
         }
     }
 
+    private fun reasoning(text: String): String {
+        return if (text.startsWith("reschedule:")) text else "reschedule: $text"
+    }
+
     override suspend fun acceptReschedule(appointmentId: String): Result<Unit> {
         return try {
-            // Remove the rejection and change it to pending or confirmed
+            // First fetch the appointment to get the requested values
+            val appt = postgrest["appointments"].select {
+                filter { eq("id", appointmentId) }
+            }.decodeSingle<Appointment>()
+
             postgrest["appointments"].update(
-                AppointmentRejectUpdate(status = "confirmed", cancellationReason = null)
+                AcceptRescheduleUpdate(
+                    status = "approved",
+                    appointmentDate = appt.rescheduleRequestedDate,
+                    startTime = appt.rescheduleRequestedStartTime,
+                    endTime = appt.rescheduleRequestedEndTime,
+                    requestedDate = null,
+                    requestedStartTime = null,
+                    requestedEndTime = null,
+                    cancellationReason = null
+                )
             ) {
                 filter { eq("id", appointmentId) }
             }
@@ -193,7 +222,16 @@ class AppointmentRepositoryImpl @Inject constructor(
     override suspend fun declineReschedule(appointmentId: String): Result<Unit> {
         return try {
             postgrest["appointments"].update(
-                AppointmentRejectUpdate(status = "cancelled", cancellationReason = "Reschedule Request Declined")
+                AcceptRescheduleUpdate(
+                    status = "approved", // Stay approved as it was before reschedule request
+                    appointmentDate = null, // Don't change main date
+                    startTime = null,
+                    endTime = null,
+                    requestedDate = null,
+                    requestedStartTime = null,
+                    requestedEndTime = null,
+                    cancellationReason = null
+                )
             ) {
                 filter { eq("id", appointmentId) }
             }

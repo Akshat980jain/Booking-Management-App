@@ -1,5 +1,6 @@
 package com.bms.app.ui.dashboard
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bms.app.domain.model.Appointment
@@ -9,6 +10,7 @@ import com.bms.app.domain.repository.AppointmentRepository
 import com.bms.app.domain.repository.ProfileRepository
 import com.bms.app.data.local.SupabaseSessionManager
 import com.bms.app.domain.util.NameUtils
+import com.bms.app.util.NotificationHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.SessionStatus
@@ -65,6 +67,7 @@ sealed class UserDashboardUiState {
 
 @HiltViewModel
 class UserDashboardViewModel @Inject constructor(
+    private val application: Application,
     private val profileRepository: ProfileRepository,
     private val appointmentRepository: AppointmentRepository,
     private val auth: Auth,
@@ -74,6 +77,9 @@ class UserDashboardViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow<UserDashboardUiState>(UserDashboardUiState.Loading)
     val uiState: StateFlow<UserDashboardUiState> = _uiState.asStateFlow()
+
+    // Track which notification IDs we've already shown system notifications for
+    private val seenNotificationIds = mutableSetOf<String>()
 
     init {
         loadDashboard()
@@ -137,12 +143,19 @@ class UserDashboardViewModel @Inject constructor(
 
             // providerMap: provider_profiles.id -> ProviderProfile
             val providerMap = providerProfiles.associateBy { it.id }
+            val providerByUserIdMap = providerProfiles.associateBy { it.userId }
 
-            // ── 6. Fetch real names for each provider from profiles table ─
-            val providerUserIds = providerProfiles.map { it.userId }.distinct()
+            // ── 6. Fetch real names for all involved users ────────────────
+            // Collect all unique user IDs we might need (all provider user IDs + any user ids from appointments)
+            val allProviderUserIds = providerProfiles.map { it.userId }.toSet()
+            val appointmentProviderIds = allAppointments.map { it.providerId }.toSet()
+            
+            // Some provider_id values in appointments might actually be user IDs
+            val idsToFetch = (allProviderUserIds + appointmentProviderIds).toList()
+
             val userProfileMap: Map<String, UserProfile> = try {
-                if (providerUserIds.isEmpty()) emptyMap()
-                else profileRepository.getProfilesByIds(providerUserIds)
+                if (idsToFetch.isEmpty()) emptyMap()
+                else profileRepository.getProfilesByIds(idsToFetch)
                     .getOrNull()
                     .orEmpty()
                     .associateBy { it.userId }
@@ -155,7 +168,7 @@ class UserDashboardViewModel @Inject constructor(
             val today = java.time.LocalDate.now()
 
             val upcomingBookings = allAppointments
-                .filter { it.status == "confirmed" || it.status == "approved" || it.status == "pending" }
+                .filter { it.status == "confirmed" || it.status == "approved" || it.status == "pending" || it.status == "rescheduling" }
                 .sortedWith(compareBy({ it.appointmentDate }, { it.startTime }))
 
             val cancelledBookings = allAppointments
@@ -176,11 +189,9 @@ class UserDashboardViewModel @Inject constructor(
                 }.getOrElse { true }
             }
 
-            // Identify active reschedule requests: rejected with matching reason and date >= today
-            val rescheduleRequests = allAppointments.filter {
-                it.status == "rejected" &&
-                it.cancellationReason?.lowercase()?.contains("reschedule") == true &&
-                runCatching { java.time.LocalDate.parse(it.appointmentDate) >= today.minusDays(1) }.getOrElse { true }
+            // Identify active reschedule requests: status is 'rescheduling' AND requester is NOT the current user
+            val rescheduleRequests = allAppointments.filter { appt ->
+                appt.status == "rescheduling" && appt.rescheduleRequesterId != userId
             }.sortedByDescending { it.appointmentDate }
 
                 // ── 8.5. Proximity Sort (Simulated) ─────────────────────────
@@ -188,7 +199,13 @@ class UserDashboardViewModel @Inject constructor(
                 val sortedProviders = providerProfiles.sortedByDescending { 
                     it.location?.contains(userProfile.city ?: "", ignoreCase = true) == true
                 }
-                val sortedProviderMap = sortedProviders.associateBy { it.id }
+                
+                // Create a robust map that supports lookup by BOTH profile.id and profile.userId
+                val robustProviderMap = mutableMapOf<String, ProviderProfile>()
+                sortedProviders.forEach { profile ->
+                    robustProviderMap[profile.id] = profile
+                    robustProviderMap[profile.userId] = profile
+                }
 
                 _uiState.update {
                     UserDashboardUiState.Success(
@@ -200,7 +217,7 @@ class UserDashboardViewModel @Inject constructor(
                         cancelledBookings = cancelledBookings,
                         paidAppointments  = paidBookings,
                         allAppointments   = allAppointments,
-                        providerMap       = sortedProviderMap,
+                        providerMap       = robustProviderMap,
                         userProfileMap    = userProfileMap,
                         totalBookings     = allAppointments.size,
                         upcomingCount     = upcomingBookings.size,
@@ -220,6 +237,9 @@ class UserDashboardViewModel @Inject constructor(
     private fun startNotificationsListener(userId: String) {
         viewModelScope.launch {
             notificationRepository.getNotificationsFlow(userId).collect { list ->
+                val previousCount = (_uiState.value as? UserDashboardUiState.Success)
+                    ?.unreadNotificationCount ?: 0
+
                 _uiState.update { state ->
                     if (state is UserDashboardUiState.Success) {
                         state.copy(
@@ -227,6 +247,24 @@ class UserDashboardViewModel @Inject constructor(
                             unreadNotificationCount = list.count { !it.isRead }
                         )
                     } else state
+                }
+
+                // Show Android system notifications for NEW contact_message items
+                val newContactMessages = list.filter { notification ->
+                    notification.type == "contact_message"
+                            && !notification.isRead
+                            && notification.id.isNotBlank()
+                            && notification.id !in seenNotificationIds
+                }
+
+                for (notification in newContactMessages) {
+                    seenNotificationIds.add(notification.id)
+                    NotificationHelper.showChatNotification(
+                        context = application,
+                        senderName = notification.title,
+                        messagePreview = notification.message,
+                        senderId = notification.id // Use notification ID for unique system notif
+                    )
                 }
             }
         }

@@ -25,9 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bms.app.domain.model.ChatConversation
-import com.bms.app.ui.components.BmsTextField
-import com.bms.app.ui.components.SkeletonBox
-import com.bms.app.ui.components.RoleBadge
+import com.bms.app.ui.components.*
 import com.bms.app.ui.theme.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -35,12 +33,19 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InboxScreen(
+    userRole: String = "USER",
     onBack: () -> Unit,
     onOpenChat: (String) -> Unit,
+    onNavigate: (String) -> Unit = {},
     viewModel: InboxViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
+
+    // Get role from session if possible, or default to USER
+    val role = remember { mutableStateOf("USER") } // In a real app, this would come from a session state
+    // For this context, we can derive it or assume it's passed. 
+    // Since we don't have a role in InboxViewModel yet, we'll keep it flexible.
 
     Scaffold(
         topBar = {
@@ -52,6 +57,21 @@ fun InboxScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Background)
+            )
+        },
+        bottomBar = {
+            val navItems = when (userRole.uppercase()) {
+                "ADMIN" -> AdminNavItems
+                "PROVIDER" -> ProviderNavItems
+                else -> UserNavItems
+            }
+            
+            BmsBottomNavBar(
+                items = navItems,
+                selectedRoute = "inbox",
+                onItemSelected = { route ->
+                    onNavigate(route)
+                }
             )
         },
         containerColor = Background

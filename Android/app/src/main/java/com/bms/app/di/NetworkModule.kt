@@ -11,6 +11,8 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.auth
+import io.github.jan.supabase.functions.Functions
+import io.github.jan.supabase.functions.functions
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.realtime.Realtime
@@ -45,6 +47,7 @@ object NetworkModule {
                 this.sessionManager = sessionManager
             }
             install(Realtime)
+            install(Functions)
         }
     }
 
@@ -64,5 +67,11 @@ object NetworkModule {
     @Singleton
     fun provideSupabaseRealtime(client: SupabaseClient): Realtime {
         return client.realtime
+    }
+
+    @Provides
+    @Singleton
+    fun provideSupabaseFunctions(client: SupabaseClient): Functions {
+        return client.functions
     }
 }

@@ -1,5 +1,6 @@
 package com.bms.app.ui.dashboard
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bms.app.domain.model.UserProfile
@@ -7,6 +8,7 @@ import com.bms.app.domain.model.UserRoleRow
 import com.bms.app.domain.util.NameUtils
 import com.bms.app.domain.repository.AppointmentRepository
 import com.bms.app.domain.repository.ProfileRepository
+import com.bms.app.util.NotificationHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
@@ -33,7 +35,8 @@ sealed class AdminUiState {
         val users: List<UserProfile>,
         val appointments: List<com.bms.app.domain.model.Appointment>,
         val transactions: List<com.bms.app.domain.model.PaymentTransaction>,
-        val adminInitials: String
+        val adminInitials: String,
+        val adminFullName: String? = null
     ) : AdminUiState()
     data class Error(val message: String, val isNetwork: Boolean = false) : AdminUiState()
 }
@@ -47,10 +50,12 @@ sealed class ExportState {
 
 @HiltViewModel
 class AdminViewModel @Inject constructor(
+    private val application: Application,
     private val profileRepository: ProfileRepository,
     private val appointmentRepository: AppointmentRepository,
     private val auth: Auth,
-    private val postgrest: Postgrest
+    private val postgrest: Postgrest,
+    private val notificationRepository: com.bms.app.domain.repository.NotificationRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AdminUiState>(AdminUiState.Loading)
@@ -58,6 +63,8 @@ class AdminViewModel @Inject constructor(
 
     private val _exportState = MutableStateFlow<ExportState>(ExportState.Idle)
     val exportState: StateFlow<ExportState> = _exportState.asStateFlow()
+
+    private val seenNotificationIds = mutableSetOf<String>()
 
     init {
         loadAdminDashboard()
@@ -73,24 +80,54 @@ class AdminViewModel @Inject constructor(
             // Retry up to 3 times with exponential backoff for transient network errors
             var lastError: String = "Unknown error"
             var isNetworkError = false
+            var succeeded = false
             repeat(3) { attempt ->
                 val result = runCatching { fetchDashboardData() }
-                if (result.isSuccess) return@launch  // success — stop retrying
+                if (result.isSuccess) {
+                    succeeded = true
+                    return@repeat
+                }
                 val ex = result.exceptionOrNull()
                 lastError = ex?.message ?: "Unknown error"
                 isNetworkError = isNetworkException(ex)
                 if (attempt < 2) {
-                    // Wait before retrying: 1s, then 3s
                     delay(if (attempt == 0) 1_000L else 3_000L)
                 }
             }
 
-            // All retries exhausted
-            val friendlyMsg = if (isNetworkError)
-                "No internet connection. Please check your network and tap Retry."
-            else
-                "Failed to load admin data: $lastError"
-            _uiState.update { AdminUiState.Error(friendlyMsg, isNetworkError) }
+            if (!succeeded) {
+                val friendlyMsg = if (isNetworkError)
+                    "No internet connection. Please check your network and tap Retry."
+                else
+                    "Failed to load admin data: $lastError"
+                _uiState.update { AdminUiState.Error(friendlyMsg, isNetworkError) }
+            }
+
+            // Start notification listener for Admin (always, regardless of dashboard load result)
+            val userId = auth.currentSessionOrNull()?.user?.id
+            if (userId != null) startNotificationsListener(userId)
+        }
+    }
+
+    private fun startNotificationsListener(userId: String) {
+        viewModelScope.launch {
+            notificationRepository.getNotificationsFlow(userId).collect { list ->
+                val newContactMessages = list.filter { notification ->
+                    notification.type == "contact_message"
+                            && !notification.isRead
+                            && notification.id.isNotBlank()
+                            && notification.id !in seenNotificationIds
+                }
+                for (notification in newContactMessages) {
+                    seenNotificationIds.add(notification.id)
+                    NotificationHelper.showChatNotification(
+                        context = application,
+                        senderName = notification.title,
+                        messagePreview = notification.message,
+                        senderId = notification.id
+                    )
+                }
+            }
         }
     }
 
@@ -205,7 +242,8 @@ class AdminViewModel @Inject constructor(
                 users = users,
                 appointments = appointments,
                 transactions = recentTransactions.sortedByDescending { it.date }.take(20),
-                adminInitials = adminInitials
+                adminInitials = adminInitials,
+                adminFullName = currentUserProfile?.fullName
             )
         }
     }

@@ -7,6 +7,7 @@ import com.bms.app.domain.model.UserProfile
 import com.bms.app.domain.repository.ChatRepository
 import com.bms.app.domain.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,9 +32,19 @@ class ChatViewModel @Inject constructor(
     val uiState: StateFlow<ChatUiState> = _uiState.asStateFlow()
 
     private var currentOtherUserId: String? = null
+    private var realtimeJob: Job? = null
+
+    /**
+     * The userId of the user we're currently chatting with.
+     * Exposed so other parts of the app can check if the user is actively
+     * viewing this conversation (for notification suppression).
+     */
+    val activeChatPartnerId: StateFlow<String?> = MutableStateFlow<String?>(null)
 
     fun loadConversation(otherUserId: String) {
         currentOtherUserId = otherUserId
+        (activeChatPartnerId as MutableStateFlow).value = otherUserId
+
         viewModelScope.launch {
             _uiState.update { ChatUiState.Loading }
             
@@ -44,29 +55,37 @@ class ChatViewModel @Inject constructor(
                 return@launch
             }
             val recipient = profileRes.getOrThrow()
+            val myId = chatRepository.getCurrentUserId() ?: ""
 
-            // 2. Load Messages
-            refreshMessages(recipient)
-        }
-    }
-
-    private suspend fun refreshMessages(recipient: UserProfile) {
-        val messagesRes = chatRepository.getMessages(recipient.userId)
-        val myId = chatRepository.getCurrentUserId() ?: ""
-        
-        if (messagesRes.isSuccess) {
-            val messages = messagesRes.getOrThrow()
-            
-            _uiState.update { 
-                ChatUiState.Success(
-                    recipient = recipient,
-                    messages = messages,
-                    currentUserId = myId
-                )
+            // 2. Load initial messages (one-shot)
+            val messagesRes = chatRepository.getMessages(recipient.userId)
+            if (messagesRes.isSuccess) {
+                _uiState.update { 
+                    ChatUiState.Success(
+                        recipient = recipient,
+                        messages = messagesRes.getOrThrow(),
+                        currentUserId = myId
+                    )
+                }
+            } else {
+                val err = messagesRes.exceptionOrNull()?.message ?: "Unknown error"
+                _uiState.update { ChatUiState.Error("Failed to load messages: $err") }
+                return@launch
             }
-        } else {
-            val err = messagesRes.exceptionOrNull()?.message ?: "Unknown error"
-            _uiState.update { ChatUiState.Error("Failed to load messages: $err") }
+
+            // 3. Start Realtime subscription for live updates
+            realtimeJob?.cancel()
+            realtimeJob = viewModelScope.launch {
+                chatRepository.getMessagesFlow(otherUserId).collect { liveMessages ->
+                    if (liveMessages.isNotEmpty()) {
+                        _uiState.update { state ->
+                            if (state is ChatUiState.Success) {
+                                state.copy(messages = liveMessages)
+                            } else state
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -81,10 +100,33 @@ class ChatViewModel @Inject constructor(
             val result = chatRepository.sendMessage(otherId, content)
             if (result.isSuccess) {
                 _sendError.update { null }
-                // Reload messages
+                // Realtime subscription will automatically pick up the new message.
+                // But also do a one-shot refresh as a safety net in case Realtime
+                // hasn't connected yet (e.g. first message in a new conversation).
                 val currentState = _uiState.value
                 if (currentState is ChatUiState.Success) {
-                    refreshMessages(currentState.recipient)
+                    val freshMessages = chatRepository.getMessages(otherId)
+                    if (freshMessages.isSuccess) {
+                        _uiState.update { state ->
+                            if (state is ChatUiState.Success) {
+                                state.copy(messages = freshMessages.getOrThrow())
+                            } else state
+                        }
+                    }
+                    // If this was the first message, start Realtime subscription
+                    if (realtimeJob == null || realtimeJob?.isActive != true) {
+                        realtimeJob = viewModelScope.launch {
+                            chatRepository.getMessagesFlow(otherId).collect { liveMessages ->
+                                if (liveMessages.isNotEmpty()) {
+                                    _uiState.update { state ->
+                                        if (state is ChatUiState.Success) {
+                                            state.copy(messages = liveMessages)
+                                        } else state
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             } else {
                 val raw = result.exceptionOrNull()?.message ?: "Unknown error"
@@ -106,5 +148,11 @@ class ChatViewModel @Inject constructor(
 
     fun clearSendError() {
         _sendError.update { null }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        (activeChatPartnerId as MutableStateFlow).value = null
+        realtimeJob?.cancel()
     }
 }

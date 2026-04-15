@@ -44,6 +44,7 @@ fun ProviderDashboardScreen(
     onMessagePatient: (userId: String) -> Unit = {},
     onContactSupport: () -> Unit = {},
     onInboxClick: () -> Unit = {},
+    onStartVideoCall: (String) -> Unit = {},
     viewModel: DashboardViewModel = hiltViewModel()
 ) {
     var selectedNav by remember { mutableStateOf("home") }
@@ -58,6 +59,7 @@ fun ProviderDashboardScreen(
     var reviewingAppointment by remember { mutableStateOf<Appointment?>(null) }
     var reviewingUser by remember { mutableStateOf<UserProfile?>(null) }
     var showRescheduleDialog by remember { mutableStateOf<Appointment?>(null) }
+    var reviewingReschedule by remember { mutableStateOf<Appointment?>(null) }
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -80,6 +82,7 @@ fun ProviderDashboardScreen(
             } else "DM"
             BmsTopBar(
                 title = "BookEase24X7",
+                userName = (uiState as? DashboardUiState.Success)?.userProfile?.fullName,
                 avatarInitials = initials,
                 isLoading = uiState is DashboardUiState.Loading,
                 onMessagesClick = onInboxClick,
@@ -88,7 +91,7 @@ fun ProviderDashboardScreen(
         },
         bottomBar = {
             BmsBottomNavBar(
-                items = MainNavItems,
+                items = ProviderNavItems,
                 selectedRoute = selectedNav,
                 onItemSelected = { route ->
                     selectedNav = route
@@ -133,6 +136,15 @@ fun ProviderDashboardScreen(
                     ErrorDisplay(state.message, viewModel::loadDashboard)
                 }
                 is DashboardUiState.Success -> {
+                    // ── Status Toggle Card ────────────────────
+                    ProviderStatusCard(
+                        isOnline = state.isOnline,
+                        isLoading = state.isStatusLoading,
+                        onToggle = { viewModel.toggleStatus(it) }
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     // ── Welcome Header ────────────────────────
                     Text(
                         text = "OVERVIEW",
@@ -170,6 +182,20 @@ fun ProviderDashboardScreen(
                         Spacer(modifier = Modifier.height(32.dp))
                     }
 
+                    // ── Reschedule Requests Section ────────────
+                    if (state.rescheduleRequests.isNotEmpty()) {
+                        RescheduleRequestsSection(
+                            appointments = state.rescheduleRequests,
+                            userProfiles = state.pendingUserProfiles,
+                            isActionLoading = state.isActionLoading,
+                            onClick = { appt, user ->
+                                reviewingReschedule = appt
+                                reviewingUser = user
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(32.dp))
+                    }
+
                     // ── Manage Availability CTA ───────────────
                     BmsButton(
                         text = "Manage Availability",
@@ -185,10 +211,30 @@ fun ProviderDashboardScreen(
                         allUpcomingAppointments = state.allUpcomingAppointments,
                         patientNames = state.patientNames,
                         patientRoles = state.patientRoles,
-                        onMessagePatient = onMessagePatient
+                        onMessagePatient = onMessagePatient,
+                        onStartVideoCall = onStartVideoCall
                     )
 
                     Spacer(modifier = Modifier.height(32.dp))
+
+                    // ── Error Snackbar for status update failure ──
+                    state.errorMessage?.let { msg ->
+                        LaunchedEffect(msg) {
+                            kotlinx.coroutines.delay(3000)
+                            viewModel.clearError()
+                        }
+                        Snackbar(
+                            modifier = Modifier.padding(bottom = 8.dp),
+                            action = {
+                                TextButton(onClick = { viewModel.clearError() }) {
+                                    Text("Dismiss", color = OnPrimary)
+                                }
+                            },
+                            containerColor = MaterialTheme.colorScheme.error
+                        ) {
+                            Text(msg, color = OnPrimary)
+                        }
+                    }
                 }
             }
         }
@@ -229,6 +275,101 @@ fun ProviderDashboardScreen(
                     reviewingAppointment = null
                 }
             )
+        }
+    }
+
+    // ── Reschedule Review Sheet ──
+    if (reviewingReschedule != null) {
+        val appt = reviewingReschedule!!
+        val isActionLoading = (uiState as? DashboardUiState.Success)?.isActionLoading == appt.id
+        
+        RescheduleReviewSheet(
+            appointment = appt,
+            user = reviewingUser,
+            isLoading = isActionLoading,
+            currencySymbol = (uiState as? DashboardUiState.Success)?.currencySymbol ?: "₹",
+            onDismiss = { reviewingReschedule = null },
+            onAccept = { 
+                viewModel.acceptReschedule(appt.id)
+                reviewingReschedule = null
+            },
+            onDecline = {
+                viewModel.declineReschedule(appt.id)
+                reviewingReschedule = null
+            }
+        )
+    }
+}
+
+// ── Provider Status Card ──────────────────────────────────────────────────────
+
+@Composable
+private fun ProviderStatusCard(
+    isOnline: Boolean,
+    isLoading: Boolean,
+    onToggle: (Boolean) -> Unit
+) {
+    val statusColor = if (isOnline) OnStatusActive else OnSurfaceVariant
+    val statusBg = if (isOnline) OnStatusActive.copy(alpha = 0.08f) else SurfaceContainerLow
+    val statusLabel = if (isOnline) "You are LIVE — patients can book you" else "You are OFFLINE — not visible to patients"
+    val statusTitle = if (isOnline) "Online" else "Offline"
+
+    Surface(
+        color = statusBg,
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier.fillMaxWidth(),
+        border = androidx.compose.foundation.BorderStroke(
+            width = 1.5.dp,
+            color = statusColor.copy(alpha = 0.3f)
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Live dot indicator
+            Box(
+                modifier = Modifier
+                    .size(10.dp)
+                    .clip(CircleShape)
+                    .background(statusColor)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = statusTitle,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = statusColor
+                )
+                Text(
+                    text = statusLabel,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = OnSurfaceVariant
+                )
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.5.dp,
+                    color = statusColor
+                )
+            } else {
+                Switch(
+                    checked = isOnline,
+                    onCheckedChange = { onToggle(it) },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = OnPrimary,
+                        checkedTrackColor = OnStatusActive,
+                        uncheckedThumbColor = OnSurfaceVariant,
+                        uncheckedTrackColor = SurfaceContainerHigh
+                    )
+                )
+            }
         }
     }
 }
@@ -430,7 +571,8 @@ private fun ScheduleSection(
     allUpcomingAppointments: List<Appointment>,
     patientNames: Map<String, String>,
     patientRoles: Map<String, String>,
-    onMessagePatient: (String) -> Unit
+    onMessagePatient: (String) -> Unit,
+    onStartVideoCall: (String) -> Unit
 ) {
     // Only display active or pending upcoming appointments
     val displayList = allUpcomingAppointments.filter { it.status.lowercase() in listOf("confirmed", "approved", "pending") }
@@ -524,7 +666,8 @@ private fun ScheduleSection(
                     badgeBg = statusColor.copy(alpha = 0.12f),
                     badgeText = statusColor,
                     showVideoIcon = isVideo,
-                    onMessagePatient = { onMessagePatient(appointment.userId) }
+                    onMessagePatient = { onMessagePatient(appointment.userId) },
+                    onStartVideoCall = { onStartVideoCall(appointment.id) }
                 )
                 Spacer(modifier = Modifier.height(12.dp))
             }
@@ -630,7 +773,8 @@ private fun ScheduleItem(
     badgeBg: androidx.compose.ui.graphics.Color,
     badgeText: androidx.compose.ui.graphics.Color,
     showVideoIcon: Boolean = false,
-    onMessagePatient: (() -> Unit)? = null
+    onMessagePatient: (() -> Unit)? = null,
+    onStartVideoCall: (() -> Unit)? = null
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -712,19 +856,14 @@ private fun ScheduleItem(
                 }
                 Spacer(modifier = Modifier.height(6.dp))
                 if (showVideoIcon) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            Icons.Outlined.Videocam,
-                            null,
-                            tint = Primary,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = detail,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Primary
-                        )
+                    TextButton(
+                        onClick = { onStartVideoCall?.invoke() },
+                        modifier = Modifier.height(32.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp)
+                    ) {
+                        Icon(Icons.Outlined.Videocam, null, tint = OnStatusActive, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("Start Video Call", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold), color = OnStatusActive)
                     }
                 } else {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1023,6 +1162,280 @@ private fun RescheduleDialog(
                         Text("Send Request", fontWeight = FontWeight.Bold)
                     }
                 }
+            }
+        }
+    }
+}
+
+// ── Reschedule Requests Section ───────────────────────────────────────────────
+
+@Composable
+private fun RescheduleRequestsSection(
+    appointments: List<Appointment>,
+    userProfiles: Map<String, UserProfile>,
+    isActionLoading: String?,
+    onClick: (Appointment, UserProfile?) -> Unit
+) {
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Reschedule Requests",
+                style = MaterialTheme.typography.headlineSmall,
+                color = OnSurface
+            )
+            Surface(
+                color = StatusPending.copy(alpha = 0.12f),
+                shape = CircleShape
+            ) {
+                Text(
+                    text = appointments.size.toString(),
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                    color = StatusPending,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(horizontal = 4.dp)
+        ) {
+            items(appointments) { appointment ->
+                val isLoading = isActionLoading == appointment.id
+                val user = userProfiles[appointment.userId]
+                RescheduleRequestCard(
+                    appointment = appointment,
+                    user = user,
+                    isLoading = isLoading,
+                    onClick = { if (isActionLoading == null) onClick(appointment, user) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun RescheduleRequestCard(
+    appointment: Appointment,
+    user: UserProfile?,
+    isLoading: Boolean = false,
+    onClick: () -> Unit
+) {
+    val requestedDate = try {
+        java.time.LocalDate.parse(appointment.rescheduleRequestedDate ?: "")
+            .format(java.time.format.DateTimeFormatter.ofPattern("MMM d"))
+    } catch (_: Exception) { "TBD" }
+
+    Surface(
+        color = SurfaceContainerLowest,
+        shape = RoundedCornerShape(20.dp),
+        shadowElevation = 2.dp,
+        modifier = Modifier.width(280.dp),
+        onClick = onClick,
+        border = androidx.compose.foundation.BorderStroke(1.dp, Primary.copy(alpha = 0.5f))
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(StatusPending),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Outlined.EventRepeat, null, tint = OnPrimary, modifier = Modifier.size(20.dp))
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = user?.fullName ?: "Patient",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = OnSurface
+                    )
+                    Text(
+                        text = "Requested: $requestedDate • ${appointment.rescheduleRequestedStartTime?.take(5)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Primary,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            Surface(
+                color = SurfaceContainerLow,
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(10.dp)) {
+                    Text(
+                        text = "Original Slot:",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = OnSurfaceVariant
+                    )
+                    Text(
+                        text = "${appointment.appointmentDate} • ${appointment.startTime.take(5)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = OnSurfaceVariant
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Primary, strokeWidth = 2.dp)
+                } else {
+                    Text("Review Choice", style = MaterialTheme.typography.labelSmall, color = Primary, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+    }
+}
+
+// ── Reschedule Review Sheet ──────────────────────────────────────────────────
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun RescheduleReviewSheet(
+    appointment: Appointment,
+    user: UserProfile?,
+    isLoading: Boolean,
+    currencySymbol: String,
+    onDismiss: () -> Unit,
+    onAccept: () -> Unit,
+    onDecline: () -> Unit
+) {
+    val originalDate = try {
+        java.time.LocalDate.parse(appointment.appointmentDate)
+            .format(java.time.format.DateTimeFormatter.ofPattern("EEE, d MMM"))
+    } catch (_: Exception) { appointment.appointmentDate }
+
+    val requestedDate = try {
+        java.time.LocalDate.parse(appointment.rescheduleRequestedDate ?: "")
+            .format(java.time.format.DateTimeFormatter.ofPattern("EEE, d MMM"))
+    } catch (_: Exception) { appointment.rescheduleRequestedDate ?: "TBD" }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = SurfaceContainerLowest,
+        dragHandle = { BottomSheetDefaults.DragHandle() }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 32.dp)
+        ) {
+            Text(
+                "Reschedule Request",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = OnSurface
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                "The patient has requested to move their appointment.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = OnSurfaceVariant
+            )
+            
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Comparison
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Surface(
+                    color = SurfaceContainerLow,
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Original Slot", style = MaterialTheme.typography.labelSmall, color = OnSurfaceVariant)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(originalDate, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                        Text(appointment.startTime.take(5), style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Icon(
+                    imageVector = Icons.Outlined.ArrowForward,
+                    contentDescription = null,
+                    modifier = Modifier.align(Alignment.CenterVertically).size(20.dp),
+                    tint = OnSurfaceVariant
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Surface(
+                    color = Primary.copy(alpha = 0.08f),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.weight(1f),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Primary)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Requested Slot", style = MaterialTheme.typography.labelSmall, color = Primary)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(requestedDate, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = Primary)
+                        Text(appointment.rescheduleRequestedStartTime?.take(5) ?: "TBD", style = MaterialTheme.typography.bodySmall, color = Primary)
+                    }
+                }
+            }
+
+            if (!appointment.cancellationReason.isNullOrBlank()) {
+                val reasonText = appointment.cancellationReason.substringAfter("reschedule: ").trim()
+                if (reasonText.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text("Reason for change", style = MaterialTheme.typography.labelMedium, color = OnSurfaceVariant)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Surface(
+                        color = SurfaceContainerLow,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = reasonText,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(16.dp),
+                            color = OnSurface
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Actions
+            Button(
+                onClick = onAccept,
+                enabled = !isLoading,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                contentPadding = PaddingValues(vertical = 14.dp)
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), color = OnPrimary, strokeWidth = 2.dp)
+                } else {
+                    Text("Approve Reschedule", fontWeight = FontWeight.Bold)
+                }
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            OutlinedButton(
+                onClick = onDecline,
+                enabled = !isLoading,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                contentPadding = PaddingValues(vertical = 14.dp)
+            ) {
+                Text("Decline Request")
             }
         }
     }

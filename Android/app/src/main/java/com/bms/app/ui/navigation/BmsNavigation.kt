@@ -12,6 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.bms.app.BuildConfig
 import com.bms.app.data.local.SessionManager
 import com.bms.app.ui.admin.ProvidersScreen
 import com.bms.app.ui.admin.UserDetailScreen
@@ -30,6 +31,18 @@ import com.bms.app.ui.schedule.ManageAvailabilityScreen
 import com.bms.app.ui.settings.*
 import com.bms.app.ui.user.BrowseProvidersScreen
 import com.bms.app.ui.user.MyBookingsScreen
+import com.bms.app.ui.config.SystemConfigViewModel
+import com.bms.app.ui.config.ConfigUiState
+import com.bms.app.ui.config.UpdateRequiredScreen
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.material3.CircularProgressIndicator
+import com.bms.app.ui.theme.Primary
+import com.bms.app.ui.video.VideoConsultationScreen
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 
 sealed class Screen(val route: String) {
     object Auth : Screen("auth")
@@ -61,19 +74,28 @@ sealed class Screen(val route: String) {
     object Rewards : Screen("rewards")
     object ProviderDetail : Screen("provider_detail/{userId}")
     object ReviewSubmission : Screen("review_submission/{appointmentId}/{providerId}/{providerName}")
+    object UpdateRequired : Screen("update_required")
+    object Splash : Screen("splash")
+    object VideoCall : Screen("video_call/{appointmentId}/{isProvider}")
 }
 
 @Composable
 fun BmsNavigation(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    configViewModel: SystemConfigViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val sessionManager = remember { SessionManager(context) }
+    val configState by configViewModel.uiState.collectAsState()
 
-    // NOTE: Read role dynamically so it always reflects the latest session state
-    // A static val would get stale if user role changes without recomposition
+    val currentVersionName = BuildConfig.VERSION_NAME
 
-    val startDestination = remember {
+    LaunchedEffect(Unit) {
+        configViewModel.checkVersion(currentVersionName)
+    }
+
+    // Determine the logical next screen based on session if update NOT required
+    val sessionDestination = remember {
         when (sessionManager.getUserRole()) {
             "ADMIN"    -> Screen.AdminDashboard.route
             "PROVIDER" -> Screen.ProviderDashboard.route
@@ -81,6 +103,8 @@ fun BmsNavigation(
             else       -> Screen.Auth.route
         }
     }
+
+    val startDestination = Screen.Splash.route
 
     // ── Centralized bottom nav handler ────────────────────────────────────────
     val handleBottomNav: (String) -> Unit = { route ->
@@ -125,7 +149,7 @@ fun BmsNavigation(
                     launchSingleTop = true
                 }
             }
-            "messages" -> {
+            "messages", "inbox" -> {
                 navController.navigate(Screen.Inbox.route) {
                     launchSingleTop = true
                 }
@@ -133,8 +157,13 @@ fun BmsNavigation(
             // ── Shared nav actions ───────────────────────────────────────
             "schedule" -> {
                 val currentRole = sessionManager.getUserRole()
-                val scheduleRoute = if (currentRole == "ADMIN") Screen.AdminSchedule.route else "provider_schedule"
+                val scheduleRoute = if (currentRole == "ADMIN") Screen.AdminSchedule.route else Screen.ProviderSchedule.route
                 navController.navigate(scheduleRoute) {
+                    launchSingleTop = true
+                }
+            }
+            "availability" -> {
+                navController.navigate(Screen.ManageAvailability.route) {
                     launchSingleTop = true
                 }
             }
@@ -172,6 +201,45 @@ fun BmsNavigation(
         navController = navController,
         startDestination = startDestination
     ) {
+        // ── Startup/Splash ────────────────────────
+        composable(Screen.Splash.route) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = Primary)
+            }
+
+            LaunchedEffect(configState) {
+                when (val state = configState) {
+                    is ConfigUiState.Success -> {
+                        if (state.isUpdateRequired) {
+                            navController.navigate(Screen.UpdateRequired.route) {
+                                popUpTo(Screen.Splash.route) { inclusive = true }
+                            }
+                        } else {
+                            navController.navigate(sessionDestination) {
+                                popUpTo(Screen.Splash.route) { inclusive = true }
+                            }
+                        }
+                    }
+                    is ConfigUiState.Error -> {
+                        // Fallback on error
+                        navController.navigate(sessionDestination) {
+                            popUpTo(Screen.Splash.route) { inclusive = true }
+                        }
+                    }
+                    else -> {}
+                }
+            }
+        }
+
+        // ── Update Required ───────────────────────
+        composable(Screen.UpdateRequired.route) {
+            val state = configState as? ConfigUiState.Success
+            UpdateRequiredScreen(
+                updateUrl = state?.config?.updateUrl,
+                currentVersion = currentVersionName,
+                requiredVersion = state?.config?.minRequiredVersionName ?: "Unknown"
+            )
+        }
         // ── Auth ──────────────────────────────────
         composable(Screen.Auth.route) {
             AuthScreen(
@@ -230,6 +298,9 @@ fun BmsNavigation(
                 },
                 onInboxClick = {
                     navController.navigate(Screen.Inbox.route)
+                },
+                onStartVideoCall = { appointmentId ->
+                    navController.navigate("video_call/$appointmentId/true")
                 }
             )
         }
@@ -284,7 +355,8 @@ fun BmsNavigation(
                         popUpTo(navController.graph.id) { inclusive = true }
                     }
                 },
-                onBottomNav = handleBottomNav
+                onBottomNav = handleBottomNav,
+                onBack = { navController.popBackStack() }
             )
         }
 
@@ -402,11 +474,14 @@ fun BmsNavigation(
 
         // ── Inbox (Messages Hub) ──────────────────
         composable(Screen.Inbox.route) {
+            val role = sessionManager.getUserRole() ?: "USER"
             com.bms.app.ui.chat.InboxScreen(
+                userRole = role,
                 onBack = { navController.popBackStack() },
                 onOpenChat = { userId ->
                     navController.navigate("chat/$userId")
-                }
+                },
+                onNavigate = handleBottomNav
             )
         }
 
@@ -433,7 +508,10 @@ fun BmsNavigation(
                         launchSingleTop = true
                     }
                 },
-                onInboxClick = { navController.navigate(Screen.Inbox.route) }
+                onInboxClick = { navController.navigate(Screen.Inbox.route) },
+                onJoinVideoCall = { appointmentId ->
+                    navController.navigate("video_call/$appointmentId/false")
+                }
             )
         }
 
@@ -516,8 +594,25 @@ fun BmsNavigation(
                 onBack = { navController.popBackStack() },
                 onSuccess = { 
                     navController.popBackStack()
-                    // Optionally show a toast or snackbar
                 }
+            )
+        }
+
+        // ── Video Consultation ────────────────────
+        composable(
+            route = Screen.VideoCall.route,
+            arguments = listOf(
+                navArgument("appointmentId") { type = NavType.StringType },
+                navArgument("isProvider") { type = NavType.BoolType }
+            )
+        ) { backStackEntry ->
+            val appointmentId = backStackEntry.arguments?.getString("appointmentId") ?: ""
+            val isProvider = backStackEntry.arguments?.getBoolean("isProvider") ?: false
+            
+            VideoConsultationScreen(
+                appointmentId = appointmentId,
+                isProvider = isProvider,
+                onNavigateBack = { navController.popBackStack() }
             )
         }
     }

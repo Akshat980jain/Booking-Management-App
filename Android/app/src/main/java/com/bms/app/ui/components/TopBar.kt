@@ -30,6 +30,7 @@ fun BmsTopBar(
     onNavigationClick: () -> Unit = {},
     onAvatarClick: () -> Unit = {},
     onMessagesClick: () -> Unit = {},
+    userName: String? = null,
     avatarInitials: String = "AJ",
     unreadCount: Int = 0,
     modifier: Modifier = Modifier
@@ -98,7 +99,7 @@ fun BmsTopBar(
                     SkeletonCircle(size = 36.dp)
                 } else {
                     BmsAvatar(
-                        name = avatarInitials,
+                        name = userName ?: avatarInitials,
                         size = AvatarSize.SMALL,
                         modifier = Modifier.clickable { onAvatarClick() }
                     )

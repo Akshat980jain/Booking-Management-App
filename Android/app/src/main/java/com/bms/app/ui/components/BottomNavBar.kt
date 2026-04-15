@@ -40,6 +40,14 @@ val MainNavItems = listOf(
     NavItem("Settings", Icons.Filled.Settings, Icons.Outlined.Settings, "settings")
 )
 
+val ProviderNavItems = listOf(
+    NavItem("Home", Icons.Filled.Home, Icons.Outlined.Home, "home"),
+    NavItem("Schedule", Icons.Outlined.CalendarMonth, Icons.Outlined.CalendarMonth, "schedule"),
+    NavItem("Manage", Icons.Outlined.Schedule, Icons.Outlined.Schedule, "availability"), // Center Action
+    NavItem("Messages", Icons.Outlined.Mail, Icons.Outlined.Mail, "inbox"),
+    NavItem("Settings", Icons.Filled.Settings, Icons.Outlined.Settings, "settings")
+)
+
 val AdminNavItems = listOf(
     NavItem("Home", Icons.Filled.Home, Icons.Outlined.Home, "home"),
     NavItem("Schedule", Icons.Outlined.CalendarMonth, Icons.Outlined.CalendarMonth, "schedule"),

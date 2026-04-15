@@ -60,6 +60,7 @@ fun AdminDashboardScreen(
         topBar = {
             BmsTopBar(
                 title = "BookEase24X7",
+                userName = (uiState as? AdminUiState.Success)?.adminFullName,
                 avatarInitials = adminInitials,
                 onAvatarClick = onAvatarClick,
                 onMessagesClick = onInboxClick,

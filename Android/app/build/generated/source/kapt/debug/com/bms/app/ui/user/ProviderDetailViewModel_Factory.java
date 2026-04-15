@@ -1,5 +1,6 @@
 package com.bms.app.ui.user;
 
+import com.bms.app.domain.repository.AppointmentRepository;
 import com.bms.app.domain.repository.ProfileRepository;
 import com.bms.app.domain.repository.ReviewRepository;
 import dagger.internal.DaggerGenerated;
@@ -27,25 +28,30 @@ public final class ProviderDetailViewModel_Factory implements Factory<ProviderDe
 
   private final Provider<ReviewRepository> reviewRepositoryProvider;
 
+  private final Provider<AppointmentRepository> appointmentRepositoryProvider;
+
   public ProviderDetailViewModel_Factory(Provider<ProfileRepository> profileRepositoryProvider,
-      Provider<ReviewRepository> reviewRepositoryProvider) {
+      Provider<ReviewRepository> reviewRepositoryProvider,
+      Provider<AppointmentRepository> appointmentRepositoryProvider) {
     this.profileRepositoryProvider = profileRepositoryProvider;
     this.reviewRepositoryProvider = reviewRepositoryProvider;
+    this.appointmentRepositoryProvider = appointmentRepositoryProvider;
   }
 
   @Override
   public ProviderDetailViewModel get() {
-    return newInstance(profileRepositoryProvider.get(), reviewRepositoryProvider.get());
+    return newInstance(profileRepositoryProvider.get(), reviewRepositoryProvider.get(), appointmentRepositoryProvider.get());
   }
 
   public static ProviderDetailViewModel_Factory create(
       Provider<ProfileRepository> profileRepositoryProvider,
-      Provider<ReviewRepository> reviewRepositoryProvider) {
-    return new ProviderDetailViewModel_Factory(profileRepositoryProvider, reviewRepositoryProvider);
+      Provider<ReviewRepository> reviewRepositoryProvider,
+      Provider<AppointmentRepository> appointmentRepositoryProvider) {
+    return new ProviderDetailViewModel_Factory(profileRepositoryProvider, reviewRepositoryProvider, appointmentRepositoryProvider);
   }
 
   public static ProviderDetailViewModel newInstance(ProfileRepository profileRepository,
-      ReviewRepository reviewRepository) {
-    return new ProviderDetailViewModel(profileRepository, reviewRepository);
+      ReviewRepository reviewRepository, AppointmentRepository appointmentRepository) {
+    return new ProviderDetailViewModel(profileRepository, reviewRepository, appointmentRepository);
   }
 }

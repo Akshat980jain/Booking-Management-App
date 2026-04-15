@@ -9,6 +9,13 @@ import com.bms.app.domain.repository.ChatRepository
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Order
+import io.github.jan.supabase.realtime.Realtime
+import io.github.jan.supabase.realtime.channel
+import io.github.jan.supabase.realtime.postgresListDataFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import javax.inject.Inject
@@ -31,7 +38,8 @@ private data class NewConvPayload(
 @Singleton
 class ChatRepositoryImpl @Inject constructor(
     private val auth: Auth,
-    private val postgrest: Postgrest
+    private val postgrest: Postgrest,
+    private val realtime: Realtime
 ) : ChatRepository {
 
     /**
@@ -114,6 +122,43 @@ class ChatRepositoryImpl @Inject constructor(
 
     override fun getCurrentUserId(): String? {
         return auth.currentSessionOrNull()?.user?.id
+    }
+
+    @OptIn(io.github.jan.supabase.annotations.SupabaseExperimental::class)
+    override fun getMessagesFlow(otherUserId: String): Flow<List<ChatMessage>> = flow {
+        val currentUserId = auth.currentSessionOrNull()?.user?.id ?: return@flow
+
+        val (p1, p2) = if (currentUserId < otherUserId) currentUserId to otherUserId
+                        else otherUserId to currentUserId
+
+        // Find the conversation
+        val conversations = try {
+            postgrest["chat_conversations"].select {
+                filter {
+                    eq("participant_1", p1)
+                    eq("participant_2", p2)
+                }
+            }.decodeList<ConvRow>()
+        } catch (e: Exception) {
+            Log.w("ChatRepository", "getMessagesFlow: Could not find conversation: ${e.message}")
+            emptyList()
+        }
+
+        val convId = conversations.firstOrNull()?.id ?: return@flow
+
+        val channel = realtime.channel("chat_messages_$convId")
+
+        // Match the exact pattern from NotificationRepositoryImpl
+        val dataFlow = channel.postgresListDataFlow(
+            schema = "public",
+            table = "chat_messages",
+            primaryKey = ChatMessage::id
+        ).map { list ->
+            list.filter { it.conversationId == convId }
+                .sortedBy { it.createdAt }
+        }
+
+        emitAll(dataFlow)
     }
 
     override suspend fun sendMessage(receiverId: String, content: String): Result<Unit> {
@@ -205,4 +250,69 @@ class ChatRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
+    @OptIn(io.github.jan.supabase.annotations.SupabaseExperimental::class)
+    override fun getConversationsFlow(): Flow<List<ChatConversation>> = flow {
+        val currentUserId = auth.currentSessionOrNull()?.user?.id ?: return@flow
+
+        val channel = realtime.channel("inbox_$currentUserId")
+
+        // Listen to chat_conversations table changes
+        val convFlow = channel.postgresListDataFlow(
+            schema = "public",
+            table = "chat_conversations",
+            primaryKey = ConvRow::id
+        ).map { rawList ->
+            rawList.filter { it.participant_1 == currentUserId || it.participant_2 == currentUserId }
+        }
+
+        // Each time chat_conversations changes, re-fetch the full conversation list
+        convFlow.collect { myConvs ->
+            if (myConvs.isEmpty()) {
+                emit(emptyList())
+                return@collect
+            }
+
+            try {
+                val otherIds = myConvs.map {
+                    if (it.participant_1 == currentUserId) it.participant_2 else it.participant_1
+                }.distinct()
+
+                val profiles = postgrest["profiles"].select {
+                    filter { isIn("user_id", otherIds) }
+                }.decodeList<UserProfile>().associateBy { it.userId }
+
+                val roles = postgrest["user_roles"].select {
+                    filter { isIn("user_id", otherIds) }
+                }.decodeList<UserRoleRow>().associateBy { it.user_id }
+
+                val lastMessages = postgrest["chat_messages"].select {
+                    filter { isIn("conversation_id", myConvs.map { c -> c.id }) }
+                    order("created_at", Order.DESCENDING)
+                }.decodeList<ChatMessage>().groupBy { it.conversationId }
+
+                val mapped = myConvs.mapNotNull { conv ->
+                    val otherId = if (conv.participant_1 == currentUserId) conv.participant_2 else conv.participant_1
+                    val profile = profiles[otherId] ?: return@mapNotNull null
+                    val role = roles[otherId]?.role
+                    val latestMsg = lastMessages[conv.id]?.firstOrNull()
+
+                    ChatConversation(
+                        conversationId = conv.id,
+                        otherParticipantId = otherId,
+                        otherParticipantName = profile.fullName,
+                        otherParticipantRole = role,
+                        otherParticipantAvatar = profile.avatarUrl,
+                        lastMessage = latestMsg?.content ?: "No messages yet",
+                        lastMessageTime = latestMsg?.createdAt ?: conv.createdAt ?: ""
+                    )
+                }.sortedByDescending { it.lastMessageTime }
+
+                emit(mapped)
+            } catch (e: Exception) {
+                Log.e("ChatRepository", "getConversationsFlow: Error resolving details", e)
+            }
+        }
+    }
 }
+

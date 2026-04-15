@@ -52,7 +52,7 @@ fun ManageAvailabilityScreen(
     onNavigate: (String) -> Unit = {},
     viewModel: AvailabilityViewModel = hiltViewModel()
 ) {
-    var selectedNav by remember { mutableStateOf("schedule") }
+    var selectedNav by remember { mutableStateOf("availability") }
     val uiState by viewModel.uiState.collectAsState()
     
     // Local copy of schedule to allow editing before saving
@@ -87,7 +87,7 @@ fun ManageAvailabilityScreen(
         },
         bottomBar = {
             BmsBottomNavBar(
-                items = MainNavItems,
+                items = ProviderNavItems,
                 selectedRoute = selectedNav,
                 onItemSelected = { route ->
                     selectedNav = route

@@ -15,6 +15,7 @@ import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.scale
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bms.app.domain.model.UserProfile
@@ -22,6 +23,7 @@ import com.bms.app.ui.settings.viewmodel.ProfileUiState
 import com.bms.app.ui.settings.viewmodel.SettingsViewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,6 +42,7 @@ fun SettingsScreen(
     onNavigateToAvailability: () -> Unit = {},
     onNavigateToProfessional: () -> Unit = {},
     onLogout: () -> Unit = {},
+    onBack: () -> Unit = {},
     onBottomNav: (String) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -67,19 +70,22 @@ fun SettingsScreen(
                 else -> Triple("Settings", "Settings", "Manage your preferences.")
             }
 
-            val role = (uiState as? ProfileUiState.Success)?.userProfile?.role?.uppercase() ?: "USER"
-            val navItems = if (role == "ADMIN") AdminNavItems else MainNavItems
-
             BmsTopBar(
                 title = title,
+                userName = (uiState as? ProfileUiState.Success)?.userProfile?.fullName,
                 avatarInitials = initials,
-                isLoading = uiState is ProfileUiState.Loading
+                isLoading = uiState is ProfileUiState.Loading,
+                showBackButton = true,
+                onNavigationClick = { onBack() }
             )
         },
         bottomBar = {
-            // Use the SAME MainNavItems to keep consistent bar across all screens
             val role = (uiState as? ProfileUiState.Success)?.userProfile?.role?.uppercase() ?: "USER"
-            val navItems = if (role == "ADMIN") AdminNavItems else MainNavItems
+            val navItems = when (role) {
+                "ADMIN" -> AdminNavItems
+                "PROVIDER" -> ProviderNavItems
+                else -> UserNavItems
+            }
             
             BmsBottomNavBar(
                 items = navItems,
@@ -161,8 +167,8 @@ fun SettingsScreen(
             ) { page ->
                 when (page) {
                     0 -> PersonalTab(viewModel, uiState, onNavigateToPersonal, onLogout)
-                    1 -> ProfessionalTab(onNavigateToProfessional)
-                    2 -> VisibilityTab(onNavigateToVisibility)
+                    1 -> ProfessionalTab(uiState, onNavigateToProfessional)
+                    2 -> VisibilityTab(uiState, viewModel, onNavigateToVisibility)
                 }
             }
         }
@@ -257,108 +263,174 @@ private fun PersonalTab(
                 
                 // ── Profile Card ──────────────────────────
                 Surface(
-            color = SurfaceContainerLowest,
-            shape = RoundedCornerShape(20.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Top
-                ) {
-                    BmsAvatar(
-                        name = uiState.userInitials,
-                        size = AvatarSize.XL,
-                        showGlassEffect = true
-                    )
-
-                    // Secondary avatar placeholder
-                    Box(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .clip(CircleShape)
-                            .background(SurfaceContainerLow),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = uiState.userInitials,
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = OnSurfaceVariant.copy(alpha = 0.4f)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row(
+                    color = SurfaceContainerLowest,
+                    shape = RoundedCornerShape(20.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    TextButton(
-                        onClick = { },
-                        colors = ButtonDefaults.textButtonColors(contentColor = Primary)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Icon(Icons.Outlined.Edit, null, modifier = Modifier.size(14.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("EDIT PHOTO", style = MaterialTheme.typography.labelSmall)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.Top
+                        ) {
+                            BmsAvatar(
+                                name = userProfile.fullName,
+                                size = AvatarSize.LARGE,
+                                showGlassEffect = true
+                            )
+
+                            // Secondary avatar placeholder (AJ circle in background)
+                            Box(
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .clip(CircleShape)
+                                    .background(SurfaceContainerLow),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = uiState.userInitials,
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    color = OnSurfaceVariant.copy(alpha = 0.4f)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 4.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            TextButton(
+                                onClick = { },
+                                colors = ButtonDefaults.textButtonColors(contentColor = Primary),
+                                contentPadding = PaddingValues(0.dp)
+                            ) {
+                                Icon(Icons.Outlined.Edit, null, modifier = Modifier.size(14.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("EDIT PHOTO", style = MaterialTheme.typography.labelSmall)
+                            }
+
+                            if (providerProfile != null) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        if (providerProfile.isActive) "ONLINE" else "OFFLINE",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (providerProfile.isActive) Color(0xFF10B981) else OnSurfaceVariant
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                    Switch(
+                                        checked = providerProfile.isActive,
+                                        onCheckedChange = { viewModel.toggleActiveStatus(it) },
+                                        colors = SwitchDefaults.colors(
+                                            checkedThumbColor = Color.White,
+                                            checkedTrackColor = Color(0xFF10B981),
+                                            uncheckedThumbColor = Color.White,
+                                            uncheckedTrackColor = SurfaceContainerHigh
+                                        ),
+                                        modifier = Modifier
+                                            .scale(0.7f)
+                                            .height(24.dp)
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        // Info Section
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Text(
+                                userProfile.fullName,
+                                style = MaterialTheme.typography.headlineSmall,
+                                color = OnSurface,
+                                fontWeight = FontWeight.ExtraBold
+                            )
+                            val roleLabel = when {
+                                providerProfile != null -> providerProfile.profession
+                                userProfile.role != null -> userProfile.role.lowercase()
+                                    .replaceFirstChar { it.uppercase() }
+                                else -> "User"
+                            }
+                            Text(
+                                roleLabel.uppercase(),
+                                style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 0.5.sp),
+                                color = Primary,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                            Spacer(modifier = Modifier.height(20.dp))
+
+                            Text(
+                                "EMAIL ADDRESS",
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    letterSpacing = 1.sp,
+                                    fontWeight = FontWeight.Black
+                                ),
+                                color = OnSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                userProfile.email,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = OnSurface,
+                                fontWeight = FontWeight.SemiBold
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Text(
+                                "CONTACT NUMBER",
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    letterSpacing = 1.sp,
+                                    fontWeight = FontWeight.Black
+                                ),
+                                color = OnSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                userProfile.phone ?: "Not set",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = OnSurface,
+                                fontWeight = FontWeight.SemiBold
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                if (providerProfile?.isVerified == true) {
+                                    StatusBadge(
+                                        "Verified Provider",
+                                        OnStatusActive.copy(alpha = 0.1f),
+                                        OnStatusActive
+                                    )
+                                }
+                                val joinedDate = try {
+                                    val iso = userProfile.createdAt.substringBefore("T")
+                                    val parts = iso.split("-")
+                                    val months = listOf(
+                                        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+                                    )
+                                    "Joined ${months[parts[1].toInt() - 1]} ${parts[0]}"
+                                } catch (e: Exception) {
+                                    "Joined ${userProfile.createdAt.take(10)}"
+                                }
+                                StatusBadge(joinedDate, SurfaceContainerHigh, OnSurfaceVariant)
+                            }
+                        }
                     }
                 }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Info
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        userProfile.fullName,
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = OnSurface
-                    )
-                    val roleLabel = when {
-                        providerProfile != null -> providerProfile.profession
-                        userProfile.role != null -> userProfile.role.lowercase().replaceFirstChar { it.uppercase() }
-                        else -> "User"
-                    }
-                    Text(
-                        roleLabel,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = OnSurfaceVariant
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Text("EMAIL ADDRESS", style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp), color = OnSurfaceVariant)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(userProfile.email, style = MaterialTheme.typography.bodyMedium, color = OnSurface)
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Text("CONTACT NUMBER", style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp), color = OnSurfaceVariant)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(userProfile.phone ?: "Not set", style = MaterialTheme.typography.bodyMedium, color = OnSurface)
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        if (providerProfile?.isVerified == true) {
-                            StatusBadge("Verified Provider", SecondaryContainer, OnSecondaryContainer)
-                        }
-                        val joinedDate = try {
-                            val iso = userProfile.createdAt.substringBefore("T")
-                            val parts = iso.split("-")
-                            val months = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
-                            "Joined ${months[parts[1].toInt() - 1]} ${parts[0]}"
-                        } catch (e: Exception) {
-                            "Joined ${userProfile.createdAt.take(10)}"
-                        }
-                        StatusBadge(joinedDate, SurfaceContainerHigh, OnSurfaceVariant)
-                    }
-                }
-            }
-        }
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -551,13 +623,91 @@ private fun LedgerRow(
 }
 
 @Composable
-private fun ProfessionalTab(onNavigateToProfessional: () -> Unit) {
+private fun ProfessionalTab(uiState: ProfileUiState, onNavigateToProfessional: () -> Unit) {
+    val state = uiState as? ProfileUiState.Success
+    val provider = state?.providerProfile
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(24.dp)
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
+        if (provider != null) {
+            Text(
+                "Practice Dashboard",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = OnSurface
+            )
+
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                StatCard(
+                    title = "Experience",
+                    value = "${provider.yearsOfExperience}Y+",
+                    icon = Icons.Outlined.WorkspacePremium,
+                    modifier = Modifier.weight(1f)
+                )
+                StatCard(
+                    title = "Rating",
+                    value = "%.1f".format(provider.averageRating ?: 0.0),
+                    icon = Icons.Outlined.Star,
+                    modifier = Modifier.weight(1f),
+                    badge = "${provider.totalReviews} REVIEWS",
+                    badgeColor = Primary.copy(alpha = 0.1f),
+                    badgeTextColor = Primary
+                )
+            }
+
+            Surface(
+                color = SurfaceContainerLowest,
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Text(
+                        "Consultation Fees",
+                        style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp, fontWeight = FontWeight.Black),
+                        color = OnSurfaceVariant
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        FeeItem("In-Person", provider.consultationFee, state.userProfile.preferredCurrency ?: "USD", Icons.Outlined.LocationOn)
+                        FeeItem("Video Call", provider.videoConsultationFee ?: 0.0, state.userProfile.preferredCurrency ?: "USD", Icons.Outlined.Videocam)
+                    }
+                }
+            }
+
+            Surface(
+                color = SurfaceContainerLowest,
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text(
+                                "Practice Location",
+                                style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp, fontWeight = FontWeight.Black),
+                                color = OnSurfaceVariant
+                            )
+                            Spacer(Modifier.height(4.dp))
+                            Text(provider.location ?: "Address not set", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                        }
+                        Icon(Icons.Outlined.Map, null, tint = Primary)
+                    }
+                }
+            }
+        }
+
         Surface(
             color = SurfaceContainerLowest,
             shape = RoundedCornerShape(16.dp),
@@ -565,18 +715,18 @@ private fun ProfessionalTab(onNavigateToProfessional: () -> Unit) {
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Text(
-                    "Professional Information",
+                    "Credential Management",
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                     color = OnSurface
                 )
                 Text(
-                    "Manage your practice details and credentials",
+                    "Manage your clinical certifications and professional history.",
                     style = MaterialTheme.typography.bodySmall,
                     color = OnSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 BmsSecondaryButton(
-                    text = "Edit Professional Info",
+                    text = "Edit Professional Profile",
                     onClick = onNavigateToProfessional
                 )
             }
@@ -585,13 +735,78 @@ private fun ProfessionalTab(onNavigateToProfessional: () -> Unit) {
 }
 
 @Composable
-private fun VisibilityTab(onNavigateToVisibility: () -> Unit) {
+private fun FeeItem(label: String, amount: Double, currency: String, icon: ImageVector) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(
+            modifier = Modifier.size(32.dp).background(Primary.copy(alpha = 0.1f), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(icon, null, tint = Primary, modifier = Modifier.size(16.dp))
+        }
+        Spacer(Modifier.width(12.dp))
+        Column {
+            Text(label, style = MaterialTheme.typography.labelSmall, color = OnSurfaceVariant)
+            Text("$amount $currency", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Black)
+        }
+    }
+}
+
+@Composable
+private fun VisibilityTab(
+    uiState: ProfileUiState,
+    viewModel: SettingsViewModel,
+    onNavigateToVisibility: () -> Unit
+) {
+    val state = uiState as? ProfileUiState.Success
+    val provider = state?.providerProfile
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(24.dp)
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
+        if (provider != null) {
+            Surface(
+                color = SurfaceContainerLowest,
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Text(
+                        "Clinical Workflow",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        color = OnSurface
+                    )
+                    Spacer(Modifier.height(16.dp))
+
+                    SettingsToggleRow(
+                        title = "Auto-Approval",
+                        subtitle = "Automatically accept bookings within availability",
+                        checked = true, // Place-holder for UI demonstrating functionality
+                        onCheckedChange = { /* viewModel.updateOperationalSettings(autoApproval = it) */ }
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    SettingsClickRow(
+                        title = "Consultation Buffer",
+                        subtitle = "${provider.bufferTimeAfter} minutes between sessions",
+                        trailing = {
+                            Text(
+                                "Edit",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = Primary,
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
+                        onClick = { /* Could show a picker */ }
+                    )
+                }
+            }
+        }
+
         Surface(
             color = SurfaceContainerLowest,
             shape = RoundedCornerShape(16.dp),
@@ -599,18 +814,18 @@ private fun VisibilityTab(onNavigateToVisibility: () -> Unit) {
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Text(
-                    "Profile Visibility",
+                    "Profile Discovery",
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                     color = OnSurface
                 )
                 Text(
-                    "Control how clients find and interact with you",
+                    "Control how clients find and interact with your public profile.",
                     style = MaterialTheme.typography.bodySmall,
                     color = OnSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 BmsSecondaryButton(
-                    text = "Manage Visibility",
+                    text = "Search & Discovery Settings",
                     onClick = onNavigateToVisibility
                 )
             }

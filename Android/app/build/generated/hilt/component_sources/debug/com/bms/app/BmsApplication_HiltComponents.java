@@ -9,6 +9,7 @@ import com.bms.app.ui.auth.AuthViewModel_HiltModules;
 import com.bms.app.ui.chat.ChatViewModel_HiltModules;
 import com.bms.app.ui.chat.InboxViewModel_HiltModules;
 import com.bms.app.ui.chat.SupportViewModel_HiltModules;
+import com.bms.app.ui.config.SystemConfigViewModel_HiltModules;
 import com.bms.app.ui.dashboard.AdminViewModel_HiltModules;
 import com.bms.app.ui.dashboard.DashboardViewModel_HiltModules;
 import com.bms.app.ui.dashboard.UserDashboardViewModel_HiltModules;
@@ -19,6 +20,8 @@ import com.bms.app.ui.settings.viewmodel.VisibilityViewModel_HiltModules;
 import com.bms.app.ui.user.ProviderDetailViewModel_HiltModules;
 import com.bms.app.ui.user.ReviewViewModel_HiltModules;
 import com.bms.app.ui.user.RewardsViewModel_HiltModules;
+import com.bms.app.ui.video.VideoCallService_GeneratedInjector;
+import com.bms.app.ui.video.VideoCallViewModel_HiltModules;
 import dagger.Binds;
 import dagger.Component;
 import dagger.Module;
@@ -163,7 +166,8 @@ public final class BmsApplication_HiltComponents {
 
   @Subcomponent
   @ServiceScoped
-  public abstract static class ServiceC implements ServiceComponent,
+  public abstract static class ServiceC implements VideoCallService_GeneratedInjector,
+      ServiceComponent,
       GeneratedComponent {
     @Subcomponent.Builder
     abstract interface Builder extends ServiceComponentBuilder {
@@ -189,8 +193,10 @@ public final class BmsApplication_HiltComponents {
           RewardsViewModel_HiltModules.KeyModule.class,
           SettingsViewModel_HiltModules.KeyModule.class,
           SupportViewModel_HiltModules.KeyModule.class,
+          SystemConfigViewModel_HiltModules.KeyModule.class,
           UserDashboardViewModel_HiltModules.KeyModule.class,
           UserDetailViewModel_HiltModules.KeyModule.class,
+          VideoCallViewModel_HiltModules.KeyModule.class,
           VisibilityViewModel_HiltModules.KeyModule.class
       }
   )
@@ -241,8 +247,10 @@ public final class BmsApplication_HiltComponents {
           RewardsViewModel_HiltModules.BindsModule.class,
           SettingsViewModel_HiltModules.BindsModule.class,
           SupportViewModel_HiltModules.BindsModule.class,
+          SystemConfigViewModel_HiltModules.BindsModule.class,
           UserDashboardViewModel_HiltModules.BindsModule.class,
           UserDetailViewModel_HiltModules.BindsModule.class,
+          VideoCallViewModel_HiltModules.BindsModule.class,
           VisibilityViewModel_HiltModules.BindsModule.class
       }
   )

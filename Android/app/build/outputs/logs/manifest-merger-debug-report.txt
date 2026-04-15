@@ -1,10 +1,11 @@
 -- Merging decision tree log ---
 manifest
-ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:2:1-29:12
-INJECTED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:2:1-29:12
-INJECTED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:2:1-29:12
-INJECTED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:2:1-29:12
+ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:2:1-38:12
+INJECTED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:2:1-38:12
+INJECTED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:2:1-38:12
+INJECTED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:2:1-38:12
 MERGED from [androidx.compose.material3:material3-android:1.2.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\66580240144f442eb0394f9155459581\transformed\jetified-material3-release\AndroidManifest.xml:17:1-22:12
+MERGED from [co.daily:client:0.37.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\5aefe87aa4109c943e71e0c1706204f3\transformed\jetified-client-0.37.0\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.hilt:hilt-navigation-compose:1.1.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\10c080afed610cabfef17aeadb257a9f\transformed\jetified-hilt-navigation-compose-1.1.0\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.hilt:hilt-navigation:1.1.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\324c63f5efebe6293f07b71843b10832\transformed\jetified-hilt-navigation-1.1.0\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.navigation:navigation-common:2.7.7] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\a6004e308368088fe50419e17def2377\transformed\navigation-common-2.7.7\AndroidManifest.xml:17:1-22:12
@@ -35,6 +36,7 @@ MERGED from [androidx.activity:activity-ktx:1.8.2] C:\Users\hp\Downloads\gradle-
 MERGED from [androidx.activity:activity-compose:1.8.2] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\7bd3d85cb924211c2cefc7d6470a9a64\transformed\jetified-activity-compose-1.8.2\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.loader:loader:1.0.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\b92e28114699326c7aab4dbd37831519\transformed\loader-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.emoji2:emoji2:1.3.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\54a32eeadb2bc1b667bf5fdd55bddf8a\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:17:1-35:12
+MERGED from [io.github.jan-tennert.supabase:functions-kt-android-debug:2.1.3] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\0edc7137d9ef91c3ba89032158180bfc\transformed\jetified-functions-kt-debug\AndroidManifest.xml:2:1-7:12
 MERGED from [io.github.jan-tennert.supabase:realtime-kt-android-debug:2.1.3] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\c5cc02a8ae868e9a3d0314de258b795c\transformed\jetified-realtime-kt-debug\AndroidManifest.xml:2:1-7:12
 MERGED from [io.github.jan-tennert.supabase:postgrest-kt-android-debug:2.1.3] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\e82015dc81bba76fbefbd1bc74518c6a\transformed\jetified-postgrest-kt-debug\AndroidManifest.xml:2:1-7:12
 MERGED from [io.github.jan-tennert.supabase:gotrue-kt-android-debug:2.1.3] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\a892f245303cf18d49d8758fa6e8be9f\transformed\jetified-gotrue-kt-debug\AndroidManifest.xml:2:1-20:12
@@ -63,14 +65,14 @@ MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] C:\Users\hp\
 MERGED from [androidx.core:core-ktx:1.12.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\7b65de5080fe0e33fb008ceeae0c387f\transformed\jetified-core-ktx-1.12.0\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.compose.runtime:runtime-saveable-android:1.6.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\b67b15beefc57c978d9e16ecaad80a1d\transformed\jetified-runtime-saveable-release\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.compose.runtime:runtime-android:1.6.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\0927810b1a43b52ab87b0c8427124361\transformed\jetified-runtime-release\AndroidManifest.xml:2:1-7:12
-MERGED from [androidx.annotation:annotation-experimental:1.4.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\47e18a842c16a232904cc91450a395e1\transformed\jetified-annotation-experimental-1.4.0\AndroidManifest.xml:2:1-7:12
-MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\c20cd03ec7473d4f4032db69047f35fe\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:17:1-27:12
 MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\78b92ac6534846970a094fbad82152ca\transformed\interpolator-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\c20cd03ec7473d4f4032db69047f35fe\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:17:1-27:12
 MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\33dd8da711a7be3c9d55a5cff9a0a2fd\transformed\core-runtime-2.2.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\3eaf03ed6c8fd8fafe963d4ba6ec8152\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:17:1-55:12
 MERGED from [com.russhwolf:multiplatform-settings-no-arg-android-debug:1.1.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\f5b4d5db9a35ef88f53d4fced89b950e\transformed\jetified-multiplatform-settings-no-arg-debug\AndroidManifest.xml:17:1-35:12
 MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\38a1b669c876917923cdedb740fac331\transformed\jetified-startup-runtime-1.1.1\AndroidManifest.xml:17:1-33:12
 MERGED from [androidx.tracing:tracing:1.0.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\f9f4b4b5ae6a2b31605a03e8f0bb73a8\transformed\jetified-tracing-1.0.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.annotation:annotation-experimental:1.4.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\47e18a842c16a232904cc91450a395e1\transformed\jetified-annotation-experimental-1.4.0\AndroidManifest.xml:2:1-7:12
 MERGED from [com.russhwolf:multiplatform-settings-coroutines-android-debug:1.1.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\1db07dc5c81ac2a75b89aa83601a8d83\transformed\jetified-multiplatform-settings-coroutines-debug\AndroidManifest.xml:2:1-7:12
 MERGED from [com.russhwolf:multiplatform-settings-android-debug:1.1.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\b720485372e221231df367262eeebbe3\transformed\jetified-multiplatform-settings-debug\AndroidManifest.xml:2:1-7:12
 MERGED from [com.soywiz.korlibs.krypto:krypto-android:4.0.10] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\9d28dbde108e3b9c3866adb5989b144d\transformed\jetified-krypto-debug\AndroidManifest.xml:2:1-9:12
@@ -101,9 +103,21 @@ uses-permission#android.permission.RECORD_AUDIO
 ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:7:5-71
 	android:name
 		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:7:22-68
+uses-permission#android.permission.POST_NOTIFICATIONS
+ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:8:5-77
+	android:name
+		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:8:22-74
+uses-permission#android.permission.FOREGROUND_SERVICE
+ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:9:5-77
+	android:name
+		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:9:22-74
+uses-permission#android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION
+ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:10:5-94
+	android:name
+		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:10:22-91
 application
-ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:9:5-27:19
-INJECTED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:9:5-27:19
+ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:12:5-36:19
+INJECTED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:12:5-36:19
 MERGED from [androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\c9cc8ecd4984577c4d5145d8383770c7\transformed\jetified-ui-tooling-release\AndroidManifest.xml:22:5-26:19
 MERGED from [androidx.compose.ui:ui-tooling-android:1.6.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\c9cc8ecd4984577c4d5145d8383770c7\transformed\jetified-ui-tooling-release\AndroidManifest.xml:22:5-26:19
 MERGED from [androidx.compose.ui:ui-test-manifest:1.6.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\703ccf5dbe6386e6c29ce56d43e42455\transformed\jetified-ui-test-manifest-1.6.1\AndroidManifest.xml:22:5-26:19
@@ -129,45 +143,55 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\hp\Downloads\gradl
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.12.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\f12399a8cfcb9482278300e43f9289d7\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
 	android:supportsRtl
-		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:15:9-35
+		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:18:9-35
 	android:label
-		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:14:9-41
+		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:17:9-41
 	android:roundIcon
-		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:13:9-48
+		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:16:9-48
 	android:icon
-		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:12:9-43
+		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:15:9-43
 	android:allowBackup
-		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:11:9-35
+		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:14:9-35
 	android:theme
-		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:16:9-44
+		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:19:9-44
 	android:name
-		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:10:9-39
-activity#com.bms.app.MainActivity
-ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:17:9-26:20
-	android:windowSoftInputMode
-		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:20:13-55
+		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:13:9-39
+service#com.bms.app.ui.video.VideoCallService
+ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:21:9-24:40
 	android:exported
-		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:19:13-36
+		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:24:13-37
+	android:foregroundServiceType
+		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:23:13-60
+	android:name
+		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:22:13-54
+activity#com.bms.app.MainActivity
+ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:26:9-35:20
+	android:windowSoftInputMode
+		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:29:13-55
+	android:exported
+		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:28:13-36
 	android:theme
-		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:21:13-48
+		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:30:13-48
 	android:name
-		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:18:13-41
+		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:27:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:22:13-25:29
+ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:31:13-34:29
 action#android.intent.action.MAIN
-ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:23:17-69
+ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:32:17-69
 	android:name
-		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:23:25-66
+		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:32:25-66
 category#android.intent.category.LAUNCHER
-ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:24:17-77
+ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:33:17-77
 	android:name
-		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:24:27-74
+		ADDED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml:33:27-74
 uses-sdk
 INJECTED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml
 INJECTED from E:\Booking Management App\Android\app\src\main\AndroidManifest.xml
 MERGED from [androidx.compose.material3:material3-android:1.2.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\66580240144f442eb0394f9155459581\transformed\jetified-material3-release\AndroidManifest.xml:20:5-44
 MERGED from [androidx.compose.material3:material3-android:1.2.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\66580240144f442eb0394f9155459581\transformed\jetified-material3-release\AndroidManifest.xml:20:5-44
+MERGED from [co.daily:client:0.37.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\5aefe87aa4109c943e71e0c1706204f3\transformed\jetified-client-0.37.0\AndroidManifest.xml:5:5-44
+MERGED from [co.daily:client:0.37.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\5aefe87aa4109c943e71e0c1706204f3\transformed\jetified-client-0.37.0\AndroidManifest.xml:5:5-44
 MERGED from [androidx.hilt:hilt-navigation-compose:1.1.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\10c080afed610cabfef17aeadb257a9f\transformed\jetified-hilt-navigation-compose-1.1.0\AndroidManifest.xml:5:5-44
 MERGED from [androidx.hilt:hilt-navigation-compose:1.1.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\10c080afed610cabfef17aeadb257a9f\transformed\jetified-hilt-navigation-compose-1.1.0\AndroidManifest.xml:5:5-44
 MERGED from [androidx.hilt:hilt-navigation:1.1.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\324c63f5efebe6293f07b71843b10832\transformed\jetified-hilt-navigation-1.1.0\AndroidManifest.xml:5:5-44
@@ -228,6 +252,8 @@ MERGED from [androidx.loader:loader:1.0.0] C:\Users\hp\Downloads\gradle-9.2.1-bi
 MERGED from [androidx.loader:loader:1.0.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\b92e28114699326c7aab4dbd37831519\transformed\loader-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.emoji2:emoji2:1.3.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\54a32eeadb2bc1b667bf5fdd55bddf8a\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:21:5-44
 MERGED from [androidx.emoji2:emoji2:1.3.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\54a32eeadb2bc1b667bf5fdd55bddf8a\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:21:5-44
+MERGED from [io.github.jan-tennert.supabase:functions-kt-android-debug:2.1.3] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\0edc7137d9ef91c3ba89032158180bfc\transformed\jetified-functions-kt-debug\AndroidManifest.xml:5:5-44
+MERGED from [io.github.jan-tennert.supabase:functions-kt-android-debug:2.1.3] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\0edc7137d9ef91c3ba89032158180bfc\transformed\jetified-functions-kt-debug\AndroidManifest.xml:5:5-44
 MERGED from [io.github.jan-tennert.supabase:realtime-kt-android-debug:2.1.3] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\c5cc02a8ae868e9a3d0314de258b795c\transformed\jetified-realtime-kt-debug\AndroidManifest.xml:5:5-44
 MERGED from [io.github.jan-tennert.supabase:realtime-kt-android-debug:2.1.3] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\c5cc02a8ae868e9a3d0314de258b795c\transformed\jetified-realtime-kt-debug\AndroidManifest.xml:5:5-44
 MERGED from [io.github.jan-tennert.supabase:postgrest-kt-android-debug:2.1.3] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\e82015dc81bba76fbefbd1bc74518c6a\transformed\jetified-postgrest-kt-debug\AndroidManifest.xml:5:5-44
@@ -284,12 +310,10 @@ MERGED from [androidx.compose.runtime:runtime-saveable-android:1.6.1] C:\Users\h
 MERGED from [androidx.compose.runtime:runtime-saveable-android:1.6.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\b67b15beefc57c978d9e16ecaad80a1d\transformed\jetified-runtime-saveable-release\AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.runtime:runtime-android:1.6.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\0927810b1a43b52ab87b0c8427124361\transformed\jetified-runtime-release\AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.runtime:runtime-android:1.6.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\0927810b1a43b52ab87b0c8427124361\transformed\jetified-runtime-release\AndroidManifest.xml:5:5-44
-MERGED from [androidx.annotation:annotation-experimental:1.4.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\47e18a842c16a232904cc91450a395e1\transformed\jetified-annotation-experimental-1.4.0\AndroidManifest.xml:5:5-44
-MERGED from [androidx.annotation:annotation-experimental:1.4.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\47e18a842c16a232904cc91450a395e1\transformed\jetified-annotation-experimental-1.4.0\AndroidManifest.xml:5:5-44
-MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\c20cd03ec7473d4f4032db69047f35fe\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:20:5-22:41
-MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\c20cd03ec7473d4f4032db69047f35fe\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\78b92ac6534846970a094fbad82152ca\transformed\interpolator-1.0.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\78b92ac6534846970a094fbad82152ca\transformed\interpolator-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\c20cd03ec7473d4f4032db69047f35fe\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\c20cd03ec7473d4f4032db69047f35fe\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\33dd8da711a7be3c9d55a5cff9a0a2fd\transformed\core-runtime-2.2.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\33dd8da711a7be3c9d55a5cff9a0a2fd\transformed\core-runtime-2.2.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\3eaf03ed6c8fd8fafe963d4ba6ec8152\transformed\jetified-profileinstaller-1.3.0\AndroidManifest.xml:21:5-44
@@ -300,6 +324,8 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\hp\Downloads\gradl
 MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\38a1b669c876917923cdedb740fac331\transformed\jetified-startup-runtime-1.1.1\AndroidManifest.xml:21:5-23:41
 MERGED from [androidx.tracing:tracing:1.0.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\f9f4b4b5ae6a2b31605a03e8f0bb73a8\transformed\jetified-tracing-1.0.0\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.tracing:tracing:1.0.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\f9f4b4b5ae6a2b31605a03e8f0bb73a8\transformed\jetified-tracing-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.annotation:annotation-experimental:1.4.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\47e18a842c16a232904cc91450a395e1\transformed\jetified-annotation-experimental-1.4.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.0] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\47e18a842c16a232904cc91450a395e1\transformed\jetified-annotation-experimental-1.4.0\AndroidManifest.xml:5:5-44
 MERGED from [com.russhwolf:multiplatform-settings-coroutines-android-debug:1.1.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\1db07dc5c81ac2a75b89aa83601a8d83\transformed\jetified-multiplatform-settings-coroutines-debug\AndroidManifest.xml:5:5-44
 MERGED from [com.russhwolf:multiplatform-settings-coroutines-android-debug:1.1.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\1db07dc5c81ac2a75b89aa83601a8d83\transformed\jetified-multiplatform-settings-coroutines-debug\AndroidManifest.xml:5:5-44
 MERGED from [com.russhwolf:multiplatform-settings-android-debug:1.1.1] C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\b720485372e221231df367262eeebbe3\transformed\jetified-multiplatform-settings-debug\AndroidManifest.xml:5:5-44

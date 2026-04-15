@@ -9,6 +9,8 @@ animator fragment_open_exit
 attr action
 attr alpha
 attr argType
+attr daily_bring_to_front
+attr daily_scale_mode
 attr data
 attr dataPattern
 attr destination
@@ -151,6 +153,8 @@ id compose_view_saveable_id_tag
 id consume_window_insets_tag
 id dialog_button
 id edit_text_id
+id fill
+id fit
 id forever
 id fragment_container_view_tag
 id hide_ime_id
@@ -348,4 +352,6 @@ styleable NavGraphNavigator startDestination
 styleable NavHost navGraph
 styleable NavInclude graph
 styleable Navigator android_label android_id route
+styleable VideoTextureView daily_scale_mode
+styleable VideoView daily_bring_to_front daily_scale_mode
 xml image_share_filepaths

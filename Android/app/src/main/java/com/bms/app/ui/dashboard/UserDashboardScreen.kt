@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bms.app.domain.model.Appointment
 import com.bms.app.domain.model.ProviderProfile
+import com.bms.app.domain.model.UserProfile
 import com.bms.app.domain.util.NameUtils
 import com.bms.app.ui.components.*
 import com.bms.app.ui.theme.*
@@ -56,6 +57,22 @@ private fun timeGreeting(): String {
     }
 }
 
+private fun resolveDisplayName(
+    providerId: String,
+    providerMap: Map<String, ProviderProfile>,
+    userProfileMap: Map<String, UserProfile>
+): String {
+    val provider = providerMap[providerId]
+    val realName = provider?.userId?.let { userProfileMap[it]?.fullName }
+        ?: userProfileMap[providerId]?.fullName // Fallback if providerId is actually userId
+    
+    return when {
+        !realName.isNullOrBlank() -> "Dr. $realName"
+        provider != null && !provider.profession.isNullOrBlank() -> "Dr. ${provider.profession}"
+        else -> "Professional"
+    }
+}
+
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,6 +84,7 @@ fun UserDashboardScreen(
     onBrowseProviders: () -> Unit = {},
     onViewAllBookings: () -> Unit = {},
     onInboxClick: () -> Unit = {},
+    onJoinVideoCall: (String) -> Unit = {},
     viewModel: UserDashboardViewModel = hiltViewModel()
 ) {
     var selectedNav by remember { mutableStateOf("home") }
@@ -81,6 +99,7 @@ fun UserDashboardScreen(
             val unreadCount = (uiState as? UserDashboardUiState.Success)?.unreadNotificationCount ?: 0
             BmsTopBar(
                 title = "BookEase24X7",
+                userName = (uiState as? UserDashboardUiState.Success)?.userProfile?.fullName,
                 avatarInitials = initials,
                 isLoading = uiState is UserDashboardUiState.Loading,
                 onMessagesClick = onInboxClick,
@@ -174,7 +193,8 @@ fun UserDashboardScreen(
                         },
                         onShowSnackbar = { msg ->
                             scope.launch { snackbarHostState.showSnackbar(msg) }
-                        }
+                        },
+                        onJoinVideoCall = onJoinVideoCall
                     )
                 }
             }
@@ -196,6 +216,7 @@ private fun UserDashboardContent(
     onAcceptReschedule: (String) -> Unit,
     onDeclineReschedule: (String) -> Unit,
     onRescheduleAppointment: (Appointment, String, String, String) -> Unit,
+    onJoinVideoCall: (String) -> Unit,
     onShowSnackbar: (String) -> Unit
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -206,6 +227,7 @@ private fun UserDashboardContent(
     var selectedDetailAppointment by remember { mutableStateOf<Appointment?>(null) }
     var appointmentToCancel by remember { mutableStateOf<Appointment?>(null) }
     var appointmentToReschedule by remember { mutableStateOf<Appointment?>(null) }
+    var invoiceToPreview by remember { mutableStateOf<Appointment?>(null) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         Spacer(modifier = Modifier.height(24.dp))
@@ -280,13 +302,8 @@ private fun UserDashboardContent(
             Spacer(modifier = Modifier.height(12.dp))
             
             state.rescheduleRequests.forEach { req ->
+                val displayName = resolveDisplayName(req.providerId, state.providerMap, state.userProfileMap)
                 val provider = state.providerMap[req.providerId]
-                val realName = provider?.userId?.let { state.userProfileMap[it]?.fullName }
-                val displayName = when {
-                    !realName.isNullOrBlank() -> "Dr. $realName"
-                    provider != null -> "Dr. ${provider.profession}"
-                    else -> "Provider"
-                }
                 
                 RescheduleRequestBanner(
                     appointment = req,
@@ -294,7 +311,7 @@ private fun UserDashboardContent(
                     onAccept = { onAcceptReschedule(req.id) },
                     onDecline = { onDeclineReschedule(req.id) },
                     onRebook = { 
-                        val targetUserId = provider?.userId ?: return@RescheduleRequestBanner
+                        val targetUserId = provider?.userId ?: req.providerId // Use providerId as fallback if it is the userId
                         onRebookProvider(targetUserId, req.id) 
                     }
                 )
@@ -305,18 +322,17 @@ private fun UserDashboardContent(
 
         // ── Next Appointment Banner ───────────────────────────────────────────────
         if (state.nextAppointment != null) {
+            val displayName = resolveDisplayName(state.nextAppointment.providerId, state.providerMap, state.userProfileMap)
             NextAppointmentBanner(
                 appointment = state.nextAppointment,
                 provider = state.providerMap[state.nextAppointment.providerId],
-                realName = state.providerMap[state.nextAppointment.providerId]?.userId
-                    ?.let { state.userProfileMap[it]?.fullName }
-                    ?.takeIf { it.isNotBlank() },
+                displayName = displayName,
                 onMessage = { 
-                    state.providerMap[state.nextAppointment.providerId]?.userId?.let { 
-                        onMessageProvider(it) 
-                    } 
+                    val targetUserId = state.providerMap[state.nextAppointment.providerId]?.userId ?: state.nextAppointment.providerId
+                    onMessageProvider(targetUserId) 
                 },
-                onCancel = { appointmentToCancel = state.nextAppointment }
+                onCancel = { appointmentToCancel = state.nextAppointment },
+                onJoinVideoCall = { onJoinVideoCall(state.nextAppointment.id) }
             )
             Spacer(modifier = Modifier.height(28.dp))
         }
@@ -430,12 +446,7 @@ private fun UserDashboardContent(
         } else {
             displayList.forEach { appointment ->
                 val provider = state.providerMap[appointment.providerId]
-                val realName = provider?.userId?.let { state.userProfileMap[it]?.fullName }?.takeIf { it.isNotBlank() }
-                val displayName = when {
-                    realName != null -> "Dr. $realName"
-                    provider != null -> "Dr. ${provider.profession}"
-                    else             -> "Provider"
-                }
+                val displayName = resolveDisplayName(appointment.providerId, state.providerMap, state.userProfileMap)
                 val subtitle = listOfNotNull(
                     provider?.profession?.takeIf { it.isNotBlank() },
                     provider?.specialty?.takeIf { it.isNotBlank() }
@@ -446,19 +457,22 @@ private fun UserDashboardContent(
                     providerName = if (selectedTab == 3) "Invoice: $displayName" else displayName,
                     providerSpecialty = if (selectedTab == 3) "Paid on ${friendlyDate(appointment.appointmentDate)}" else subtitle,
                     onClick = { selectedDetailAppointment = appointment },
-                    onMessage = { provider?.userId?.let { onMessageProvider(it) } },
+                    onMessage = { 
+                        val targetUserId = provider?.userId ?: appointment.providerId
+                        onMessageProvider(targetUserId) 
+                    },
                     onRate = {
-                        val name = realName ?: provider?.profession ?: "Provider"
-                        onNavigate("review_submission/${appointment.id}/${appointment.providerId}/$name")
+                        onNavigate("review_submission/${appointment.id}/${appointment.providerId}/$displayName")
                     },
                     onPayNow = {
-                        onRebookProvider(provider?.userId ?: "", appointment.id)
+                        val targetUserId = provider?.userId ?: appointment.providerId
+                        onRebookProvider(targetUserId, appointment.id)
                     },
                     onDownloadInvoice = {
-                        onShowSnackbar("Invoice downloaded for ${appointment.id}")
+                        invoiceToPreview = appointment
                     },
                     onTelehealthJoin = {
-                        onShowSnackbar("Joining secure video consultation...")
+                        onJoinVideoCall(appointment.id)
                     }
                 )
                 Spacer(modifier = Modifier.height(12.dp))
@@ -481,8 +495,7 @@ private fun UserDashboardContent(
     // ── Dialogs ───────────────────────────────────────────────────────────────
     selectedDetailAppointment?.let { appt ->
         val provider = state.providerMap[appt.providerId]
-        val realName = provider?.userId?.let { state.userProfileMap[it]?.fullName }
-        val displayName = if (!realName.isNullOrBlank()) "Dr. $realName" else "Dr. ${provider?.profession ?: "Provider"}"
+        val displayName = resolveDisplayName(appt.providerId, state.providerMap, state.userProfileMap)
         
         AppointmentDetailDialog(
             appointment = appt,
@@ -513,6 +526,21 @@ private fun UserDashboardContent(
             }
         )
     }
+
+    invoiceToPreview?.let { appt ->
+        val provider = state.providerMap[appt.providerId]
+        val displayName = resolveDisplayName(appt.providerId, state.providerMap, state.userProfileMap)
+        
+        InvoicePreviewDialog(
+            appointment = appt,
+            provider = provider,
+            providerName = displayName,
+            onDismiss = { invoiceToPreview = null },
+            onDownloadStart = {
+                onShowSnackbar("Starting invoice download...")
+            }
+        )
+    }
 }
 
 // ── Next Appointment Banner ───────────────────────────────────────────────────
@@ -521,9 +549,10 @@ private fun UserDashboardContent(
 private fun NextAppointmentBanner(
     appointment: Appointment,
     provider: ProviderProfile?,
-    realName: String?,
+    displayName: String,
     onMessage: () -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    onJoinVideoCall: () -> Unit
 ) {
     val isVideo = appointment.isVideoConsultation == true
     Surface(
@@ -570,11 +599,6 @@ private fun NextAppointmentBanner(
 
             // Provider info
             Row(verticalAlignment = Alignment.CenterVertically) {
-                val displayName = when {
-                    !realName.isNullOrBlank() -> realName
-                    provider != null          -> provider.profession
-                    else                      -> "DR"
-                }
                 val providerInitials = NameUtils.getInitials(displayName)
                 Box(
                     modifier = Modifier
@@ -592,7 +616,7 @@ private fun NextAppointmentBanner(
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
                     Text(
-                        text = if (!realName.isNullOrBlank()) "Dr. $realName" else "Dr. ${provider?.profession ?: "Provider"}",
+                        text = displayName,
                         style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
                         color = OnSurface,
                         maxLines = 1,
@@ -635,6 +659,20 @@ private fun NextAppointmentBanner(
             }
 
             Spacer(modifier = Modifier.height(14.dp))
+
+if (isVideo && appointment.status != "pending") {
+                Button(
+                    onClick = onJoinVideoCall,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Primary)
+                ) {
+                    Icon(Icons.Outlined.Videocam, contentDescription = null, modifier = Modifier.size(20.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Join Video Consultation", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+            }
 
             // Action buttons
             Row(
@@ -689,12 +727,12 @@ fun BookingListItem(
     val isVideo = appointment.isVideoConsultation == true
     val statusColor = when (appointment.status) {
         "confirmed", "approved" -> StatusActive
-        "pending"   -> StatusPending
+        "pending", "rescheduling" -> StatusPending
         "completed" -> StatusInfo
         "cancelled", "rejected" -> MaterialTheme.colorScheme.error
         else        -> OnSurfaceVariant
     }
-    val statusText = appointment.status.replaceFirstChar { it.uppercase() }
+    val statusText = if (appointment.status == "rescheduling") "Rescheduling" else appointment.status.replaceFirstChar { it.uppercase() }
 
     Surface(
         color = SurfaceContainerLowest,

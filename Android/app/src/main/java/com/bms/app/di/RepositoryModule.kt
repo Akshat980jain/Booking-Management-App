@@ -59,4 +59,16 @@ abstract class RepositoryModule {
     abstract fun bindNotificationRepository(
         notificationRepositoryImpl: NotificationRepositoryImpl
     ): NotificationRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindConfigRepository(
+        configRepositoryImpl: ConfigRepositoryImpl
+    ): ConfigRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindVideoRepository(
+        videoRepositoryImpl: VideoRepositoryImpl
+    ): VideoRepository
 }

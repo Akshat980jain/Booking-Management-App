@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.bms.app.domain.model.ChatConversation
 import com.bms.app.domain.repository.ChatRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,12 +27,16 @@ class InboxViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<InboxUiState>(InboxUiState.Loading)
     val uiState: StateFlow<InboxUiState> = _uiState.asStateFlow()
 
+    private var realtimeJob: Job? = null
+
     init {
         loadConversations()
     }
 
     fun loadConversations() {
         _uiState.update { InboxUiState.Loading }
+
+        // 1. One-shot fetch for immediate display
         viewModelScope.launch {
             chatRepository.getConversations()
                 .onSuccess { list ->
@@ -41,5 +46,18 @@ class InboxViewModel @Inject constructor(
                     _uiState.update { InboxUiState.Error(err.message ?: "Failed to load messages") }
                 }
         }
+
+        // 2. Start Realtime subscription for live updates
+        realtimeJob?.cancel()
+        realtimeJob = viewModelScope.launch {
+            chatRepository.getConversationsFlow().collect { liveList ->
+                _uiState.update { InboxUiState.Success(liveList) }
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        realtimeJob?.cancel()
     }
 }

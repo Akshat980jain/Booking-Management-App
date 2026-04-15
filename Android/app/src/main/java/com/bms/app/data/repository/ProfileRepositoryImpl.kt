@@ -115,7 +115,24 @@ class ProfileRepositoryImpl @Inject constructor(
 
     override suspend fun updateProviderProfile(profile: ProviderProfile): Result<Unit> {
         return try {
-            postgrest["provider_profiles"].upsert(profile) {
+            postgrest["provider_profiles"].update(
+                {
+                    set("is_active", profile.isActive)
+                    set("profession", profile.profession)
+                    profile.specialty?.let { set("specialty", it) }
+                    profile.bio?.let { set("bio", it) }
+                    profile.location?.let { set("location", it) }
+                    set("years_of_experience", profile.yearsOfExperience)
+                    profile.phone?.let { set("phone", it) }
+                    set("consultation_fee", profile.consultationFee)
+                    profile.videoConsultationFee?.let { set("video_consultation_fee", it) }
+                    set("video_enabled", profile.videoEnabled)
+                    set("require_video_payment", profile.requireVideoPayment)
+                    set("require_in_person_payment", profile.requireInPersonPayment)
+                    set("buffer_time_after", profile.bufferTimeAfter)
+                    set("timezone", profile.timezone)
+                }
+            ) {
                 filter {
                     eq("user_id", profile.userId)
                 }

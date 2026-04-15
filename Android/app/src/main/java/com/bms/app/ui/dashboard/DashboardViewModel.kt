@@ -1,5 +1,6 @@
 package com.bms.app.ui.dashboard
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bms.app.domain.model.Appointment
@@ -12,6 +13,7 @@ import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.auth
 import com.bms.app.data.local.SupabaseSessionManager
+import com.bms.app.util.NotificationHelper
 import io.github.jan.supabase.postgrest.Postgrest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,8 +43,14 @@ sealed class DashboardUiState {
         val patientRoles: Map<String, String> = emptyMap(),
         val userInitials: String = "PR",
         val currencySymbol: String = "₹",
+        val rescheduleRequests: List<Appointment> = emptyList(),
         val isActionLoading: String? = null,
-        val errorMessage: String? = null
+        val errorMessage: String? = null,
+        /** Provider online/offline status */
+        val isOnline: Boolean = true,
+        val isStatusLoading: Boolean = false,
+        /** Stores the provider profile id for status updates */
+        val providerProfileId: String = ""
     ) : DashboardUiState()
     object ProfileIncomplete : DashboardUiState()
     data class Error(val message: String) : DashboardUiState()
@@ -50,15 +58,19 @@ sealed class DashboardUiState {
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
+    private val application: Application,
     private val profileRepository: ProfileRepository,
     private val appointmentRepository: AppointmentRepository,
     private val auth: Auth,
     private val sessionManager: SupabaseSessionManager,
-    private val postgrest: Postgrest
+    private val postgrest: Postgrest,
+    private val notificationRepository: com.bms.app.domain.repository.NotificationRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<DashboardUiState>(DashboardUiState.Loading)
     val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
+
+    private val seenNotificationIds = mutableSetOf<String>()
 
     init {
         loadDashboard()
@@ -206,7 +218,7 @@ class DashboardViewModel @Inject constructor(
                 } catch (_: Exception) { emptyMap() }
 
                 val totalAppointments = allAppointments.size
-                val pendingRequests = allAppointments.count { it.status == "pending" }
+                val pendingRequests = allAppointments.count { it.status == "pending" || it.status == "rescheduling" }
                 val newPatients = allAppointments.map { it.userId }.distinct().size
                 
                 // Estimate revenue based on consultation fees
@@ -231,11 +243,39 @@ class DashboardViewModel @Inject constructor(
                             patientNames = patientNamesMap,
                             patientRoles = patientRolesMap,
                             userInitials = com.bms.app.domain.util.NameUtils.getInitials(userProfile.fullName),
-                            currencySymbol = currencySymbol
+                            currencySymbol = currencySymbol,
+                            rescheduleRequests = allAppointments.filter { it.status == "rescheduling" },
+                            isOnline = providerProfile.isActive,
+                            providerProfileId = providerProfile.id
                         )
                     }
             } else {
                 _uiState.update { DashboardUiState.Error("Connectivity Issue: Failed to load appointments") }
+            }
+
+            // Start notification listener for Provider
+            startNotificationsListener(userId)
+        }
+    }
+
+    private fun startNotificationsListener(userId: String) {
+        viewModelScope.launch {
+            notificationRepository.getNotificationsFlow(userId).collect { list ->
+                val newContactMessages = list.filter { notification ->
+                    notification.type == "contact_message"
+                            && !notification.isRead
+                            && notification.id.isNotBlank()
+                            && notification.id !in seenNotificationIds
+                }
+                for (notification in newContactMessages) {
+                    seenNotificationIds.add(notification.id)
+                    NotificationHelper.showChatNotification(
+                        context = application,
+                        senderName = notification.title,
+                        messagePreview = notification.message,
+                        senderId = notification.id
+                    )
+                }
             }
         }
     }
@@ -285,10 +325,98 @@ class DashboardViewModel @Inject constructor(
         rejectAppointment(appointmentId, reason)
     }
 
+    fun acceptReschedule(appointmentId: String) {
+        val currentState = _uiState.value
+        if (currentState !is DashboardUiState.Success) return
+        
+        viewModelScope.launch {
+            _uiState.update { currentState.copy(isActionLoading = appointmentId) }
+            val result = appointmentRepository.acceptReschedule(appointmentId)
+            if (result.isSuccess) {
+                loadDashboard(isRefresh = true)
+            } else {
+                _uiState.update { currentState.copy(
+                    isActionLoading = null,
+                    errorMessage = "Failed to accept: ${result.exceptionOrNull()?.message}"
+                ) }
+            }
+        }
+    }
+
+    fun declineReschedule(appointmentId: String) {
+        val currentState = _uiState.value
+        if (currentState !is DashboardUiState.Success) return
+        
+        viewModelScope.launch {
+            _uiState.update { currentState.copy(isActionLoading = appointmentId) }
+            val result = appointmentRepository.declineReschedule(appointmentId)
+            if (result.isSuccess) {
+                loadDashboard(isRefresh = true)
+            } else {
+                _uiState.update { currentState.copy(
+                    isActionLoading = null,
+                    errorMessage = "Failed to decline: ${result.exceptionOrNull()?.message}"
+                ) }
+            }
+        }
+    }
+
     fun clearError() {
         val currentState = _uiState.value
         if (currentState is DashboardUiState.Success) {
             _uiState.update { currentState.copy(errorMessage = null) }
+        }
+    }
+
+    /**
+     * Toggles the provider's Online/Offline status.
+     * Uses optimistic update: the UI reflects the change immediately, and the database
+     * is updated asynchronously. On failure, state is reverted.
+     */
+    fun toggleStatus(active: Boolean) {
+        val currentState = _uiState.value as? DashboardUiState.Success ?: return
+
+        // 1. Optimistic update — UI responds instantly
+        _uiState.update { currentState.copy(isOnline = active, isStatusLoading = true) }
+
+        viewModelScope.launch {
+            try {
+                // Fetch the current provider profile to do a safe upsert
+                val userId = auth.currentSessionOrNull()?.user?.id ?: return@launch
+                val profileResult = profileRepository.getProviderProfile(userId)
+                val providerProfile = profileResult.getOrNull() ?: return@launch
+
+                // 2. Persist to database
+                val updatedProfile = providerProfile.copy(isActive = active)
+                val result = profileRepository.updateProviderProfile(updatedProfile)
+
+                if (result.isSuccess) {
+                    // 3. Confirm state, clear loading.
+                    // Small delay to avoid reading stale data from Supabase replication lag
+                    delay(800)
+                    _uiState.update { state ->
+                        if (state is DashboardUiState.Success) {
+                            state.copy(isOnline = active, isStatusLoading = false)
+                        } else state
+                    }
+                } else {
+                    // 4. Revert on failure
+                    _uiState.update { state ->
+                        if (state is DashboardUiState.Success) {
+                            state.copy(isOnline = !active, isStatusLoading = false,
+                                errorMessage = "Failed to update status. Try again.")
+                        } else state
+                    }
+                }
+            } catch (e: Exception) {
+                // 5. Revert on exception
+                _uiState.update { state ->
+                    if (state is DashboardUiState.Success) {
+                        state.copy(isOnline = !active, isStatusLoading = false,
+                            errorMessage = "Network error: ${e.message?.take(40)}")
+                    } else state
+                }
+            }
         }
     }
 }

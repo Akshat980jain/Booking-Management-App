@@ -1,7 +1,9 @@
 package com.bms.app.ui.dashboard;
 
+import android.app.Application;
 import com.bms.app.data.local.SupabaseSessionManager;
 import com.bms.app.domain.repository.AppointmentRepository;
+import com.bms.app.domain.repository.NotificationRepository;
 import com.bms.app.domain.repository.ProfileRepository;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
@@ -26,6 +28,8 @@ import javax.inject.Provider;
     "KotlinInternalInJava"
 })
 public final class DashboardViewModel_Factory implements Factory<DashboardViewModel> {
+  private final Provider<Application> applicationProvider;
+
   private final Provider<ProfileRepository> profileRepositoryProvider;
 
   private final Provider<AppointmentRepository> appointmentRepositoryProvider;
@@ -36,33 +40,41 @@ public final class DashboardViewModel_Factory implements Factory<DashboardViewMo
 
   private final Provider<Postgrest> postgrestProvider;
 
-  public DashboardViewModel_Factory(Provider<ProfileRepository> profileRepositoryProvider,
+  private final Provider<NotificationRepository> notificationRepositoryProvider;
+
+  public DashboardViewModel_Factory(Provider<Application> applicationProvider,
+      Provider<ProfileRepository> profileRepositoryProvider,
       Provider<AppointmentRepository> appointmentRepositoryProvider, Provider<Auth> authProvider,
       Provider<SupabaseSessionManager> sessionManagerProvider,
-      Provider<Postgrest> postgrestProvider) {
+      Provider<Postgrest> postgrestProvider,
+      Provider<NotificationRepository> notificationRepositoryProvider) {
+    this.applicationProvider = applicationProvider;
     this.profileRepositoryProvider = profileRepositoryProvider;
     this.appointmentRepositoryProvider = appointmentRepositoryProvider;
     this.authProvider = authProvider;
     this.sessionManagerProvider = sessionManagerProvider;
     this.postgrestProvider = postgrestProvider;
+    this.notificationRepositoryProvider = notificationRepositoryProvider;
   }
 
   @Override
   public DashboardViewModel get() {
-    return newInstance(profileRepositoryProvider.get(), appointmentRepositoryProvider.get(), authProvider.get(), sessionManagerProvider.get(), postgrestProvider.get());
+    return newInstance(applicationProvider.get(), profileRepositoryProvider.get(), appointmentRepositoryProvider.get(), authProvider.get(), sessionManagerProvider.get(), postgrestProvider.get(), notificationRepositoryProvider.get());
   }
 
-  public static DashboardViewModel_Factory create(
+  public static DashboardViewModel_Factory create(Provider<Application> applicationProvider,
       Provider<ProfileRepository> profileRepositoryProvider,
       Provider<AppointmentRepository> appointmentRepositoryProvider, Provider<Auth> authProvider,
       Provider<SupabaseSessionManager> sessionManagerProvider,
-      Provider<Postgrest> postgrestProvider) {
-    return new DashboardViewModel_Factory(profileRepositoryProvider, appointmentRepositoryProvider, authProvider, sessionManagerProvider, postgrestProvider);
+      Provider<Postgrest> postgrestProvider,
+      Provider<NotificationRepository> notificationRepositoryProvider) {
+    return new DashboardViewModel_Factory(applicationProvider, profileRepositoryProvider, appointmentRepositoryProvider, authProvider, sessionManagerProvider, postgrestProvider, notificationRepositoryProvider);
   }
 
-  public static DashboardViewModel newInstance(ProfileRepository profileRepository,
-      AppointmentRepository appointmentRepository, Auth auth, SupabaseSessionManager sessionManager,
-      Postgrest postgrest) {
-    return new DashboardViewModel(profileRepository, appointmentRepository, auth, sessionManager, postgrest);
+  public static DashboardViewModel newInstance(Application application,
+      ProfileRepository profileRepository, AppointmentRepository appointmentRepository, Auth auth,
+      SupabaseSessionManager sessionManager, Postgrest postgrest,
+      NotificationRepository notificationRepository) {
+    return new DashboardViewModel(application, profileRepository, appointmentRepository, auth, sessionManager, postgrest, notificationRepository);
   }
 }

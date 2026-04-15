@@ -72,9 +72,11 @@ class SettingsViewModel @Inject constructor(
         _profileStrength.value = completed.toFloat() / total.toFloat()
     }
 
-    fun fetchProfile() {
+    fun fetchProfile(isSilent: Boolean = false) {
         viewModelScope.launch {
-            _uiState.update { ProfileUiState.Loading }
+            if (!isSilent) {
+                _uiState.update { ProfileUiState.Loading }
+            }
             
             val currentUserId = auth.currentSessionOrNull()?.user?.id ?: ""
             val userResult = repository.getCurrentUserProfile(currentUserId)
@@ -100,7 +102,9 @@ class SettingsViewModel @Inject constructor(
                     calculateProfileStrength(enrichedProfile, null)
                 }
             }.onFailure { error ->
-                _uiState.update { ProfileUiState.Error(error.localizedMessage ?: "Unknown API Error") }
+                if (!isSilent) {
+                    _uiState.update { ProfileUiState.Error(error.localizedMessage ?: "Unknown API Error") }
+                }
             }
         }
     }
@@ -108,8 +112,75 @@ class SettingsViewModel @Inject constructor(
     fun toggleTwoFa(enabled: Boolean) {
         val currentUserId = auth.currentSessionOrNull()?.user?.id ?: return
         viewModelScope.launch {
+            // Optimistic update for Two-FA
+            val currentState = (_uiState.value as? ProfileUiState.Success)
+            if (currentState != null) {
+                _uiState.update { currentState.copy(userProfile = currentState.userProfile.copy(twoFaEnabled = enabled)) }
+            }
+
             repository.updateTwoFa(currentUserId, enabled).onSuccess {
-                fetchProfile() // Force sub-state refresh
+                // We successfully updated. A slight delay ensures the fetch sees the fresh DB state
+                // but since we updated the local state optimistically, the UI is already correct.
+                kotlinx.coroutines.delay(500)
+                fetchProfile(isSilent = true)
+            }.onFailure {
+                // Revert on failure
+                fetchProfile(isSilent = true)
+            }
+        }
+    }
+
+    fun toggleActiveStatus(active: Boolean) {
+        viewModelScope.launch {
+            val successState = _uiState.value as? ProfileUiState.Success ?: return@launch
+            val provider = successState.providerProfile ?: return@launch
+            
+            // 1. Immediate local update (Snappy UI)
+            val updatedProvider = provider.copy(isActive = active)
+            _uiState.update { 
+                successState.copy(providerProfile = updatedProvider)
+            }
+            
+            // 2. Persistent update
+            repository.updateProviderProfile(updatedProvider).onSuccess {
+                // 3. Success! We don't fetch immediately to avoid "stale read" race condition.
+                // We'll do a silent fetch after a short delay just to be sure,
+                // but our local state is already authoritative.
+                kotlinx.coroutines.delay(800)
+                fetchProfile(isSilent = true)
+            }.onFailure {
+                // Revert on failure
+                fetchProfile(isSilent = true)
+            }
+        }
+    }
+
+    fun updateFees(physical: Double, video: Double) {
+        viewModelScope.launch {
+            val successState = _uiState.value as? ProfileUiState.Success ?: return@launch
+            val provider = successState.providerProfile ?: return@launch
+            repository.updateProviderProfile(
+                provider.copy(
+                    consultationFee = physical,
+                    videoConsultationFee = video
+                )
+            ).onSuccess {
+                fetchProfile()
+            }
+        }
+    }
+
+    fun updateOperationalSettings(autoApproval: Boolean? = null, bufferTime: Int? = null) {
+        viewModelScope.launch {
+            val successState = _uiState.value as? ProfileUiState.Success ?: return@launch
+            val provider = successState.providerProfile ?: return@launch
+            repository.updateProviderProfile(
+                provider.copy(
+                    // We'll use bufferTimeAfter for consultation buffer for now
+                    bufferTimeAfter = bufferTime ?: provider.bufferTimeAfter
+                )
+            ).onSuccess {
+                fetchProfile()
             }
         }
     }

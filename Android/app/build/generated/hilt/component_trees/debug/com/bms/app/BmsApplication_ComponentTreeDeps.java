@@ -34,6 +34,8 @@ import hilt_aggregated_deps._com_bms_app_ui_chat_InboxViewModel_HiltModules_Bind
 import hilt_aggregated_deps._com_bms_app_ui_chat_InboxViewModel_HiltModules_KeyModule;
 import hilt_aggregated_deps._com_bms_app_ui_chat_SupportViewModel_HiltModules_BindsModule;
 import hilt_aggregated_deps._com_bms_app_ui_chat_SupportViewModel_HiltModules_KeyModule;
+import hilt_aggregated_deps._com_bms_app_ui_config_SystemConfigViewModel_HiltModules_BindsModule;
+import hilt_aggregated_deps._com_bms_app_ui_config_SystemConfigViewModel_HiltModules_KeyModule;
 import hilt_aggregated_deps._com_bms_app_ui_dashboard_AdminViewModel_HiltModules_BindsModule;
 import hilt_aggregated_deps._com_bms_app_ui_dashboard_AdminViewModel_HiltModules_KeyModule;
 import hilt_aggregated_deps._com_bms_app_ui_dashboard_DashboardViewModel_HiltModules_BindsModule;
@@ -54,6 +56,9 @@ import hilt_aggregated_deps._com_bms_app_ui_user_ReviewViewModel_HiltModules_Bin
 import hilt_aggregated_deps._com_bms_app_ui_user_ReviewViewModel_HiltModules_KeyModule;
 import hilt_aggregated_deps._com_bms_app_ui_user_RewardsViewModel_HiltModules_BindsModule;
 import hilt_aggregated_deps._com_bms_app_ui_user_RewardsViewModel_HiltModules_KeyModule;
+import hilt_aggregated_deps._com_bms_app_ui_video_VideoCallService_GeneratedInjector;
+import hilt_aggregated_deps._com_bms_app_ui_video_VideoCallViewModel_HiltModules_BindsModule;
+import hilt_aggregated_deps._com_bms_app_ui_video_VideoCallViewModel_HiltModules_KeyModule;
 import hilt_aggregated_deps._dagger_hilt_android_flags_FragmentGetContextFix_FragmentGetContextFixEntryPoint;
 import hilt_aggregated_deps._dagger_hilt_android_flags_HiltWrapper_FragmentGetContextFix_FragmentGetContextFixModule;
 import hilt_aggregated_deps._dagger_hilt_android_internal_lifecycle_DefaultViewModelFactories_ActivityEntryPoint;
@@ -111,6 +116,8 @@ import hilt_aggregated_deps._dagger_hilt_android_internal_modules_HiltWrapper_Ac
         _com_bms_app_ui_chat_InboxViewModel_HiltModules_KeyModule.class,
         _com_bms_app_ui_chat_SupportViewModel_HiltModules_BindsModule.class,
         _com_bms_app_ui_chat_SupportViewModel_HiltModules_KeyModule.class,
+        _com_bms_app_ui_config_SystemConfigViewModel_HiltModules_BindsModule.class,
+        _com_bms_app_ui_config_SystemConfigViewModel_HiltModules_KeyModule.class,
         _com_bms_app_ui_dashboard_AdminViewModel_HiltModules_BindsModule.class,
         _com_bms_app_ui_dashboard_AdminViewModel_HiltModules_KeyModule.class,
         _com_bms_app_ui_dashboard_DashboardViewModel_HiltModules_BindsModule.class,
@@ -131,6 +138,9 @@ import hilt_aggregated_deps._dagger_hilt_android_internal_modules_HiltWrapper_Ac
         _com_bms_app_ui_user_ReviewViewModel_HiltModules_KeyModule.class,
         _com_bms_app_ui_user_RewardsViewModel_HiltModules_BindsModule.class,
         _com_bms_app_ui_user_RewardsViewModel_HiltModules_KeyModule.class,
+        _com_bms_app_ui_video_VideoCallService_GeneratedInjector.class,
+        _com_bms_app_ui_video_VideoCallViewModel_HiltModules_BindsModule.class,
+        _com_bms_app_ui_video_VideoCallViewModel_HiltModules_KeyModule.class,
         _dagger_hilt_android_flags_FragmentGetContextFix_FragmentGetContextFixEntryPoint.class,
         _dagger_hilt_android_flags_HiltWrapper_FragmentGetContextFix_FragmentGetContextFixModule.class,
         _dagger_hilt_android_internal_lifecycle_DefaultViewModelFactories_ActivityEntryPoint.class,

@@ -32,7 +32,7 @@ fun ProviderScheduleScreen(
     viewModel: AvailabilityViewModel = hiltViewModel()
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
-    val tabs = listOf("Today's Agenda", "Availability")
+    val tabs = listOf("Agenda", "Insights")
     
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -57,7 +57,7 @@ fun ProviderScheduleScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             BmsBottomNavBar(
-                items = MainNavItems,
+                items = ProviderNavItems,
                 selectedRoute = "schedule",
                 onItemSelected = { route ->
                     if (route != "schedule") onNavigate(route)
@@ -100,7 +100,7 @@ fun ProviderScheduleScreen(
 
             when (selectedTab) {
                 0 -> AgendaTab(uiState, viewModel, onNavigate)
-                1 -> AvailabilityTab(uiState, viewModel)
+                1 -> InsightsTab(uiState)
             }
         }
     }
@@ -437,9 +437,132 @@ fun EmptyStatePlaceholder() {
 }
 
 @Composable
-fun AvailabilityTab(uiState: AvailabilityUiState, viewModel: AvailabilityViewModel) {
-    ManageAvailabilityContent(
-        uiState = uiState,
-        viewModel = viewModel
-    )
+fun InsightsTab(uiState: AvailabilityUiState) {
+    val state = uiState as? AvailabilityUiState.Success ?: return
+
+    val appointments = state.appointments
+    val completedAppts = appointments.filter { it.status.lowercase() == "completed" }
+    val totalRevenue = completedAppts.sumOf { appt -> 
+        if (appt.isVideoConsultation == true) (state.videoFee)
+        else state.physicalFee
+    }
+    
+    val videoCount = completedAppts.count { it.isVideoConsultation == true }
+    val physicalCount = completedAppts.count { it.isVideoConsultation != true }
+
+    // History: Completed or Cancelled items, sorted by date (newest first)
+    val historyItems = appointments.filter { 
+        it.status.lowercase() in setOf("completed", "cancelled", "rejected") 
+    }.sortedByDescending { it.appointmentDate + it.startTime }
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(20.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        // Stats Overview
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Text(
+                    "Business Performance",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = OnSurface
+                )
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    StatCard(
+                        title = "Lifetime Revenue",
+                        value = "${state.currencySymbol}${String.format("%.0f", totalRevenue)}",
+                        icon = Icons.Outlined.Payments,
+                        modifier = Modifier.weight(1f),
+                        isHighlighted = true
+                    )
+                    StatCard(
+                        title = "Total Sessions",
+                        value = completedAppts.size.toString(),
+                        icon = Icons.Outlined.TaskAlt,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+        }
+
+        // Distribution Section
+        item {
+            Surface(
+                color = SurfaceContainerLowest,
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        "Consultation Types",
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = OnSurfaceVariant
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        DistributionIndicator("Physical", physicalCount, countColor = Color(0xFF6366F1), modifier = Modifier.weight(1f))
+                        DistributionIndicator("Video", videoCount, countColor = Primary, modifier = Modifier.weight(1f))
+                    }
+                }
+            }
+        }
+
+        // History Section
+        item {
+            Text(
+                "Recent Activity",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = OnSurface,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+
+        if (historyItems.isEmpty()) {
+            item {
+                Box(Modifier.fillMaxWidth().padding(40.dp), contentAlignment = Alignment.Center) {
+                    Text("No past activity recorded", color = OnSurfaceVariant)
+                }
+            }
+        } else {
+            items(historyItems) { appt ->
+                HistoryItem(
+                    appointment = appt,
+                    users = state.users,
+                    currencySymbol = state.currencySymbol
+                )
+            }
+        }
+        
+        item { Spacer(Modifier.height(20.dp)) }
+    }
+}
+
+@Composable
+fun DistributionIndicator(label: String, count: Int, countColor: Color, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .background(countColor.copy(alpha = 0.05f), RoundedCornerShape(12.dp))
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(Modifier.size(8.dp).clip(CircleShape).background(countColor))
+        Spacer(Modifier.width(8.dp))
+        Column {
+            Text(label, style = MaterialTheme.typography.labelSmall, color = OnSurfaceVariant)
+            Text(count.toString(), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black, color = OnSurface)
+        }
+    }
 }

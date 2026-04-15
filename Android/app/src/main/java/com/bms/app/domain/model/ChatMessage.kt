@@ -5,13 +5,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ChatMessage(
-    val id: String? = null,
+    val id: String = "",
     @SerialName("conversation_id")
     val conversationId: String = "",
     @SerialName("sender_id")
-    val senderId: String,
+    val senderId: String = "",
     @SerialName("message")
-    val content: String,
+    val content: String = "",
     @SerialName("created_at")
     val createdAt: String? = null
 )
+

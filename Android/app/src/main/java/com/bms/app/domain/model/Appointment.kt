@@ -18,6 +18,13 @@ data class Appointment(
     @SerialName("payment_method") val paymentMethod: String? = null,
     @SerialName("payment_status") val paymentStatus: String? = "pending",
     @SerialName("payment_amount") val paymentAmount: Int? = null,
+    @SerialName("reschedule_requested_date") val rescheduleRequestedDate: String? = null,
+    @SerialName("reschedule_requested_start_time") val rescheduleRequestedStartTime: String? = null,
+    @SerialName("reschedule_requested_end_time") val rescheduleRequestedEndTime: String? = null,
+    @SerialName("reschedule_requester_id") val rescheduleRequesterId: String? = null,
+    @SerialName("meeting_url") val meetingUrl: String? = null,
+    @SerialName("meeting_room_name") val meetingRoomName: String? = null,
+    @SerialName("video_status") val videoStatus: String? = null,
     @SerialName("created_at") val createdAt: String = "",
     @SerialName("updated_at") val updatedAt: String = ""
 )

@@ -1,5 +1,6 @@
 package com.bms.app.ui.dashboard;
 
+import android.app.Application;
 import com.bms.app.data.local.SupabaseSessionManager;
 import com.bms.app.domain.repository.AppointmentRepository;
 import com.bms.app.domain.repository.NotificationRepository;
@@ -26,6 +27,8 @@ import javax.inject.Provider;
     "KotlinInternalInJava"
 })
 public final class UserDashboardViewModel_Factory implements Factory<UserDashboardViewModel> {
+  private final Provider<Application> applicationProvider;
+
   private final Provider<ProfileRepository> profileRepositoryProvider;
 
   private final Provider<AppointmentRepository> appointmentRepositoryProvider;
@@ -36,10 +39,12 @@ public final class UserDashboardViewModel_Factory implements Factory<UserDashboa
 
   private final Provider<NotificationRepository> notificationRepositoryProvider;
 
-  public UserDashboardViewModel_Factory(Provider<ProfileRepository> profileRepositoryProvider,
+  public UserDashboardViewModel_Factory(Provider<Application> applicationProvider,
+      Provider<ProfileRepository> profileRepositoryProvider,
       Provider<AppointmentRepository> appointmentRepositoryProvider, Provider<Auth> authProvider,
       Provider<SupabaseSessionManager> sessionManagerProvider,
       Provider<NotificationRepository> notificationRepositoryProvider) {
+    this.applicationProvider = applicationProvider;
     this.profileRepositoryProvider = profileRepositoryProvider;
     this.appointmentRepositoryProvider = appointmentRepositoryProvider;
     this.authProvider = authProvider;
@@ -49,20 +54,20 @@ public final class UserDashboardViewModel_Factory implements Factory<UserDashboa
 
   @Override
   public UserDashboardViewModel get() {
-    return newInstance(profileRepositoryProvider.get(), appointmentRepositoryProvider.get(), authProvider.get(), sessionManagerProvider.get(), notificationRepositoryProvider.get());
+    return newInstance(applicationProvider.get(), profileRepositoryProvider.get(), appointmentRepositoryProvider.get(), authProvider.get(), sessionManagerProvider.get(), notificationRepositoryProvider.get());
   }
 
-  public static UserDashboardViewModel_Factory create(
+  public static UserDashboardViewModel_Factory create(Provider<Application> applicationProvider,
       Provider<ProfileRepository> profileRepositoryProvider,
       Provider<AppointmentRepository> appointmentRepositoryProvider, Provider<Auth> authProvider,
       Provider<SupabaseSessionManager> sessionManagerProvider,
       Provider<NotificationRepository> notificationRepositoryProvider) {
-    return new UserDashboardViewModel_Factory(profileRepositoryProvider, appointmentRepositoryProvider, authProvider, sessionManagerProvider, notificationRepositoryProvider);
+    return new UserDashboardViewModel_Factory(applicationProvider, profileRepositoryProvider, appointmentRepositoryProvider, authProvider, sessionManagerProvider, notificationRepositoryProvider);
   }
 
-  public static UserDashboardViewModel newInstance(ProfileRepository profileRepository,
-      AppointmentRepository appointmentRepository, Auth auth, SupabaseSessionManager sessionManager,
-      NotificationRepository notificationRepository) {
-    return new UserDashboardViewModel(profileRepository, appointmentRepository, auth, sessionManager, notificationRepository);
+  public static UserDashboardViewModel newInstance(Application application,
+      ProfileRepository profileRepository, AppointmentRepository appointmentRepository, Auth auth,
+      SupabaseSessionManager sessionManager, NotificationRepository notificationRepository) {
+    return new UserDashboardViewModel(application, profileRepository, appointmentRepository, auth, sessionManager, notificationRepository);
   }
 }
