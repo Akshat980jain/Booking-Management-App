@@ -292,36 +292,76 @@ const HowItWorks = () => {
       <section className="py-16">
         <div className="container">
           <h2 className="text-3xl font-bold text-center mb-4">Four Simple Steps</h2>
-          <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
+          <p className="text-center text-muted-foreground mb-8 max-w-2xl mx-auto">
             From finding the right provider to attending your appointment, we've made every step intuitive and hassle-free.
           </p>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+          {/* Helpful guide callout */}
+          <div className="mb-8 p-4 rounded-xl bg-indigo-50/50 border border-indigo-100/50 dark:bg-indigo-950/20 dark:border-indigo-900/30 flex items-start gap-3 max-w-2xl mx-auto">
+            <span className="text-xl">💡</span>
+            <div>
+              <h4 className="font-semibold text-sm text-indigo-950 dark:text-indigo-200">How to get started?</h4>
+              <p className="text-xs text-indigo-900/80 dark:text-indigo-300/80 mt-0.5">
+                We recommend starting with **Step 1** by searching our directories. Look out for the "Search Providers" button in Step 1 to instantly transition to our provider network list.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 relative">
             {steps.map((step, index) => (
-              <Card
-                key={step.title}
-                className="relative overflow-hidden border-2 hover:border-primary/50 transition-all hover:shadow-lg"
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className={`p-3 rounded-xl ${step.color}`}>
-                      <step.icon className="h-6 w-6" />
+              <div key={step.title} className="relative flex flex-col justify-between">
+                <Card
+                  className="relative overflow-hidden border-2 hover:border-primary/50 transition-all hover:shadow-lg flex-1 flex flex-col justify-between"
+                >
+                  <CardContent className="p-6 flex flex-col justify-between h-full">
+                    <div>
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className={`p-3 rounded-xl ${step.color}`}>
+                          <step.icon className="h-6 w-6" />
+                        </div>
+                        <span className="text-4xl font-bold text-muted-foreground/30">
+                          {index + 1}
+                        </span>
+                      </div>
+                      <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
+                      <p className="text-muted-foreground text-sm mb-4">{step.description}</p>
+                      <ul className="space-y-2 mb-4">
+                        {step.details.map((detail, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm">
+                            <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                            <span className="text-muted-foreground">{detail}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                    <span className="text-4xl font-bold text-muted-foreground/30">
-                      {index + 1}
-                    </span>
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-                  <p className="text-muted-foreground text-sm mb-4">{step.description}</p>
-                  <ul className="space-y-2">
-                    {step.details.map((detail, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm">
-                        <CheckCircle className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span className="text-muted-foreground">{detail}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
+                    {index === 0 && (
+                      <div className="mt-4 pt-4 border-t border-border/50">
+                        <Link to="/providers">
+                          <Button className="w-full gap-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white border-0 shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98]" size="sm">
+                            Search Providers
+                            <ChevronRight className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+                {/* Visual Flow Cues between steps */}
+                {index < 3 && (
+                  <>
+                    {/* Desktop Right Chevron */}
+                    <div className="hidden lg:flex absolute top-1/2 -right-4 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-background border-2 border-border items-center justify-center text-muted-foreground shadow-sm">
+                      <ChevronRight className="h-4 w-4" />
+                    </div>
+                    {/* Mobile/Tablet Down Chevron (displayed between cards sequentially) */}
+                    <div className="lg:hidden flex justify-center py-2 text-muted-foreground">
+                      <div className="w-8 h-8 rounded-full bg-background border border-border flex items-center justify-center shadow-sm">
+                        <ChevronRight className="h-4 w-4 rotate-90" />
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             ))}
           </div>
         </div>

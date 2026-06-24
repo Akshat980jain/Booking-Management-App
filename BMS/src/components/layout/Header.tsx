@@ -133,7 +133,7 @@ const Header = React.forwardRef<HTMLElement>((_, ref) => {
                 </Button>
               </Link>
               <Link to="/auth?mode=signup">
-                <Button size="sm">
+                <Button size="sm" className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all text-white border-0 font-medium">
                   Sign up
                 </Button>
               </Link>
@@ -205,11 +205,11 @@ const Header = React.forwardRef<HTMLElement>((_, ref) => {
                 </>
               ) : (
                 <>
-                  <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="outline" className="w-full">Sign In</Button>
+                  <Link to="/auth" onClick={() => setIsMenuOpen(false)} className="w-full">
+                    <Button variant="outline" className="w-full h-12 text-base font-medium">Sign In</Button>
                   </Link>
-                  <Link to="/auth?mode=signup" onClick={() => setIsMenuOpen(false)}>
-                    <Button className="w-full">Sign up</Button>
+                  <Link to="/auth?mode=signup" onClick={() => setIsMenuOpen(false)} className="w-full">
+                    <Button className="w-full h-12 text-base font-medium bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white border-0">Sign up</Button>
                   </Link>
                 </>
               )}

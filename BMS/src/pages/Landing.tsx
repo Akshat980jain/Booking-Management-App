@@ -96,10 +96,10 @@ const Landing = () => {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative py-16 md:py-24 overflow-hidden">
+      <section className="relative py-12 md:py-16 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-background" />
         <div className="container relative">
-          <div className="max-w-3xl mx-auto text-center space-y-8">
+          <div className="max-w-3xl mx-auto text-center space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
               <CheckCircle2 className="h-4 w-4" />
               Trusted by thousands of users
@@ -108,19 +108,19 @@ const Landing = () => {
               Book Appointments with{" "}
               <span className="text-primary">Trusted Professionals</span>
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               Find and book appointments with doctors, tutors, consultants, and service 
               professionals in your area. Simple, fast, and secure.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
               <Link to="/providers">
-                <Button size="lg" className="w-full sm:w-auto gap-2">
+                <Button size="lg" className="w-full sm:w-auto gap-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 hover:shadow-lg text-white border-0 hover:scale-[1.02] active:scale-[0.98] transition-all">
                   Find a Provider
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
               <Link to="/auth?mode=signup&role=provider">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                <Button size="lg" variant="ghost" className="w-full sm:w-auto text-muted-foreground hover:text-foreground">
                   Join as Provider
                 </Button>
               </Link>
@@ -130,7 +130,7 @@ const Landing = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-12 md:py-16 border-y bg-muted/30">
+      <section className="py-8 md:py-12 border-y bg-muted/30">
         <div className="container">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat) => (
@@ -144,7 +144,7 @@ const Landing = () => {
       </section>
 
       {/* Categories Section */}
-      <section className="py-16 md:py-24">
+      <section className="py-12 md:py-16">
         <div className="container">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-serif font-bold mb-4">Browse by Category</h2>
@@ -171,7 +171,7 @@ const Landing = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 md:py-24 bg-muted/30">
+      <section className="py-12 md:py-16 bg-muted/30">
         <div className="container">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-serif font-bold mb-4">Why Choose BookEase?</h2>
@@ -196,7 +196,7 @@ const Landing = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-16 md:py-24">
+      <section className="py-12 md:py-16">
         <div className="container">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-serif font-bold mb-4">How It Works</h2>
@@ -210,12 +210,17 @@ const Landing = () => {
               { step: "2", title: "Choose a Time", description: "Select from available time slots that work for your schedule" },
               { step: "3", title: "Book & Confirm", description: "Confirm your appointment and receive instant confirmation" },
             ].map((item) => (
-              <div key={item.step} className="relative text-center">
-                <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xl font-bold">
+              <div key={item.step} className="relative text-center group">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xl font-bold group-hover:scale-110 transition-transform">
                   {item.step}
                 </div>
                 <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
-                <p className="text-muted-foreground">{item.description}</p>
+                <p className="text-muted-foreground mb-3">{item.description}</p>
+                {item.step === "1" && (
+                  <Link to="/providers" className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 hover:underline">
+                    Start Search <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                )}
               </div>
             ))}
           </div>
@@ -223,7 +228,7 @@ const Landing = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-16 md:py-24 bg-muted/30">
+      <section className="py-12 md:py-16 bg-muted/30">
         <div className="container">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-serif font-bold mb-4">What Our Users Say</h2>
@@ -253,17 +258,17 @@ const Landing = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24">
+      <section className="py-12 md:py-16">
         <div className="container">
           <Card className="bg-primary text-primary-foreground">
-            <CardContent className="p-12 text-center">
+            <CardContent className="p-8 md:p-12 text-center">
               <h2 className="text-3xl font-serif font-bold mb-4">Ready to Get Started?</h2>
               <p className="text-primary-foreground/80 max-w-2xl mx-auto mb-8">
                 Join thousands of users who have simplified their appointment booking experience with BookEase.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link to="/auth?mode=signup">
-                  <Button size="lg" className="w-full sm:w-auto bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-semibold shadow-md">
+                  <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow-md hover:shadow-lg border-0 hover:scale-[1.02] active:scale-[0.98] transition-all">
                     Create Free Account
                   </Button>
                 </Link>
