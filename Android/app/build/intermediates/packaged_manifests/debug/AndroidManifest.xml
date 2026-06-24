@@ -14,7 +14,10 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <permission
         android:name="com.bms.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
@@ -37,7 +40,7 @@
         <service
             android:name="com.bms.app.ui.video.VideoCallService"
             android:exported="false"
-            android:foregroundServiceType="mediaProjection" />
+            android:foregroundServiceType="camera|microphone|mediaProjection" />
 
         <activity
             android:name="com.bms.app.MainActivity"

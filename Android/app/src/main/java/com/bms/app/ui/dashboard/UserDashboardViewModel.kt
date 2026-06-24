@@ -78,8 +78,7 @@ class UserDashboardViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<UserDashboardUiState>(UserDashboardUiState.Loading)
     val uiState: StateFlow<UserDashboardUiState> = _uiState.asStateFlow()
 
-    // Track which notification IDs we've already shown system notifications for
-    private val seenNotificationIds = mutableSetOf<String>()
+    // seenNotificationIds lives in notificationRepository (singleton) — shared across all dashboards.
 
     init {
         loadDashboard()
@@ -166,9 +165,13 @@ class UserDashboardViewModel @Inject constructor(
 
             // ── 8. Derive stats ───────────────────────────────────────────
             val today = java.time.LocalDate.now()
+            val todayStr = today.toString()
 
             val upcomingBookings = allAppointments
-                .filter { it.status == "confirmed" || it.status == "approved" || it.status == "pending" || it.status == "rescheduling" }
+                .filter { 
+                    (it.status == "confirmed" || it.status == "approved" || it.status == "pending" || it.status == "rescheduling") &&
+                    it.appointmentDate >= todayStr
+                }
                 .sortedWith(compareBy({ it.appointmentDate }, { it.startTime }))
 
             val cancelledBookings = allAppointments
@@ -176,7 +179,10 @@ class UserDashboardViewModel @Inject constructor(
                 .sortedByDescending { it.appointmentDate }
 
             val pastBookings = allAppointments
-                .filter { it.status == "completed" }
+                .filter { 
+                    it.status == "completed" || 
+                    ((it.status == "confirmed" || it.status == "approved" || it.status == "pending" || it.status == "rescheduling") && it.appointmentDate < todayStr)
+                }
                 .sortedByDescending { it.appointmentDate }
 
             val paidBookings = allAppointments
@@ -237,9 +243,7 @@ class UserDashboardViewModel @Inject constructor(
     private fun startNotificationsListener(userId: String) {
         viewModelScope.launch {
             notificationRepository.getNotificationsFlow(userId).collect { list ->
-                val previousCount = (_uiState.value as? UserDashboardUiState.Success)
-                    ?.unreadNotificationCount ?: 0
-
+                // Update in-app notification list
                 _uiState.update { state ->
                     if (state is UserDashboardUiState.Success) {
                         state.copy(
@@ -249,21 +253,30 @@ class UserDashboardViewModel @Inject constructor(
                     } else state
                 }
 
-                // Show Android system notifications for NEW contact_message items
-                val newContactMessages = list.filter { notification ->
+                // Show Android system notifications only for NEW, RECENT, UNREAD contact_message items.
+                // Grouping is done by sender name (not notification ID) so Android replaces the
+                // existing card for that sender instead of stacking one entry per message.
+                val notificationsToShow = list.filter { notification ->
                     notification.type == "contact_message"
                             && !notification.isRead
                             && notification.id.isNotBlank()
-                            && notification.id !in seenNotificationIds
+                            // 1. Skip if already shown in this app session
+                            && !notificationRepository.hasBeenSeen(notification.id)
+                            // 2. Skip if older than 24 hours (prevents backlog re-surfacing)
+                            && (notificationRepository as? com.bms.app.data.repository.NotificationRepositoryImpl)
+                                ?.isRecentNotification(notification.createdAt) != false
                 }
 
-                for (notification in newContactMessages) {
-                    seenNotificationIds.add(notification.id)
+                for (notification in notificationsToShow) {
+                    notificationRepository.markAsSeen(notification.id)
+                    // Use the sender's clean name as the grouping key so that Android shows
+                    // at most 1 notification card per sender in the shade.
+                    val senderGroupKey = notification.title.removePrefix("💬 ").trim().lowercase()
                     NotificationHelper.showChatNotification(
                         context = application,
                         senderName = notification.title,
                         messagePreview = notification.message,
-                        senderId = notification.id // Use notification ID for unique system notif
+                        senderId = senderGroupKey
                     )
                 }
             }

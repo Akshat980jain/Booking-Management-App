@@ -103,12 +103,58 @@ Deno.serve(async (req) => {
  
     const userName = profile?.full_name || user.email?.split("@")[0] || "User";
  
-    // Calculate token expiry (appointment end time + 2 hours buffer)
+    // Calculate token expiry (valid for 2 hours from right now, to handle late joins)
     const appointmentDate = new Date(`${appointment.appointment_date}T${appointment.end_time}`);
-    const expiryTime = new Date(appointmentDate.getTime() + 2 * 60 * 60 * 1000);
+    const expiryTime = new Date(Math.max(
+      appointmentDate.getTime() + 2 * 60 * 60 * 1000,
+      Date.now() + 2 * 60 * 60 * 1000
+    ));
  
-    // Generate meeting token for the static room
-    console.log(`Generating token for user ${userName} in room ${STATIC_ROOM_NAME}`);
+    let roomName = appointment.meeting_room_name;
+    let roomUrl = appointment.meeting_url;
+
+    // 1. Create the room if it doesn't exist
+    if (!roomName || !roomUrl) {
+      console.log(`Creating new Daily.co room for appointment ${appointment_id}`);
+      
+      const roomCreateRes = await fetch("https://api.daily.co/v1/rooms", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${DAILY_API_KEY}`,
+        },
+        body: JSON.stringify({
+          properties: {
+             exp: Math.floor(expiryTime.getTime() / 1000), // Auto-delete room after appointment over
+          }
+        })
+      });
+
+      if (!roomCreateRes.ok) {
+        const errorText = await roomCreateRes.text();
+        console.error("Daily.co room API error:", errorText);
+        return new Response(
+          JSON.stringify({ error: `Failed to create Daily room. API said: ${errorText}` }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const roomData = await roomCreateRes.json();
+      roomUrl = roomData.url;
+      roomName = roomData.name;
+
+      // Update appointment in Supabase
+      await supabase
+        .from("appointments")
+        .update({
+          meeting_url: roomUrl,
+          meeting_room_name: roomName,
+        })
+        .eq("id", appointment_id);
+    }
+
+    // 2. Generate meeting token for the room
+    console.log(`Generating token for user ${userName} in room ${roomName}`);
  
     const tokenResponse = await fetch("https://api.daily.co/v1/meeting-tokens", {
       method: "POST",
@@ -118,9 +164,9 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         properties: {
-          room_name: STATIC_ROOM_NAME,
-          user_id: user.id,
-          user_name: userName,
+          room_name: roomName,
+          user_id: user.id.substring(0, 50), // Daily limit
+          user_name: userName.substring(0, 50), // Daily limit
           is_owner: isProvider,
           exp: Math.floor(expiryTime.getTime() / 1000),
           enable_screenshare: true,
@@ -134,7 +180,7 @@ Deno.serve(async (req) => {
       const errorText = await tokenResponse.text();
       console.error("Daily.co token API error:", errorText);
       return new Response(
-        JSON.stringify({ error: "Failed to generate meeting token" }),
+        JSON.stringify({ error: `Failed to generate meeting token. Daily API said: ${errorText}` }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -142,22 +188,11 @@ Deno.serve(async (req) => {
     const tokenData = await tokenResponse.json();
     console.log(`Token generated successfully for ${userName}`);
  
-    // Update appointment with meeting URL if not already set
-    if (!appointment.meeting_url) {
-      await supabase
-        .from("appointments")
-        .update({
-          meeting_url: STATIC_ROOM_URL,
-          meeting_room_name: STATIC_ROOM_NAME,
-        })
-        .eq("id", appointment_id);
-    }
- 
     // Return room URL with token
     return new Response(
       JSON.stringify({
-        room_url: `${STATIC_ROOM_URL}?t=${tokenData.token}`,
-        room_name: STATIC_ROOM_NAME,
+        room_url: `${roomUrl}?t=${tokenData.token}`,
+        room_name: roomName,
         token: tokenData.token,
         user_name: userName,
         is_provider: isProvider,

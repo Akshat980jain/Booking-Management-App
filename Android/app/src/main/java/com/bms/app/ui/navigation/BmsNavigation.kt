@@ -525,6 +525,9 @@ fun BmsNavigation(
                 },
                 onRateProvider = { appointmentId, providerId, providerName ->
                     navController.navigate("review_submission/$appointmentId/$providerId/$providerName")
+                },
+                onJoinVideoCall = { appointmentId ->
+                    navController.navigate("video_call/$appointmentId/false")
                 }
             )
         }

@@ -37,12 +37,38 @@ class VideoCallViewModel @Inject constructor(
 
     private val _callClient = MutableStateFlow<CallClient?>(null)
     val callClient: StateFlow<CallClient?> = _callClient.asStateFlow()
+
+    /** Separate StateFlow for the LOCAL participant — never mixed into remoteParticipants.
+     *  This prevents the local user from appearing in the main remote video slot. */
+    private val _localParticipant = MutableStateFlow<Participant?>(null)
+    val localParticipant: StateFlow<Participant?> = _localParticipant.asStateFlow()
+
+    private val _isProvider = MutableStateFlow(false)
+    val isProvider: StateFlow<Boolean> = _isProvider.asStateFlow()
+
+    private val _currentAppointmentId = MutableStateFlow<String?>(null)
+    val currentAppointmentId: StateFlow<String?> = _currentAppointmentId.asStateFlow()
+
     private var appointmentId: String? = null
-    private var isProvider: Boolean = false
+    private var isProviderFlag: Boolean = false
+
+    // Tracks which camera is currently active (true = front/user)
+    private var isFrontCamera = true
+
+    // Tracks the local participant's ID once known, for robust filtering
+    private var localParticipantId: ParticipantId? = null
 
     private val clientListener = object : CallClientListener {
         override fun onParticipantJoined(participant: Participant) {
-            _participants.update { it + (participant.id to participant) }
+            if (participant.info.isLocal) {
+                // This IS the local user — capture them directly
+                localParticipantId = participant.id
+                _localParticipant.value = participant
+                // Also remove from remote map in case of race condition
+                _participants.update { it - participant.id }
+            } else {
+                _participants.update { it + (participant.id to participant) }
+            }
         }
 
         override fun onParticipantLeft(participant: Participant, reason: ParticipantLeftReason) {
@@ -50,12 +76,27 @@ class VideoCallViewModel @Inject constructor(
         }
 
         override fun onParticipantUpdated(participant: Participant) {
-            _participants.update { it + (participant.id to participant) }
+            if (participant.info.isLocal || participant.id == localParticipantId) {
+                // Local participant updated (e.g. mic/camera toggle)
+                localParticipantId = participant.id
+                _localParticipant.value = participant
+            } else {
+                _participants.update { it + (participant.id to participant) }
+            }
         }
-        
+
         override fun onCallStateUpdated(state: co.daily.model.CallState) {
-             // Handle call state if needed
+            refreshLocal()
         }
+    }
+
+    /** Backup sync from the SDK's .local property — used on call state changes. */
+    private fun refreshLocal() {
+        val local = _callClient.value?.participants()?.local ?: return
+        localParticipantId = local.id
+        _localParticipant.value = local
+        // Ensure local is NOT in the remote map
+        _participants.update { it - local.id }
     }
 
     // Managed in initCall below
@@ -70,7 +111,7 @@ class VideoCallViewModel @Inject constructor(
             
             statusFlow.onEach { action ->
                 val newStatus = action.record["video_status"]?.toString()
-                if (newStatus == "admitted" && !isProvider) {
+                if (newStatus == "admitted" && !isProviderFlag) {
                     // Patient is admitted, join the call
                     joinCall()
                 }
@@ -105,14 +146,16 @@ class VideoCallViewModel @Inject constructor(
 
     fun initCall(appointmentId: String, isProvider: Boolean) {
         this.appointmentId = appointmentId
-        this.isProvider = isProvider
-        
+        this.isProviderFlag = isProvider
+        _isProvider.value = isProvider
+        _currentAppointmentId.value = appointmentId
+
         val serviceIntent = Intent(context, VideoCallService::class.java).apply {
             putExtra(VideoCallService.EXTRA_APPOINTMENT_ID, appointmentId)
         }
         context.startForegroundService(serviceIntent)
         context.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
-        
+
         observeVideoStatus(appointmentId)
         loadRoomInfo(appointmentId, isProvider)
     }
@@ -123,11 +166,11 @@ class VideoCallViewModel @Inject constructor(
             videoRepository.createOrJoinRoom(id, isProvider)
                 .onSuccess { info ->
                     pendingRoomInfo = info
-                    if (isProvider) {
-                        joinCall(info.url, info.token)
-                    } else {
-                        _uiState.value = VideoCallUiState.WaitingRoom
-                    }
+                    // Both provider and consumer join immediately using the returned room_url
+                    // (which already embeds the token as ?t=TOKEN)
+                    // Consumer will see "Waiting for other participant" on InCallScreen until
+                    // the provider's video appears — no manual "admit" gate needed.
+                    joinCall(info.url, null)
                 }
                 .onFailure {
                     _uiState.value = VideoCallUiState.Error(it.message ?: "Failed to load video room")
@@ -136,15 +179,40 @@ class VideoCallViewModel @Inject constructor(
     }
 
     private fun joinCall(url: String? = null, token: String? = null) {
+        // room_url from the edge function already contains the token embedded as ?t=...
+        // Use it directly — no need to append again
         val finalUrl = url ?: pendingRoomInfo?.url ?: return
-        val finalToken = token ?: pendingRoomInfo?.token
         
-        val urlWithToken = if (finalToken != null) "$finalUrl?t=$finalToken" else finalUrl
-        
-        _callClient.value?.join(url = urlWithToken) { result ->
+        // Force audio routing to Speakerphone instead of Earpiece
+        try {
+            val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager
+            audioManager.mode = android.media.AudioManager.MODE_IN_COMMUNICATION
+            audioManager.isSpeakerphoneOn = true
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        _callClient.value?.join(url = finalUrl) { result ->
             if (result.error == null) {
                 _uiState.value = VideoCallUiState.InCall
-                if (isProvider) {
+
+                // Explicitly enable camera and microphone — some rooms default to muted
+                _callClient.value?.setInputsEnabled(camera = true)
+                _callClient.value?.setInputsEnabled(microphone = true)
+
+                // Force front camera — SDK defaults to back camera regardless of isFrontCamera flag
+                enforceFrontCamera()
+
+                // Seed the local participant — retry because SDK may not have it ready immediately
+                viewModelScope.launch {
+                    repeat(10) { attempt ->
+                        refreshLocal()
+                        if (_localParticipant.value != null) return@launch
+                        kotlinx.coroutines.delay(500L) // Wait 500ms between retries
+                    }
+                }
+
+                if (isProviderFlag) {
                     viewModelScope.launch {
                         videoRepository.updateVideoStatus(appointmentId!!, "provider_ready")
                     }
@@ -154,30 +222,89 @@ class VideoCallViewModel @Inject constructor(
                     }
                 }
             } else {
-                _uiState.value = VideoCallUiState.Error("Failed to join call")
+                _uiState.value = VideoCallUiState.Error("Failed to join call: ${result.error}")
             }
+        }
+    }
+
+    /** Explicitly applies front camera facing mode. 
+     *  The Daily SDK always starts with the device default (back camera) regardless 
+     *  of our isFrontCamera flag, so we must push this setting after joining. */
+    private fun enforceFrontCamera() {
+        val client = _callClient.value ?: return
+        try {
+            val trackSettings = VideoMediaTrackSettingsUpdate.Builder()
+                .withFacingMode(FacingModeUpdate.user)
+                .build()
+            val cameraSettings = CameraInputSettingsUpdate.Builder()
+                .withSettings(trackSettings)
+                .build()
+            val inputUpdate = InputSettingsUpdate.Builder()
+                .withCamera(cameraSettings)
+                .build()
+            client.updateInputs(inputUpdate) { /* no-op on error; user can flip manually */ }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
     fun toggleMute() {
         val client = _callClient.value ?: return
-        val currentEnabled = client.inputs().microphone.isEnabled
+        // Get the active local participant state to check the current mic status
+        val localParticipant = client.participants().local
+        val currentEnabled = localParticipant?.media?.microphone?.track != null
         client.setInputsEnabled(microphone = !currentEnabled)
     }
 
     fun toggleVideo() {
         val client = _callClient.value ?: return
-        val currentEnabled = client.inputs().camera.isEnabled
+        // Get the active local participant state to check the current video status
+        val localParticipant = client.participants().local
+        val currentEnabled = localParticipant?.media?.camera?.track != null
         client.setInputsEnabled(camera = !currentEnabled)
     }
 
     fun switchCamera() {
-        // TODO: Implement camera switching using correct deviceId/facingMode API for version 0.37.0
-        // Currently disabled to ensure build stability.
+        val client = _callClient.value ?: return
+        try {
+            isFrontCamera = !isFrontCamera
+            val newFacingMode = if (isFrontCamera) FacingModeUpdate.user else FacingModeUpdate.environment
+            val trackSettings = VideoMediaTrackSettingsUpdate.Builder()
+                .withFacingMode(newFacingMode)
+                .build()
+            val cameraSettings = CameraInputSettingsUpdate.Builder()
+                .withSettings(trackSettings)
+                .build()
+            val inputUpdate = InputSettingsUpdate.Builder()
+                .withCamera(cameraSettings)
+                .build()
+            client.updateInputs(inputUpdate) { result ->
+                if (result.error != null) {
+                    isFrontCamera = !isFrontCamera // Revert on failure
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            isFrontCamera = !isFrontCamera
+        }
+    }
+
+    fun admitPatient() {
+        val id = appointmentId ?: return
+        viewModelScope.launch {
+            videoRepository.admitPatient(id)
+        }
     }
 
     fun startScreenShare(mediaProjectionIntent: Intent) {
-        _callClient.value?.startScreenShare(mediaProjectionIntent)
+        try {
+            _callClient.value?.setScreenShareProjectionIntent(mediaProjectionPermissionResultData = mediaProjectionIntent)
+            _callClient.value?.startScreenShare(mediaProjectionPermissionResultData = mediaProjectionIntent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            // Some versions might use different signatures, but we'll try to be consistent
+            _callClient.value?.startScreenShare(mediaProjectionIntent)
+        }
     }
 
     fun stopScreenShare() {

@@ -4,7 +4,7 @@ import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
 import dagger.internal.QualifierMetadata;
 import dagger.internal.ScopeMetadata;
-import io.github.jan.supabase.functions.Functions;
+import io.github.jan.supabase.SupabaseClient;
 import io.github.jan.supabase.postgrest.Postgrest;
 import javax.annotation.processing.Generated;
 import javax.inject.Provider;
@@ -25,25 +25,26 @@ import javax.inject.Provider;
 public final class VideoRepositoryImpl_Factory implements Factory<VideoRepositoryImpl> {
   private final Provider<Postgrest> postgrestProvider;
 
-  private final Provider<Functions> functionsProvider;
+  private final Provider<SupabaseClient> supabaseClientProvider;
 
   public VideoRepositoryImpl_Factory(Provider<Postgrest> postgrestProvider,
-      Provider<Functions> functionsProvider) {
+      Provider<SupabaseClient> supabaseClientProvider) {
     this.postgrestProvider = postgrestProvider;
-    this.functionsProvider = functionsProvider;
+    this.supabaseClientProvider = supabaseClientProvider;
   }
 
   @Override
   public VideoRepositoryImpl get() {
-    return newInstance(postgrestProvider.get(), functionsProvider.get());
+    return newInstance(postgrestProvider.get(), supabaseClientProvider.get());
   }
 
   public static VideoRepositoryImpl_Factory create(Provider<Postgrest> postgrestProvider,
-      Provider<Functions> functionsProvider) {
-    return new VideoRepositoryImpl_Factory(postgrestProvider, functionsProvider);
+      Provider<SupabaseClient> supabaseClientProvider) {
+    return new VideoRepositoryImpl_Factory(postgrestProvider, supabaseClientProvider);
   }
 
-  public static VideoRepositoryImpl newInstance(Postgrest postgrest, Functions functions) {
-    return new VideoRepositoryImpl(postgrest, functions);
+  public static VideoRepositoryImpl newInstance(Postgrest postgrest,
+      SupabaseClient supabaseClient) {
+    return new VideoRepositoryImpl(postgrest, supabaseClient);
   }
 }

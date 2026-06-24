@@ -63,7 +63,7 @@ const Header = React.forwardRef<HTMLElement>((_, ref) => {
             How It Works
           </Link>
           <Link to="/about" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            About
+            About Us
           </Link>
         </nav>
 
@@ -90,31 +90,31 @@ const Header = React.forwardRef<HTMLElement>((_, ref) => {
                   <DropdownMenuItem asChild>
                     <Link to={getDashboardPath()} className="cursor-pointer">
                       <LayoutDashboard className="mr-2 h-4 w-4" />
-                      Dashboard
+                      My Dashboard
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/dashboard/user/profile" className="cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
-                      Profile
+                      Account Settings
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/messages" className="cursor-pointer">
                       <MessageCircle className="mr-2 h-4 w-4" />
-                      Messages
+                      Chat & Messages
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/favorites" className="cursor-pointer">
                       <Heart className="mr-2 h-4 w-4" />
-                      Favorites
+                      Saved Providers
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/rewards" className="cursor-pointer">
                       <Gift className="mr-2 h-4 w-4" />
-                      Rewards
+                      Streaks & Rewards
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -176,7 +176,7 @@ const Header = React.forwardRef<HTMLElement>((_, ref) => {
               className="text-sm font-medium py-2"
               onClick={() => setIsMenuOpen(false)}
             >
-              About
+              About Us
             </Link>
             <div className="flex flex-col gap-2 pt-4 border-t">
               {user ? (
@@ -188,7 +188,7 @@ const Header = React.forwardRef<HTMLElement>((_, ref) => {
                   <Link to={getDashboardPath()} onClick={() => setIsMenuOpen(false)}>
                     <Button variant="outline" className="w-full">
                       <LayoutDashboard className="mr-2 h-4 w-4" />
-                      Dashboard
+                      My Dashboard
                     </Button>
                   </Link>
                   <Button 

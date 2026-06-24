@@ -41,6 +41,7 @@ fun MyBookingsScreen(
     onBack: () -> Unit = {},
     onMessageProvider: (providerId: String) -> Unit = {},
     onRateProvider: (appointmentId: String, providerId: String, providerName: String) -> Unit = { _, _, _ -> },
+    onJoinVideoCall: (String) -> Unit = {},
     viewModel: UserDashboardViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -180,7 +181,8 @@ fun MyBookingsScreen(
                                         if (provider != null) {
                                             onRateProvider(appointment.id, provider.userId, displayName)
                                         }
-                                    }
+                                    },
+                                    onTelehealthJoin = { onJoinVideoCall(appointment.id) }
                                 )
                             }
                         }

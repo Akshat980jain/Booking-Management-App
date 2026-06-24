@@ -230,7 +230,7 @@ const About = () => {
           <Badge className="mb-4" variant="secondary">
             Transforming Healthcare Access
           </Badge>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+          <h1 className="text-4xl md:text-5xl font-serif font-bold tracking-tight mb-4">
             About BookEase
           </h1>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-8">
@@ -255,10 +255,10 @@ const About = () => {
       </section>
 
       {/* Problem & Solution Section */}
-      <section className="py-16">
+      <section className="py-16 md:py-24">
         <div className="container">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">The Problem We're Solving</h2>
+            <h2 className="text-3xl font-serif font-bold mb-4">The Problem We're Solving</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Traditional healthcare scheduling is broken. We built BookEase to fix it.
             </p>
@@ -303,10 +303,10 @@ const About = () => {
       </section>
 
       {/* Core Values Section */}
-      <section className="py-16 bg-muted/30">
+      <section className="py-16 md:py-24 bg-muted/30">
         <div className="container">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Our Core Values</h2>
+            <h2 className="text-3xl font-serif font-bold mb-4">Our Core Values</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               These principles guide every decision we make and every feature we build.
             </p>
@@ -328,14 +328,14 @@ const About = () => {
       </section>
 
       {/* What Makes Us Different */}
-      <section className="py-16">
+      <section className="py-16 md:py-24">
         <div className="container">
           <div className="text-center mb-12">
             <Badge className="mb-4" variant="outline">
               <Sparkles className="h-3 w-3 mr-1" />
               Why BookEase
             </Badge>
-            <h2 className="text-3xl font-bold mb-4">What Makes Us Different</h2>
+            <h2 className="text-3xl font-serif font-bold mb-4">What Makes Us Different</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               We're not just another booking platform. Here's what sets BookEase apart.
             </p>
@@ -357,9 +357,9 @@ const About = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-primary text-primary-foreground">
+      <section className="py-12 md:py-16 bg-primary text-primary-foreground">
         <div className="container">
-          <h2 className="text-3xl font-bold text-center mb-12">
+          <h2 className="text-3xl font-serif font-bold text-center mb-12">
             BookEase by the Numbers
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
@@ -381,14 +381,14 @@ const About = () => {
       </section>
 
       {/* Specialties Section */}
-      <section className="py-16">
+      <section className="py-16 md:py-24">
         <div className="container">
           <div className="text-center mb-12">
             <Badge className="mb-4" variant="outline">
               <Stethoscope className="h-3 w-3 mr-1" />
               Wide Coverage
             </Badge>
-            <h2 className="text-3xl font-bold mb-4">Specialties We Support</h2>
+            <h2 className="text-3xl font-serif font-bold mb-4">Specialties We Support</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Find providers across a wide range of healthcare specialties, with more being added regularly.
             </p>
@@ -408,14 +408,14 @@ const About = () => {
       </section>
 
       {/* Technology Section */}
-      <section className="py-16 bg-muted/30">
+      <section className="py-16 md:py-24 bg-muted/30">
         <div className="container">
           <div className="text-center mb-12">
             <Badge className="mb-4" variant="outline">
               <Brain className="h-3 w-3 mr-1" />
               Built for Scale
             </Badge>
-            <h2 className="text-3xl font-bold mb-4">Technology & Security</h2>
+            <h2 className="text-3xl font-serif font-bold mb-4">Technology & Security</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Built with modern technology and enterprise-grade security to ensure reliability, speed, and privacy.
             </p>
@@ -437,10 +437,10 @@ const About = () => {
       </section>
 
       {/* Journey Timeline */}
-      <section className="py-16">
+      <section className="py-16 md:py-24">
         <div className="container max-w-4xl">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Our Journey</h2>
+            <h2 className="text-3xl font-serif font-bold mb-4">Our Journey</h2>
             <p className="text-muted-foreground">
               From idea to a platform trusted by thousands—here's how we got here.
             </p>
@@ -468,14 +468,14 @@ const About = () => {
       </section>
 
       {/* Founder Section */}
-      <section className="py-16 bg-muted/30">
+      <section className="py-16 md:py-24 bg-muted/30">
         <div className="container max-w-4xl">
           <div className="text-center mb-12">
             <Badge className="mb-4" variant="outline">
               <Award className="h-3 w-3 mr-1" />
               Leadership
             </Badge>
-            <h2 className="text-3xl font-bold mb-4">Meet the Founder</h2>
+            <h2 className="text-3xl font-serif font-bold mb-4">Meet the Founder</h2>
           </div>
           <Card className="overflow-hidden">
             <CardContent className="p-8">
@@ -515,9 +515,9 @@ const About = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
+      <section className="py-16 md:py-24 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
         <div className="container text-center">
-          <h2 className="text-3xl font-bold mb-4">Join the BookEase Community</h2>
+          <h2 className="text-3xl font-serif font-bold mb-4">Join the BookEase Community</h2>
           <p className="text-primary-foreground/80 mb-8 max-w-xl mx-auto">
             Whether you're a patient looking for quality care or a provider ready to
             grow your practice, BookEase is here to help. Sign up today—it's free!

@@ -6,22 +6,15 @@ import io.github.jan.supabase.functions.Functions
 import io.github.jan.supabase.postgrest.Postgrest
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import io.ktor.client.call.body
-import io.ktor.client.request.setBody
 import io.github.jan.supabase.functions.functions
+import io.github.jan.supabase.SupabaseClient
 import javax.inject.Inject
 import javax.inject.Singleton
-
-@Serializable
-private data class VideoRoomRequest(
-    @SerialName("appointment_id") val appointmentId: String,
-    val action: String? = null
-)
-
-@Serializable
-private data class AdmitPatientRequest(
-    @SerialName("appointment_id") val appointmentId: String
-)
 
 @Serializable
 private data class VideoStatusUpdate(
@@ -31,17 +24,21 @@ private data class VideoStatusUpdate(
 @Singleton
 class VideoRepositoryImpl @Inject constructor(
     private val postgrest: Postgrest,
-    private val functions: Functions
+    private val supabaseClient: SupabaseClient
 ) : VideoRepository {
 
     override suspend fun createOrJoinRoom(appointmentId: String, isProvider: Boolean): Result<VideoRoomInfo> {
         return try {
-            val response = functions.invoke("create-video-room") {
-                setBody(VideoRoomRequest(
-                    appointmentId = appointmentId,
-                    action = if (isProvider) "create" else "join"
-                ))
+            // Build the request as a JsonObject — no ContentNegotiation/setBody needed
+            val body = buildJsonObject {
+                put("appointment_id", appointmentId)
+                put("action", if (isProvider) "create" else "join")
             }
+
+            val response = supabaseClient.functions.invoke(
+                function = "create-video-room",
+                body = body
+            )
             val info = response.body<VideoRoomInfo>()
             Result.success(info)
         } catch (e: Exception) {
@@ -51,9 +48,12 @@ class VideoRepositoryImpl @Inject constructor(
 
     override suspend fun admitPatient(appointmentId: String): Result<Unit> {
         return try {
-            functions.invoke(
+            val body = buildJsonObject {
+                put("appointment_id", appointmentId)
+            }
+            supabaseClient.functions.invoke(
                 function = "admit-patient",
-                body = AdmitPatientRequest(appointmentId = appointmentId)
+                body = body
             )
             Result.success(Unit)
         } catch (e: Exception) {

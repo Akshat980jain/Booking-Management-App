@@ -35,8 +35,18 @@ class VideoCallService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val appointmentId = intent?.getStringExtra(EXTRA_APPOINTMENT_ID) ?: "Unknwon"
-        startForeground(NOTIFICATION_ID, createNotification(appointmentId))
+        val appointmentId = intent?.getStringExtra(EXTRA_APPOINTMENT_ID) ?: "Consultation"
+        val notification = createNotification(appointmentId)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(
+                NOTIFICATION_ID,
+                notification,
+                android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA or
+                android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+            )
+        } else {
+            startForeground(NOTIFICATION_ID, notification)
+        }
         return START_NOT_STICKY
     }
 

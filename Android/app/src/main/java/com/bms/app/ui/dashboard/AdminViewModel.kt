@@ -64,7 +64,7 @@ class AdminViewModel @Inject constructor(
     private val _exportState = MutableStateFlow<ExportState>(ExportState.Idle)
     val exportState: StateFlow<ExportState> = _exportState.asStateFlow()
 
-    private val seenNotificationIds = mutableSetOf<String>()
+    // seenNotificationIds lives in notificationRepository (singleton) — shared across all dashboards.
 
     init {
         loadAdminDashboard()
@@ -112,19 +112,26 @@ class AdminViewModel @Inject constructor(
     private fun startNotificationsListener(userId: String) {
         viewModelScope.launch {
             notificationRepository.getNotificationsFlow(userId).collect { list ->
-                val newContactMessages = list.filter { notification ->
+                // Show Android system notifications only for NEW, RECENT, UNREAD contact_message items.
+                // Grouping by sender name ensures at most 1 card per sender in the notification shade.
+                val notificationsToShow = list.filter { notification ->
                     notification.type == "contact_message"
                             && !notification.isRead
                             && notification.id.isNotBlank()
-                            && notification.id !in seenNotificationIds
+                            // 1. Skip if already shown in this app session
+                            && !notificationRepository.hasBeenSeen(notification.id)
+                            // 2. Skip if older than 24 hours (prevents backlog re-surfacing)
+                            && (notificationRepository as? com.bms.app.data.repository.NotificationRepositoryImpl)
+                                ?.isRecentNotification(notification.createdAt) != false
                 }
-                for (notification in newContactMessages) {
-                    seenNotificationIds.add(notification.id)
+                for (notification in notificationsToShow) {
+                    notificationRepository.markAsSeen(notification.id)
+                    val senderGroupKey = notification.title.removePrefix("💬 ").trim().lowercase()
                     NotificationHelper.showChatNotification(
                         context = application,
                         senderName = notification.title,
                         messagePreview = notification.message,
-                        senderId = notification.id
+                        senderId = senderGroupKey
                     )
                 }
             }
