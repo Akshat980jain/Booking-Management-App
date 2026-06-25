@@ -15,8 +15,10 @@ export interface ChatMessage {
 
 export interface ChatConversation {
   id: string;
-  user_id: string;
-  provider_id: string;
+  user_id?: string | null;
+  provider_id?: string | null;
+  participant_1?: string | null;
+  participant_2?: string | null;
   last_message_at: string;
   created_at: string;
   provider?: {
@@ -51,7 +53,7 @@ export const useChat = () => {
       const { data, error } = await supabase
         .from("chat_conversations")
         .select(`
-          id, user_id, provider_id, last_message_at, created_at
+          id, user_id, provider_id, participant_1, participant_2, last_message_at, created_at
         `)
         .order("last_message_at", { ascending: false })
         .limit(100);
@@ -89,9 +91,11 @@ export const useChat = () => {
         };
       });
 
-      enrichedConversations.forEach((conv) => {
+      enrichedConversations.forEach((conv: any) => {
         if (conv.user_id) allUserIds.add(conv.user_id);
         if (conv.provider?.user_id) allUserIds.add(conv.provider.user_id);
+        if (conv.participant_1) allUserIds.add(conv.participant_1);
+        if (conv.participant_2) allUserIds.add(conv.participant_2);
         conversationIds.push(conv.id);
       });
 
@@ -129,16 +133,40 @@ export const useChat = () => {
         }
       });
 
-      return enrichedConversations.map((conv) => ({
-        ...conv,
-        provider: conv.provider ? {
-          ...conv.provider,
-          profile: profileMap.get(conv.provider.user_id) || null,
-        } : undefined,
-        user: profileMap.get(conv.user_id) || null,
-        lastMessage: lastMessageMap.get(conv.id) || null,
-        unreadCount: unreadCountMap.get(conv.id) || 0,
-      })) as ChatConversation[];
+      return enrichedConversations.map((conv: any) => {
+        // Find other user ID
+        let otherUserId: string | null = null;
+        if (conv.participant_1 && conv.participant_2) {
+          otherUserId = conv.participant_1 === user.id ? conv.participant_2 : conv.participant_1;
+        } else {
+          // Fallback to legacy fields
+          if (conv.user_id === user.id) {
+            otherUserId = conv.provider?.user_id || null;
+          } else {
+            otherUserId = conv.user_id;
+          }
+        }
+
+        const otherProfile = otherUserId ? (profileMap.get(otherUserId) || null) : null;
+        const userProfile = conv.user_id ? (profileMap.get(conv.user_id) || null) : null;
+        const providerUserProfile = conv.provider?.user_id ? (profileMap.get(conv.provider.user_id) || null) : null;
+
+        return {
+          ...conv,
+          provider: conv.provider ? {
+            ...conv.provider,
+            profile: providerUserProfile || otherProfile,
+          } : (otherProfile ? {
+            id: "",
+            profession: "",
+            user_id: otherUserId || "",
+            profile: otherProfile,
+          } : undefined),
+          user: userProfile || otherProfile,
+          lastMessage: lastMessageMap.get(conv.id) || null,
+          unreadCount: unreadCountMap.get(conv.id) || 0,
+        };
+      }) as ChatConversation[];
     },
     enabled: !!user?.id,
   });
@@ -148,24 +176,26 @@ export const useChat = () => {
     mutationFn: async (providerId: string) => {
       if (!user?.id) throw new Error("Must be logged in");
 
-      // Check if conversation already exists
-      const { data: existing } = await supabase
-        .from("chat_conversations")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("provider_id", providerId)
-        .maybeSingle();
-
-      if (existing) return existing.id;
-
-      const { data, error } = await supabase
-        .from("chat_conversations")
-        .insert({ user_id: user.id, provider_id: providerId })
-        .select("id")
+      // 1. Fetch provider's user_id from provider_profiles
+      const { data: providerProfile, error: ppError } = await supabase
+        .from("provider_profiles")
+        .select("user_id")
+        .eq("id", providerId)
         .single();
 
-      if (error) throw error;
-      return data.id;
+      if (ppError || !providerProfile?.user_id) {
+        throw new Error(ppError?.message || "Provider user profile not found");
+      }
+
+      // 2. Call the RPC function to get or create the conversation
+      const { data: conversationId, error: rpcError } = await supabase
+        .rpc("get_or_create_conversation", {
+          p_user_1: user.id,
+          p_user_2: providerProfile.user_id,
+        });
+
+      if (rpcError) throw rpcError;
+      return conversationId;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["chat-conversations"] });
