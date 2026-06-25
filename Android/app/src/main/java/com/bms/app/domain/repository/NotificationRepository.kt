@@ -14,4 +14,7 @@ interface NotificationRepository {
 
     /** Marks a notification as shown for this session. Thread-safe. */
     fun markAsSeen(notificationId: String)
+
+    /** Returns true if the notification was created within the last 24 hours. */
+    fun isRecentNotification(createdAt: String): Boolean
 }

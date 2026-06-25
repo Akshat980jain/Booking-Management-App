@@ -263,8 +263,7 @@ class UserDashboardViewModel @Inject constructor(
                             // 1. Skip if already shown in this app session
                             && !notificationRepository.hasBeenSeen(notification.id)
                             // 2. Skip if older than 24 hours (prevents backlog re-surfacing)
-                            && (notificationRepository as? com.bms.app.data.repository.NotificationRepositoryImpl)
-                                ?.isRecentNotification(notification.createdAt) != false
+                            && notificationRepository.isRecentNotification(notification.createdAt)
                 }
 
                 for (notification in notificationsToShow) {

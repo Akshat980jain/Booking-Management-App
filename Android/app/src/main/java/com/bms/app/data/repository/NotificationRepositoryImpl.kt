@@ -1,5 +1,7 @@
 package com.bms.app.data.repository
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import com.bms.app.domain.model.Notification
 import com.bms.app.domain.repository.NotificationRepository
 import io.github.jan.supabase.postgrest.Postgrest
@@ -12,30 +14,28 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.emitAll
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import java.util.Collections
-import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class NotificationRepositoryImpl @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val postgrest: Postgrest,
     private val realtime: Realtime
 ) : NotificationRepository {
 
-    /**
-     * Session-scoped set — survives ViewModel recreation within the same process because
-     * this class is @Singleton. Using a thread-safe ConcurrentHashMap-backed set to guard
-     * against concurrent coroutine collector emissions.
-     */
-    private val seenNotificationIds: MutableSet<String> =
-        Collections.newSetFromMap(ConcurrentHashMap())
+    private val prefs = context.getSharedPreferences("notification_prefs", Context.MODE_PRIVATE)
 
-    override fun hasBeenSeen(notificationId: String): Boolean =
-        notificationId in seenNotificationIds
+    override fun hasBeenSeen(notificationId: String): Boolean {
+        val seenSet = prefs.getStringSet("seen_ids", emptySet()) ?: emptySet()
+        return notificationId in seenSet
+    }
 
     override fun markAsSeen(notificationId: String) {
-        seenNotificationIds.add(notificationId)
+        val seenSet = prefs.getStringSet("seen_ids", emptySet()) ?: emptySet()
+        val newSet = seenSet.toMutableSet()
+        newSet.add(notificationId)
+        prefs.edit().putStringSet("seen_ids", newSet).apply()
     }
 
     /**
@@ -43,7 +43,7 @@ class NotificationRepositoryImpl @Inject constructor(
      * This is the primary guard against months-old backlog notifications re-appearing
      * when the app is opened after a long period of inactivity.
      */
-    fun isRecentNotification(createdAt: String): Boolean {
+    override fun isRecentNotification(createdAt: String): Boolean {
         return try {
             val instant = Instant.parse(createdAt)
             val cutoff = Instant.now().minus(24, ChronoUnit.HOURS)
