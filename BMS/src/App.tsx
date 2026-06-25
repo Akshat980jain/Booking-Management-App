@@ -73,6 +73,7 @@ const App = () => (
               <Route path="/dashboard/admin" element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboard /></ProtectedRoute>} />
               
               <Route path="/landing" element={<Navigate to="/" replace />} />
+              <Route path="/index.html" element={<Navigate to="/" replace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AuthProvider>
