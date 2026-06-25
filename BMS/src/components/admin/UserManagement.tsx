@@ -489,7 +489,7 @@ const UserManagement = () => {
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent align="end" onCloseAutoFocus={(event) => event.preventDefault()}>
                           <DropdownMenuItem onClick={() => handleChangeRole(user)}>
                             <UserCog className="h-4 w-4 mr-2" />
                             Change Role

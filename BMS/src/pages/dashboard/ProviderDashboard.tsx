@@ -508,7 +508,7 @@ const ProviderDashboard = () => {
                                       <MoreHorizontal className="h-4 w-4" />
                                     </Button>
                                   </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
+                                  <DropdownMenuContent align="end" onCloseAutoFocus={(event) => event.preventDefault()}>
                                     <DropdownMenuItem onClick={() => handleComplete(appointment)}>
                                       Mark as Completed
                                     </DropdownMenuItem>
@@ -651,7 +651,7 @@ const ProviderDashboard = () => {
                                       <MoreHorizontal className="h-4 w-4" />
                                     </Button>
                                   </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
+                                  <DropdownMenuContent align="end" onCloseAutoFocus={(event) => event.preventDefault()}>
                                     <DropdownMenuItem onClick={() => handleComplete(appointment)}>
                                       Mark as Completed
                                     </DropdownMenuItem>

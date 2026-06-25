@@ -328,7 +328,7 @@ const UserDashboard = () => {
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+                  <DropdownMenuContent align="end" onCloseAutoFocus={(event) => event.preventDefault()}>
                     <DropdownMenuItem onClick={() => handleViewDetailsClick(appointment)}>View Details</DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleRescheduleClick(appointment)}>
                       Reschedule
