@@ -99,13 +99,21 @@ export const useChat = () => {
         conversationIds.push(conv.id);
       });
 
+      console.log("[useChat] allUserIds:", Array.from(allUserIds));
+
       // Batch fetch all profiles at once
-      const { data: profiles } = await supabase
+      const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
         .select("user_id, full_name, avatar_url")
         .in("user_id", Array.from(allUserIds));
 
+      if (profilesError) {
+        console.error("[useChat] profilesError:", profilesError);
+      }
+      console.log("[useChat] fetched profiles:", profiles);
+
       const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
+      console.log("[useChat] profileMap:", Array.from(profileMap.entries()));
 
       // Batch fetch last messages for all conversations using a single query
       // We'll get the latest message per conversation by fetching recent messages and deduping
@@ -133,7 +141,7 @@ export const useChat = () => {
         }
       });
 
-      return enrichedConversations.map((conv: any) => {
+      const finalConversations = enrichedConversations.map((conv: any) => {
         // Find other user ID
         let otherUserId: string | null = null;
         if (conv.participant_1 && conv.participant_2) {
@@ -167,6 +175,9 @@ export const useChat = () => {
           unreadCount: unreadCountMap.get(conv.id) || 0,
         };
       }) as ChatConversation[];
+
+      console.log("[useChat] finalConversations:", finalConversations);
+      return finalConversations;
     },
     enabled: !!user?.id,
   });
