@@ -252,32 +252,6 @@ class UserDashboardViewModel @Inject constructor(
                         )
                     } else state
                 }
-
-                // Show Android system notifications only for NEW, RECENT, UNREAD contact_message items.
-                // Grouping is done by sender name (not notification ID) so Android replaces the
-                // existing card for that sender instead of stacking one entry per message.
-                val notificationsToShow = list.filter { notification ->
-                    notification.type == "contact_message"
-                            && !notification.isRead
-                            && notification.id.isNotBlank()
-                            // 1. Skip if already shown in this app session
-                            && !notificationRepository.hasBeenSeen(notification.id)
-                            // 2. Skip if older than 24 hours (prevents backlog re-surfacing)
-                            && notificationRepository.isRecentNotification(notification.createdAt)
-                }
-
-                for (notification in notificationsToShow) {
-                    notificationRepository.markAsSeen(notification.id)
-                    // Use the sender's clean name as the grouping key so that Android shows
-                    // at most 1 notification card per sender in the shade.
-                    val senderGroupKey = notification.title.removePrefix("💬 ").trim().lowercase()
-                    NotificationHelper.showChatNotification(
-                        context = application,
-                        senderName = notification.title,
-                        messagePreview = notification.message,
-                        senderId = senderGroupKey
-                    )
-                }
             }
         }
     }

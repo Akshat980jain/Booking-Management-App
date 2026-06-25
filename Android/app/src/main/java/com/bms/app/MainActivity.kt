@@ -15,15 +15,49 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.bms.app.ui.navigation.BmsNavigation
 import com.bms.app.ui.theme.BMSTheme
+import com.bms.app.domain.repository.NotificationRepository
+import com.bms.app.util.NotificationHelper
 import dagger.hilt.android.AndroidEntryPoint
+import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.gotrue.SessionStatus
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var auth: Auth
+
+    @Inject
+    lateinit var notificationRepository: NotificationRepository
+
+    private var notificationListenerJob: Job? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Listen to session changes globally and start/stop the notifications listener
+        lifecycleScope.launch {
+            auth.sessionStatus.collect { status ->
+                when (status) {
+                    is SessionStatus.Authenticated -> {
+                        val userId = status.session.user?.id
+                        if (userId != null) {
+                            startGlobalNotificationsListener(userId)
+                        }
+                    }
+                    else -> {
+                        stopGlobalNotificationsListener()
+                    }
+                }
+            }
+        }
+
         setContent {
             BMSTheme {
                 // Launcher for notification permission
@@ -56,5 +90,35 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
 
+    private fun startGlobalNotificationsListener(userId: String) {
+        if (notificationListenerJob?.isActive == true) return // Already running
+
+        notificationListenerJob = lifecycleScope.launch {
+            notificationRepository.getNotificationsFlow(userId).collect { list ->
+                val notificationsToShow = list.filter { notification ->
+                    notification.type == "contact_message"
+                            && !notification.isRead
+                            && notification.id.isNotBlank()
+                            && !notificationRepository.hasBeenSeen(notification.id)
+                            && notificationRepository.isRecentNotification(notification.createdAt)
+                }
+                for (notification in notificationsToShow) {
+                    notificationRepository.markAsSeen(notification.id)
+                    val senderGroupKey = notification.title.removePrefix("💬 ").trim().lowercase()
+                    NotificationHelper.showChatNotification(
+                        context = applicationContext,
+                        senderName = notification.title,
+                        messagePreview = notification.message,
+                        senderId = senderGroupKey
+                    )
+                }
+            }
+        }
+    }
+
+    private fun stopGlobalNotificationsListener() {
+        notificationListenerJob?.cancel()
+        notificationListenerJob = null
+    }
+}
