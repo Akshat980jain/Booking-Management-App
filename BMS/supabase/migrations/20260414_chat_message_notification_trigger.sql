@@ -79,6 +79,23 @@ BEGIN
     'contact_message'
   );
 
+  -- Invoke the send-notification edge function to trigger FCM push
+  PERFORM net.http_post(
+    url := 'https://qmznlttogejdbcnrxggt.supabase.co/functions/v1/send-notification',
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFtem5sdHRvZ2VqZGJjbnJ4Z2d0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNTYyNDYsImV4cCI6MjA4NzgzMjI0Nn0.IKE0iH9ow3HDqQrZWopoOSFa2HUBqHamdwDgyW0Ddq0'
+    ),
+    body := jsonb_build_object(
+      'user_id', v_receiver_id,
+      'title', '💬 ' || v_sender_name,
+      'message', LEFT(NEW.message, 100),
+      'type', 'contact_message',
+      'skip_db_insert', true
+    ),
+    timeout_milliseconds := 2000
+  );
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;

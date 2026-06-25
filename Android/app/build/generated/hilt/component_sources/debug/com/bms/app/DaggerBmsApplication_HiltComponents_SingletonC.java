@@ -18,6 +18,8 @@ import com.bms.app.data.repository.NotificationRepositoryImpl;
 import com.bms.app.data.repository.ProfileRepositoryImpl;
 import com.bms.app.data.repository.ReviewRepositoryImpl;
 import com.bms.app.data.repository.VideoRepositoryImpl;
+import com.bms.app.data.service.BmsFirebaseMessagingService;
+import com.bms.app.data.service.BmsFirebaseMessagingService_MembersInjector;
 import com.bms.app.di.AppModule_ProvideSessionManagerFactory;
 import com.bms.app.di.NetworkModule_ProvideSessionManagerFactory;
 import com.bms.app.di.NetworkModule_ProvideSupabaseAuthFactory;
@@ -63,6 +65,9 @@ import com.bms.app.ui.user.RewardsViewModel_HiltModules_KeyModule_ProvideFactory
 import com.bms.app.ui.video.VideoCallService;
 import com.bms.app.ui.video.VideoCallViewModel;
 import com.bms.app.ui.video.VideoCallViewModel_HiltModules_KeyModule_ProvideFactory;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import dagger.hilt.android.ActivityRetainedLifecycle;
 import dagger.hilt.android.ViewModelLifecycle;
 import dagger.hilt.android.internal.builders.ActivityComponentBuilder;
@@ -81,15 +86,12 @@ import dagger.hilt.android.internal.modules.ApplicationContextModule_ProvideAppl
 import dagger.hilt.android.internal.modules.ApplicationContextModule_ProvideContextFactory;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.DoubleCheck;
-import dagger.internal.MapBuilder;
 import dagger.internal.Preconditions;
 import dagger.internal.Provider;
-import dagger.internal.SetBuilder;
 import io.github.jan.supabase.SupabaseClient;
 import io.github.jan.supabase.gotrue.Auth;
 import io.github.jan.supabase.postgrest.Postgrest;
 import io.github.jan.supabase.realtime.Realtime;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.processing.Generated;
@@ -416,6 +418,7 @@ public final class DaggerBmsApplication_HiltComponents_SingletonC {
 
     @Override
     public void injectMainActivity(MainActivity arg0) {
+      injectMainActivity2(arg0);
     }
 
     @Override
@@ -425,7 +428,7 @@ public final class DaggerBmsApplication_HiltComponents_SingletonC {
 
     @Override
     public Set<String> getViewModelKeys() {
-      return SetBuilder.<String>newSetBuilder(18).add(AdminViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(AuthViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(AvailabilityViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(BookingViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(ChatViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(DashboardViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(InboxViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(ProfessionalInfoViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(ProviderDetailViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(ReviewViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(RewardsViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(SettingsViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(SupportViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(SystemConfigViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(UserDashboardViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(UserDetailViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(VideoCallViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(VisibilityViewModel_HiltModules_KeyModule_ProvideFactory.provide()).build();
+      return ImmutableSet.<String>of(AdminViewModel_HiltModules_KeyModule_ProvideFactory.provide(), AuthViewModel_HiltModules_KeyModule_ProvideFactory.provide(), AvailabilityViewModel_HiltModules_KeyModule_ProvideFactory.provide(), BookingViewModel_HiltModules_KeyModule_ProvideFactory.provide(), ChatViewModel_HiltModules_KeyModule_ProvideFactory.provide(), DashboardViewModel_HiltModules_KeyModule_ProvideFactory.provide(), InboxViewModel_HiltModules_KeyModule_ProvideFactory.provide(), ProfessionalInfoViewModel_HiltModules_KeyModule_ProvideFactory.provide(), ProviderDetailViewModel_HiltModules_KeyModule_ProvideFactory.provide(), ReviewViewModel_HiltModules_KeyModule_ProvideFactory.provide(), RewardsViewModel_HiltModules_KeyModule_ProvideFactory.provide(), SettingsViewModel_HiltModules_KeyModule_ProvideFactory.provide(), SupportViewModel_HiltModules_KeyModule_ProvideFactory.provide(), SystemConfigViewModel_HiltModules_KeyModule_ProvideFactory.provide(), UserDashboardViewModel_HiltModules_KeyModule_ProvideFactory.provide(), UserDetailViewModel_HiltModules_KeyModule_ProvideFactory.provide(), VideoCallViewModel_HiltModules_KeyModule_ProvideFactory.provide(), VisibilityViewModel_HiltModules_KeyModule_ProvideFactory.provide());
     }
 
     @Override
@@ -441,6 +444,13 @@ public final class DaggerBmsApplication_HiltComponents_SingletonC {
     @Override
     public ViewComponentBuilder viewComponentBuilder() {
       return new ViewCBuilder(singletonCImpl, activityRetainedCImpl, activityCImpl);
+    }
+
+    @CanIgnoreReturnValue
+    private MainActivity injectMainActivity2(MainActivity instance) {
+      MainActivity_MembersInjector.injectAuth(instance, singletonCImpl.provideSupabaseAuthProvider.get());
+      MainActivity_MembersInjector.injectNotificationRepository(instance, singletonCImpl.notificationRepositoryImplProvider.get());
+      return instance;
     }
   }
 
@@ -522,12 +532,12 @@ public final class DaggerBmsApplication_HiltComponents_SingletonC {
 
     @Override
     public Map<String, javax.inject.Provider<ViewModel>> getHiltViewModelMap() {
-      return MapBuilder.<String, javax.inject.Provider<ViewModel>>newMapBuilder(18).put("com.bms.app.ui.dashboard.AdminViewModel", ((Provider) adminViewModelProvider)).put("com.bms.app.ui.auth.AuthViewModel", ((Provider) authViewModelProvider)).put("com.bms.app.ui.schedule.AvailabilityViewModel", ((Provider) availabilityViewModelProvider)).put("com.bms.app.ui.admin.BookingViewModel", ((Provider) bookingViewModelProvider)).put("com.bms.app.ui.chat.ChatViewModel", ((Provider) chatViewModelProvider)).put("com.bms.app.ui.dashboard.DashboardViewModel", ((Provider) dashboardViewModelProvider)).put("com.bms.app.ui.chat.InboxViewModel", ((Provider) inboxViewModelProvider)).put("com.bms.app.ui.settings.viewmodel.ProfessionalInfoViewModel", ((Provider) professionalInfoViewModelProvider)).put("com.bms.app.ui.user.ProviderDetailViewModel", ((Provider) providerDetailViewModelProvider)).put("com.bms.app.ui.user.ReviewViewModel", ((Provider) reviewViewModelProvider)).put("com.bms.app.ui.user.RewardsViewModel", ((Provider) rewardsViewModelProvider)).put("com.bms.app.ui.settings.viewmodel.SettingsViewModel", ((Provider) settingsViewModelProvider)).put("com.bms.app.ui.chat.SupportViewModel", ((Provider) supportViewModelProvider)).put("com.bms.app.ui.config.SystemConfigViewModel", ((Provider) systemConfigViewModelProvider)).put("com.bms.app.ui.dashboard.UserDashboardViewModel", ((Provider) userDashboardViewModelProvider)).put("com.bms.app.ui.admin.UserDetailViewModel", ((Provider) userDetailViewModelProvider)).put("com.bms.app.ui.video.VideoCallViewModel", ((Provider) videoCallViewModelProvider)).put("com.bms.app.ui.settings.viewmodel.VisibilityViewModel", ((Provider) visibilityViewModelProvider)).build();
+      return ImmutableMap.<String, javax.inject.Provider<ViewModel>>builderWithExpectedSize(18).put("com.bms.app.ui.dashboard.AdminViewModel", ((Provider) adminViewModelProvider)).put("com.bms.app.ui.auth.AuthViewModel", ((Provider) authViewModelProvider)).put("com.bms.app.ui.schedule.AvailabilityViewModel", ((Provider) availabilityViewModelProvider)).put("com.bms.app.ui.admin.BookingViewModel", ((Provider) bookingViewModelProvider)).put("com.bms.app.ui.chat.ChatViewModel", ((Provider) chatViewModelProvider)).put("com.bms.app.ui.dashboard.DashboardViewModel", ((Provider) dashboardViewModelProvider)).put("com.bms.app.ui.chat.InboxViewModel", ((Provider) inboxViewModelProvider)).put("com.bms.app.ui.settings.viewmodel.ProfessionalInfoViewModel", ((Provider) professionalInfoViewModelProvider)).put("com.bms.app.ui.user.ProviderDetailViewModel", ((Provider) providerDetailViewModelProvider)).put("com.bms.app.ui.user.ReviewViewModel", ((Provider) reviewViewModelProvider)).put("com.bms.app.ui.user.RewardsViewModel", ((Provider) rewardsViewModelProvider)).put("com.bms.app.ui.settings.viewmodel.SettingsViewModel", ((Provider) settingsViewModelProvider)).put("com.bms.app.ui.chat.SupportViewModel", ((Provider) supportViewModelProvider)).put("com.bms.app.ui.config.SystemConfigViewModel", ((Provider) systemConfigViewModelProvider)).put("com.bms.app.ui.dashboard.UserDashboardViewModel", ((Provider) userDashboardViewModelProvider)).put("com.bms.app.ui.admin.UserDetailViewModel", ((Provider) userDetailViewModelProvider)).put("com.bms.app.ui.video.VideoCallViewModel", ((Provider) videoCallViewModelProvider)).put("com.bms.app.ui.settings.viewmodel.VisibilityViewModel", ((Provider) visibilityViewModelProvider)).build();
     }
 
     @Override
     public Map<String, Object> getHiltViewModelAssistedMap() {
-      return Collections.<String, Object>emptyMap();
+      return ImmutableMap.<String, Object>of();
     }
 
     private static final class SwitchingProvider<T> implements Provider<T> {
@@ -680,7 +690,20 @@ public final class DaggerBmsApplication_HiltComponents_SingletonC {
     }
 
     @Override
+    public void injectBmsFirebaseMessagingService(BmsFirebaseMessagingService arg0) {
+      injectBmsFirebaseMessagingService2(arg0);
+    }
+
+    @Override
     public void injectVideoCallService(VideoCallService arg0) {
+    }
+
+    @CanIgnoreReturnValue
+    private BmsFirebaseMessagingService injectBmsFirebaseMessagingService2(
+        BmsFirebaseMessagingService instance) {
+      BmsFirebaseMessagingService_MembersInjector.injectNotificationRepository(instance, singletonCImpl.notificationRepositoryImplProvider.get());
+      BmsFirebaseMessagingService_MembersInjector.injectAuth(instance, singletonCImpl.provideSupabaseAuthProvider.get());
+      return instance;
     }
   }
 
@@ -693,19 +716,19 @@ public final class DaggerBmsApplication_HiltComponents_SingletonC {
 
     private Provider<SupabaseClient> provideSupabaseClientProvider;
 
+    private Provider<Auth> provideSupabaseAuthProvider;
+
     private Provider<Postgrest> provideSupabasePostgrestProvider;
+
+    private Provider<Realtime> provideSupabaseRealtimeProvider;
+
+    private Provider<NotificationRepositoryImpl> notificationRepositoryImplProvider;
 
     private Provider<ProfileRepositoryImpl> profileRepositoryImplProvider;
 
     private Provider<ProfileRepository> bindProfileRepositoryProvider;
 
     private Provider<AppointmentRepositoryImpl> appointmentRepositoryImplProvider;
-
-    private Provider<Auth> provideSupabaseAuthProvider;
-
-    private Provider<Realtime> provideSupabaseRealtimeProvider;
-
-    private Provider<NotificationRepositoryImpl> notificationRepositoryImplProvider;
 
     private Provider<AuthRepositoryImpl> authRepositoryImplProvider;
 
@@ -733,15 +756,15 @@ public final class DaggerBmsApplication_HiltComponents_SingletonC {
 
     @SuppressWarnings("unchecked")
     private void initialize(final ApplicationContextModule applicationContextModuleParam) {
-      this.provideSessionManagerProvider = DoubleCheck.provider(new SwitchingProvider<SupabaseSessionManager>(singletonCImpl, 3));
-      this.provideSupabaseClientProvider = DoubleCheck.provider(new SwitchingProvider<SupabaseClient>(singletonCImpl, 2));
-      this.provideSupabasePostgrestProvider = DoubleCheck.provider(new SwitchingProvider<Postgrest>(singletonCImpl, 1));
-      this.profileRepositoryImplProvider = new SwitchingProvider<>(singletonCImpl, 0);
+      this.provideSessionManagerProvider = DoubleCheck.provider(new SwitchingProvider<SupabaseSessionManager>(singletonCImpl, 2));
+      this.provideSupabaseClientProvider = DoubleCheck.provider(new SwitchingProvider<SupabaseClient>(singletonCImpl, 1));
+      this.provideSupabaseAuthProvider = DoubleCheck.provider(new SwitchingProvider<Auth>(singletonCImpl, 0));
+      this.provideSupabasePostgrestProvider = DoubleCheck.provider(new SwitchingProvider<Postgrest>(singletonCImpl, 4));
+      this.provideSupabaseRealtimeProvider = DoubleCheck.provider(new SwitchingProvider<Realtime>(singletonCImpl, 5));
+      this.notificationRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<NotificationRepositoryImpl>(singletonCImpl, 3));
+      this.profileRepositoryImplProvider = new SwitchingProvider<>(singletonCImpl, 6);
       this.bindProfileRepositoryProvider = DoubleCheck.provider((Provider) profileRepositoryImplProvider);
-      this.appointmentRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<AppointmentRepositoryImpl>(singletonCImpl, 4));
-      this.provideSupabaseAuthProvider = DoubleCheck.provider(new SwitchingProvider<Auth>(singletonCImpl, 5));
-      this.provideSupabaseRealtimeProvider = DoubleCheck.provider(new SwitchingProvider<Realtime>(singletonCImpl, 7));
-      this.notificationRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<NotificationRepositoryImpl>(singletonCImpl, 6));
+      this.appointmentRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<AppointmentRepositoryImpl>(singletonCImpl, 7));
       this.authRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<AuthRepositoryImpl>(singletonCImpl, 8));
       this.availabilityRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<AvailabilityRepositoryImpl>(singletonCImpl, 9));
       this.chatRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<ChatRepositoryImpl>(singletonCImpl, 10));
@@ -754,12 +777,12 @@ public final class DaggerBmsApplication_HiltComponents_SingletonC {
     }
 
     @Override
-    public void injectBmsApplication(BmsApplication bmsApplication) {
+    public void injectBmsApplication(BmsApplication arg0) {
     }
 
     @Override
     public Set<Boolean> getDisableFragmentGetContextFix() {
-      return Collections.<Boolean>emptySet();
+      return ImmutableSet.<Boolean>of();
     }
 
     @Override
@@ -786,29 +809,29 @@ public final class DaggerBmsApplication_HiltComponents_SingletonC {
       @Override
       public T get() {
         switch (id) {
-          case 0: // com.bms.app.data.repository.ProfileRepositoryImpl 
-          return (T) new ProfileRepositoryImpl(singletonCImpl.provideSupabasePostgrestProvider.get());
-
-          case 1: // io.github.jan.supabase.postgrest.Postgrest 
-          return (T) NetworkModule_ProvideSupabasePostgrestFactory.provideSupabasePostgrest(singletonCImpl.provideSupabaseClientProvider.get());
-
-          case 2: // io.github.jan.supabase.SupabaseClient 
-          return (T) NetworkModule_ProvideSupabaseClientFactory.provideSupabaseClient(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.provideSessionManagerProvider.get());
-
-          case 3: // com.bms.app.data.local.SupabaseSessionManager 
-          return (T) NetworkModule_ProvideSessionManagerFactory.provideSessionManager(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
-
-          case 4: // com.bms.app.data.repository.AppointmentRepositoryImpl 
-          return (T) new AppointmentRepositoryImpl(singletonCImpl.provideSupabasePostgrestProvider.get());
-
-          case 5: // io.github.jan.supabase.gotrue.Auth 
+          case 0: // io.github.jan.supabase.gotrue.Auth 
           return (T) NetworkModule_ProvideSupabaseAuthFactory.provideSupabaseAuth(singletonCImpl.provideSupabaseClientProvider.get());
 
-          case 6: // com.bms.app.data.repository.NotificationRepositoryImpl 
+          case 1: // io.github.jan.supabase.SupabaseClient 
+          return (T) NetworkModule_ProvideSupabaseClientFactory.provideSupabaseClient(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.provideSessionManagerProvider.get());
+
+          case 2: // com.bms.app.data.local.SupabaseSessionManager 
+          return (T) NetworkModule_ProvideSessionManagerFactory.provideSessionManager(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+
+          case 3: // com.bms.app.data.repository.NotificationRepositoryImpl 
           return (T) new NotificationRepositoryImpl(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.provideSupabasePostgrestProvider.get(), singletonCImpl.provideSupabaseRealtimeProvider.get());
 
-          case 7: // io.github.jan.supabase.realtime.Realtime 
+          case 4: // io.github.jan.supabase.postgrest.Postgrest 
+          return (T) NetworkModule_ProvideSupabasePostgrestFactory.provideSupabasePostgrest(singletonCImpl.provideSupabaseClientProvider.get());
+
+          case 5: // io.github.jan.supabase.realtime.Realtime 
           return (T) NetworkModule_ProvideSupabaseRealtimeFactory.provideSupabaseRealtime(singletonCImpl.provideSupabaseClientProvider.get());
+
+          case 6: // com.bms.app.data.repository.ProfileRepositoryImpl 
+          return (T) new ProfileRepositoryImpl(singletonCImpl.provideSupabasePostgrestProvider.get());
+
+          case 7: // com.bms.app.data.repository.AppointmentRepositoryImpl 
+          return (T) new AppointmentRepositoryImpl(singletonCImpl.provideSupabasePostgrestProvider.get());
 
           case 8: // com.bms.app.data.repository.AuthRepositoryImpl 
           return (T) new AuthRepositoryImpl(singletonCImpl.provideSupabaseAuthProvider.get(), singletonCImpl.provideSupabasePostgrestProvider.get());

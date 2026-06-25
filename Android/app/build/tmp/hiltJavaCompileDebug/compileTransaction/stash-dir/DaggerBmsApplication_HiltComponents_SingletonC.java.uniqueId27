@@ -805,7 +805,7 @@ public final class DaggerBmsApplication_HiltComponents_SingletonC {
           return (T) NetworkModule_ProvideSupabaseAuthFactory.provideSupabaseAuth(singletonCImpl.provideSupabaseClientProvider.get());
 
           case 6: // com.bms.app.data.repository.NotificationRepositoryImpl 
-          return (T) new NotificationRepositoryImpl(singletonCImpl.provideSupabasePostgrestProvider.get(), singletonCImpl.provideSupabaseRealtimeProvider.get());
+          return (T) new NotificationRepositoryImpl(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule), singletonCImpl.provideSupabasePostgrestProvider.get(), singletonCImpl.provideSupabaseRealtimeProvider.get());
 
           case 7: // io.github.jan.supabase.realtime.Realtime 
           return (T) NetworkModule_ProvideSupabaseRealtimeFactory.provideSupabaseRealtime(singletonCImpl.provideSupabaseClientProvider.get());

@@ -1,9 +1,135 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import * as jose from "https://deno.land/x/jose@v4.14.4/index.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+async function sendFcmNotification(
+  supabase: ReturnType<typeof createClient>,
+  userId: string,
+  title: string,
+  message: string,
+  type: string
+) {
+  const firebaseServiceAccountJson = Deno.env.get("FIREBASE_SERVICE_ACCOUNT") || Deno.env.get("FCM_SERVICE_ACCOUNT");
+  if (!firebaseServiceAccountJson) {
+    console.warn("Neither FIREBASE_SERVICE_ACCOUNT nor FCM_SERVICE_ACCOUNT secret is set. Skipping FCM push notification.");
+    return;
+  }
+
+  let serviceAccount;
+  try {
+    serviceAccount = JSON.parse(firebaseServiceAccountJson);
+  } catch (err) {
+    console.error("Failed to parse Firebase service account JSON secret:", err);
+    return;
+  }
+
+  // Fetch FCM tokens from database
+  const { data: tokenRows, error: tokenError } = await supabase
+    .from("user_fcm_tokens")
+    .select("fcm_token")
+    .eq("user_id", userId);
+
+  if (tokenError) {
+    console.error("Error fetching FCM tokens:", tokenError);
+    return;
+  }
+
+  if (!tokenRows || tokenRows.length === 0) {
+    console.log(`No FCM tokens registered for user: ${userId}`);
+    return;
+  }
+
+  const fcmTokens = tokenRows.map((r: { fcm_token: string }) => r.fcm_token);
+  console.log(`Sending FCM push notification to ${fcmTokens.length} devices for user ${userId}`);
+
+  try {
+    // Generate JWT for Google OAuth2
+    const privateKey = await jose.importPKCS8(serviceAccount.private_key, "RS256");
+    const jwt = await new jose.SignJWT({
+      scope: "https://www.googleapis.com/auth/firebase.messaging",
+    })
+      .setProtectedHeader({ alg: "RS256" })
+      .setIssuer(serviceAccount.client_email)
+      .setAudience("https://oauth2.googleapis.com/token")
+      .setExpirationTime("1h")
+      .setIssuedAt()
+      .sign(privateKey);
+
+    // Get Access Token
+    const oauthResponse = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+        assertion: jwt,
+      }),
+    });
+
+    if (!oauthResponse.ok) {
+      const errText = await oauthResponse.text();
+      throw new Error(`Failed to obtain OAuth2 access token: ${errText}`);
+    }
+
+    const { access_token } = await oauthResponse.json();
+
+    // Send notification to each registered device token
+    const projectId = serviceAccount.project_id || "bookease24x7";
+    const fcmUrl = `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`;
+
+    for (const token of fcmTokens) {
+      const fcmPayload = {
+        message: {
+          token: token,
+          notification: {
+            title: title,
+            body: message,
+          },
+          data: {
+            title: title,
+            body: message,
+            type: type,
+            sender_id: type === "contact_message" ? title.replace("💬 ", "").trim().toLowerCase() : "",
+          },
+          android: {
+            priority: "high",
+            notification: {
+              channel_id: "bms_chat_messages",
+              sound: "default",
+            },
+          },
+        },
+      };
+
+      const fcmResponse = await fetch(fcmUrl, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${access_token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(fcmPayload),
+      });
+
+      const responseText = await fcmResponse.text();
+      if (!fcmResponse.ok) {
+        console.error(`FCM send failed for token ${token.substring(0, 10)}... :`, responseText);
+        if (fcmResponse.status === 400 || fcmResponse.status === 404) {
+          console.log(`Deleting invalid FCM token: ${token.substring(0, 10)}...`);
+          await supabase.from("user_fcm_tokens").delete().eq("fcm_token", token);
+        }
+      } else {
+        console.log(`Successfully sent FCM notification to token prefix: ${token.substring(0, 10)}`);
+      }
+    }
+  } catch (err) {
+    console.error("Failed to send FCM push notifications:", err);
+  }
+}
 
 // Simple in-memory rate limiting
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
@@ -193,6 +319,7 @@ Deno.serve(async (req) => {
       recipient_email,
       recipient_name,
       send_email = false,
+      skip_db_insert = false,
     } = body;
 
     // Backwards compatibility: normalize legacy type
@@ -208,26 +335,33 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    console.log(`Creating notification for user: ${user_id}, type: ${type}`);
+    if (!skip_db_insert) {
+      console.log(`Creating notification for user: ${user_id}, type: ${type}`);
 
-    // Insert notification into database
-    const { error: insertError } = await supabase.from("notifications").insert({
-      user_id,
-      title: sanitizedTitle,
-      message: sanitizedMessage,
-      type,
-      related_appointment_id: related_appointment_id || null,
-    });
-
-    if (insertError) {
-      console.error("Error inserting notification:", insertError);
-      return new Response(JSON.stringify({ error: "Failed to create notification" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      // Insert notification into database
+      const { error: insertError } = await supabase.from("notifications").insert({
+        user_id,
+        title: sanitizedTitle,
+        message: sanitizedMessage,
+        type,
+        related_appointment_id: related_appointment_id || null,
       });
+
+      if (insertError) {
+        console.error("Error inserting notification:", insertError);
+        return new Response(JSON.stringify({ error: "Failed to create notification" }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      console.log(`Notification created successfully for user: ${user_id}`);
+    } else {
+      console.log(`Skipping DB insert for notification (already inserted by trigger) for user: ${user_id}`);
     }
 
-    console.log(`Notification created successfully for user: ${user_id}`);
+    // Send FCM push notifications
+    await sendFcmNotification(supabase, user_id, sanitizedTitle, sanitizedMessage, type);
 
     // Send email if requested
     let emailResult:

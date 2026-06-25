@@ -49,6 +49,7 @@ class MainActivity : ComponentActivity() {
                         val userId = status.session.user?.id
                         if (userId != null) {
                             startGlobalNotificationsListener(userId)
+                            registerFcmToken(userId)
                         }
                     }
                     else -> {
@@ -120,5 +121,25 @@ class MainActivity : ComponentActivity() {
     private fun stopGlobalNotificationsListener() {
         notificationListenerJob?.cancel()
         notificationListenerJob = null
+    }
+
+    private fun registerFcmToken(userId: String) {
+        try {
+            com.google.firebase.messaging.FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    android.util.Log.w("MainActivity", "Fetching FCM registration token failed", task.exception)
+                    return@addOnCompleteListener
+                }
+                val token = task.result
+                if (token != null) {
+                    lifecycleScope.launch {
+                        val deviceName = "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}"
+                        notificationRepository.registerFcmToken(userId, token, deviceName)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("MainActivity", "Error registering FCM token", e)
+        }
     }
 }

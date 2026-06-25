@@ -17,4 +17,7 @@ interface NotificationRepository {
 
     /** Returns true if the notification was created within the last 24 hours. */
     fun isRecentNotification(createdAt: String): Boolean
+
+    /** Registers or updates FCM token for a user in the user_fcm_tokens table */
+    suspend fun registerFcmToken(userId: String, token: String, deviceName: String? = null): Result<Unit>
 }

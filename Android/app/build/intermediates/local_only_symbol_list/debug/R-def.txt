@@ -8,6 +8,11 @@ string email_label
 string filter_rating
 string filter_video
 string forgot_password
+string gcm_defaultSenderId
+string google_api_key
+string google_app_id
+string google_crash_reporting_api_key
+string google_storage_bucket
 string login_subtitle
 string login_title
 string member_tier
@@ -17,6 +22,7 @@ string nav_home
 string nav_saved
 string nav_settings
 string password_label
+string project_id
 string recent_activity
 string reset_password
 string rewards_title

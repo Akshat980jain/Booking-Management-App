@@ -19,6 +19,7 @@ import dagger.hilt.processor.internal.definecomponent.codegen._dagger_hilt_andro
 import dagger.hilt.processor.internal.definecomponent.codegen._dagger_hilt_components_SingletonComponent;
 import hilt_aggregated_deps._com_bms_app_BmsApplication_GeneratedInjector;
 import hilt_aggregated_deps._com_bms_app_MainActivity_GeneratedInjector;
+import hilt_aggregated_deps._com_bms_app_data_service_BmsFirebaseMessagingService_GeneratedInjector;
 import hilt_aggregated_deps._com_bms_app_di_AppModule;
 import hilt_aggregated_deps._com_bms_app_di_NetworkModule;
 import hilt_aggregated_deps._com_bms_app_di_RepositoryModule;
@@ -101,6 +102,7 @@ import hilt_aggregated_deps._dagger_hilt_android_internal_modules_HiltWrapper_Ac
     aggregatedDeps = {
         _com_bms_app_BmsApplication_GeneratedInjector.class,
         _com_bms_app_MainActivity_GeneratedInjector.class,
+        _com_bms_app_data_service_BmsFirebaseMessagingService_GeneratedInjector.class,
         _com_bms_app_di_AppModule.class,
         _com_bms_app_di_NetworkModule.class,
         _com_bms_app_di_RepositoryModule.class,

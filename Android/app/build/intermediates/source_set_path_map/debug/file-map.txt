@@ -1,61 +1,69 @@
-com.bms.app-jetified-runtime-release-0 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\0927810b1a43b52ab87b0c8427124361\transformed\jetified-runtime-release\res
-com.bms.app-jetified-hilt-navigation-compose-1.1.0-1 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\10c080afed610cabfef17aeadb257a9f\transformed\jetified-hilt-navigation-compose-1.1.0\res
-com.bms.app-jetified-savedstate-1.2.1-2 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\11f49ff2e3e1c65092f888a296ebe551\transformed\jetified-savedstate-1.2.1\res
-com.bms.app-lifecycle-viewmodel-2.7.0-3 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\173b475e36d7925659f9768dc6ab58c5\transformed\lifecycle-viewmodel-2.7.0\res
-com.bms.app-jetified-material-icons-core-release-4 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\17a5f160597db96ecf3a87c33eb4c06d\transformed\jetified-material-icons-core-release\res
-com.bms.app-lifecycle-livedata-core-2.7.0-5 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\1915b5d479852e36566034facaa20859\transformed\lifecycle-livedata-core-2.7.0\res
-com.bms.app-jetified-lifecycle-livedata-core-ktx-2.7.0-6 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\1f99f8e87c919c83769b16db472d6a03\transformed\jetified-lifecycle-livedata-core-ktx-2.7.0\res
-com.bms.app-jetified-lifecycle-process-2.7.0-7 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\239e92265339989800779cd319ca68d1\transformed\jetified-lifecycle-process-2.7.0\res
-com.bms.app-lifecycle-runtime-2.7.0-8 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\24cb23433a7061ef7ff18f41d68487a1\transformed\lifecycle-runtime-2.7.0\res
-com.bms.app-jetified-hilt-navigation-1.1.0-9 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\324c63f5efebe6293f07b71843b10832\transformed\jetified-hilt-navigation-1.1.0\res
-com.bms.app-jetified-foundation-layout-release-10 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\32ef4483aa8313007808b91512780553\transformed\jetified-foundation-layout-release\res
-com.bms.app-navigation-runtime-2.7.7-11 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\33d478b733645b83e75a44915f9753cd\transformed\navigation-runtime-2.7.7\res
-com.bms.app-core-runtime-2.2.0-12 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\33dd8da711a7be3c9d55a5cff9a0a2fd\transformed\core-runtime-2.2.0\res
-com.bms.app-jetified-startup-runtime-1.1.1-13 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\38a1b669c876917923cdedb740fac331\transformed\jetified-startup-runtime-1.1.1\res
-com.bms.app-jetified-profileinstaller-1.3.0-14 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\3eaf03ed6c8fd8fafe963d4ba6ec8152\transformed\jetified-profileinstaller-1.3.0\res
-com.bms.app-jetified-lifecycle-viewmodel-ktx-2.7.0-15 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\4081b79e1475b1cc3d678eb4901cf9c7\transformed\jetified-lifecycle-viewmodel-ktx-2.7.0\res
-com.bms.app-jetified-annotation-experimental-1.4.0-16 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\47e18a842c16a232904cc91450a395e1\transformed\jetified-annotation-experimental-1.4.0\res
-com.bms.app-jetified-ui-graphics-release-17 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\4a04e3524e3205bcbc6b4648caed0074\transformed\jetified-ui-graphics-release\res
-com.bms.app-jetified-ui-util-release-18 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\4c1e687744a475900da7b90b0e1d5a0f\transformed\jetified-ui-util-release\res
-com.bms.app-jetified-emoji2-1.3.0-19 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\54a32eeadb2bc1b667bf5fdd55bddf8a\transformed\jetified-emoji2-1.3.0\res
-com.bms.app-jetified-ui-text-release-20 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\5a51e3ac249437c3a6739e904cf3eb48\transformed\jetified-ui-text-release\res
-com.bms.app-jetified-client-0.37.0-21 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\5aefe87aa4109c943e71e0c1706204f3\transformed\jetified-client-0.37.0\res
-com.bms.app-navigation-runtime-ktx-2.7.7-22 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\5f85919a40915e49f5534b6f0381739a\transformed\navigation-runtime-ktx-2.7.7\res
-com.bms.app-browser-1.7.0-23 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\62566a7753ea0b9b5fe6bd51a3f5e111\transformed\browser-1.7.0\res
-com.bms.app-jetified-navigation-compose-2.7.7-24 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\62756bb75d00a307b8be753bc40e8a6d\transformed\jetified-navigation-compose-2.7.7\res
-com.bms.app-navigation-common-ktx-2.7.7-25 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\6461b398c337183598ec6e82088e48f3\transformed\navigation-common-ktx-2.7.7\res
-com.bms.app-jetified-material3-release-26 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\66580240144f442eb0394f9155459581\transformed\jetified-material3-release\res
-com.bms.app-jetified-ui-geometry-release-27 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\6ae3acdaea4827d3d8b0271c10386a06\transformed\jetified-ui-geometry-release\res
-com.bms.app-jetified-ui-test-manifest-1.6.1-28 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\703ccf5dbe6386e6c29ce56d43e42455\transformed\jetified-ui-test-manifest-1.6.1\res
-com.bms.app-jetified-ui-tooling-preview-release-29 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\763db4702bff85bc09b372c671cb1e15\transformed\jetified-ui-tooling-preview-release\res
-com.bms.app-jetified-core-ktx-1.12.0-30 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\7b65de5080fe0e33fb008ceeae0c387f\transformed\jetified-core-ktx-1.12.0\res
-com.bms.app-jetified-activity-compose-1.8.2-31 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\7bd3d85cb924211c2cefc7d6470a9a64\transformed\jetified-activity-compose-1.8.2\res
-com.bms.app-jetified-customview-poolingcontainer-1.0.0-32 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\8100aee4cae400bbee3fa21ed93fb043\transformed\jetified-customview-poolingcontainer-1.0.0\res
-com.bms.app-jetified-activity-ktx-1.8.2-33 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\85c99330c5856c7a3de79ede8eb5285d\transformed\jetified-activity-ktx-1.8.2\res
-com.bms.app-jetified-material-icons-extended-release-34 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\86bb2727a21c03f66659ec4bc613c13d\transformed\jetified-material-icons-extended-release\res
-com.bms.app-jetified-foundation-release-35 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\87c2b4c891c4f49ed3d067260947007f\transformed\jetified-foundation-release\res
-com.bms.app-jetified-activity-1.8.2-36 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\8c7f7fc8a2ce781d0dae7a6cc9c9305c\transformed\jetified-activity-1.8.2\res
-com.bms.app-jetified-animation-core-release-37 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\a030413042f5e12e8a2cf480c57e04ad\transformed\jetified-animation-core-release\res
-com.bms.app-navigation-common-2.7.7-38 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\a6004e308368088fe50419e17def2377\transformed\navigation-common-2.7.7\res
-com.bms.app-jetified-savedstate-ktx-1.2.1-39 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\b655b9f57c7a4c9b09b8f7eeede49ee2\transformed\jetified-savedstate-ktx-1.2.1\res
-com.bms.app-jetified-runtime-saveable-release-40 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\b67b15beefc57c978d9e16ecaad80a1d\transformed\jetified-runtime-saveable-release\res
-com.bms.app-jetified-animation-release-41 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\b717839c77aa43aef0b7cc6b4024b202\transformed\jetified-animation-release\res
-com.bms.app-jetified-lifecycle-viewmodel-savedstate-2.7.0-42 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\b9967e76bbb6a8ffca58f66e52cf6e98\transformed\jetified-lifecycle-viewmodel-savedstate-2.7.0\res
-com.bms.app-jetified-material-release-43 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\c15f8b494a51fbcf9810bd748388d16e\transformed\jetified-material-release\res
-com.bms.app-jetified-lifecycle-viewmodel-compose-2.7.0-44 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\c3cff9cafb991a88aba2e678281732a8\transformed\jetified-lifecycle-viewmodel-compose-2.7.0\res
-com.bms.app-jetified-ui-tooling-release-45 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\c9cc8ecd4984577c4d5145d8383770c7\transformed\jetified-ui-tooling-release\res
-com.bms.app-lifecycle-livedata-2.7.0-46 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\cfe8231f86832fc45cf4ae1768b6ac61\transformed\lifecycle-livedata-2.7.0\res
-com.bms.app-fragment-1.5.1-47 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\d5dee8f1528260feaf3121b32052dc00\transformed\fragment-1.5.1\res
-com.bms.app-jetified-lifecycle-runtime-compose-2.7.0-48 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\d78bb2c5930e2f44280e2323a4bb9bcd\transformed\jetified-lifecycle-runtime-compose-2.7.0\res
-com.bms.app-jetified-ui-tooling-data-release-49 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\e6923ccbfc0b31a2f957579205ae7914\transformed\jetified-ui-tooling-data-release\res
-com.bms.app-jetified-material-ripple-release-50 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\e6d29024880715226e54af85d30e9cce\transformed\jetified-material-ripple-release\res
-com.bms.app-jetified-ui-unit-release-51 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\ee09f6fcf79130dcf6ef85245ddeff33\transformed\jetified-ui-unit-release\res
-com.bms.app-core-1.12.0-52 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\f12399a8cfcb9482278300e43f9289d7\transformed\core-1.12.0\res
-com.bms.app-jetified-ui-release-53 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\f757f09b861426226c6e2b2f690d9cb0\transformed\jetified-ui-release\res
-com.bms.app-jetified-lifecycle-runtime-ktx-2.7.0-54 C:\Users\hp\Downloads\gradle-9.2.1-bin\caches\transforms-4\fc84b808dc114631e1cccce3326962fa\transformed\jetified-lifecycle-runtime-ktx-2.7.0\res
-com.bms.app-resValues-55 E:\Booking Management App\Android\app\build\generated\res\resValues\debug
-com.bms.app-packageDebugResources-56 E:\Booking Management App\Android\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
-com.bms.app-packageDebugResources-57 E:\Booking Management App\Android\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
-com.bms.app-merged_res-58 E:\Booking Management App\Android\app\build\intermediates\merged_res\debug
-com.bms.app-debug-59 E:\Booking Management App\Android\app\src\debug\res
-com.bms.app-main-60 E:\Booking Management App\Android\app\src\main\res
+com.bms.app-jetified-core-ktx-1.12.0-0 C:\Users\hp\.gradle\caches\transforms-4\0493115538fba030d8487488b7e8c70b\transformed\jetified-core-ktx-1.12.0\res
+com.bms.app-jetified-customview-poolingcontainer-1.0.0-1 C:\Users\hp\.gradle\caches\transforms-4\0616ea80e7dc47dee3cf3700093f4634\transformed\jetified-customview-poolingcontainer-1.0.0\res
+com.bms.app-jetified-runtime-saveable-release-2 C:\Users\hp\.gradle\caches\transforms-4\0c75c4bb26dfb40485fec4e07b542139\transformed\jetified-runtime-saveable-release\res
+com.bms.app-jetified-activity-compose-1.8.2-3 C:\Users\hp\.gradle\caches\transforms-4\14e9d9058651090ca6af9e263515c1b3\transformed\jetified-activity-compose-1.8.2\res
+com.bms.app-jetified-lifecycle-viewmodel-savedstate-2.7.0-4 C:\Users\hp\.gradle\caches\transforms-4\1aabbd13a08687c0e0118c78fc8aada6\transformed\jetified-lifecycle-viewmodel-savedstate-2.7.0\res
+com.bms.app-jetified-hilt-navigation-1.1.0-5 C:\Users\hp\.gradle\caches\transforms-4\1b8f0bd13e884120215609cec914ac1e\transformed\jetified-hilt-navigation-1.1.0\res
+com.bms.app-jetified-animation-release-6 C:\Users\hp\.gradle\caches\transforms-4\27762225bf81746dddb52276608c29e1\transformed\jetified-animation-release\res
+com.bms.app-jetified-foundation-release-7 C:\Users\hp\.gradle\caches\transforms-4\2d3143333d879fb4f6792f2478d0a5ff\transformed\jetified-foundation-release\res
+com.bms.app-jetified-ui-release-8 C:\Users\hp\.gradle\caches\transforms-4\2f7509af1e9c8e4d4c57231e58efb9c1\transformed\jetified-ui-release\res
+com.bms.app-jetified-material-release-9 C:\Users\hp\.gradle\caches\transforms-4\3098e365e2a7ab642cd9c472bad42b0b\transformed\jetified-material-release\res
+com.bms.app-jetified-ui-tooling-data-release-10 C:\Users\hp\.gradle\caches\transforms-4\3f740b63f7d3b23470d0bf23ff607bf7\transformed\jetified-ui-tooling-data-release\res
+com.bms.app-jetified-foundation-layout-release-11 C:\Users\hp\.gradle\caches\transforms-4\42661f7c22a28282ee7965dd1b6b50bd\transformed\jetified-foundation-layout-release\res
+com.bms.app-jetified-ads-adservices-java-1.0.0-beta05-12 C:\Users\hp\.gradle\caches\transforms-4\451c6f723331883543837e9844eb9ae4\transformed\jetified-ads-adservices-java-1.0.0-beta05\res
+com.bms.app-jetified-material3-release-13 C:\Users\hp\.gradle\caches\transforms-4\4b947f1dea8ccb4e3bc472465e2fce84\transformed\jetified-material3-release\res
+com.bms.app-jetified-ui-test-manifest-1.6.1-14 C:\Users\hp\.gradle\caches\transforms-4\4c4f42b4bfd783c080fcee1bf8a0a769\transformed\jetified-ui-test-manifest-1.6.1\res
+com.bms.app-jetified-client-0.37.0-15 C:\Users\hp\.gradle\caches\transforms-4\5526a8872336491a4b892d05b9e3b0b9\transformed\jetified-client-0.37.0\res
+com.bms.app-lifecycle-runtime-2.7.0-16 C:\Users\hp\.gradle\caches\transforms-4\552bd103e10463fcabbbdd494b5f971b\transformed\lifecycle-runtime-2.7.0\res
+com.bms.app-jetified-material-icons-extended-release-17 C:\Users\hp\.gradle\caches\transforms-4\5ca1e9ce740f9c148f644b29fd27d20b\transformed\jetified-material-icons-extended-release\res
+com.bms.app-jetified-savedstate-1.2.1-18 C:\Users\hp\.gradle\caches\transforms-4\61b54652c03f777212c2523b201ffa09\transformed\jetified-savedstate-1.2.1\res
+com.bms.app-jetified-play-services-basement-18.3.0-19 C:\Users\hp\.gradle\caches\transforms-4\6e00ea38277423d66f5f894953dca9a3\transformed\jetified-play-services-basement-18.3.0\res
+com.bms.app-jetified-lifecycle-viewmodel-ktx-2.7.0-20 C:\Users\hp\.gradle\caches\transforms-4\7c980bd20e9028313ee2034bb2da71b9\transformed\jetified-lifecycle-viewmodel-ktx-2.7.0\res
+com.bms.app-jetified-lifecycle-runtime-ktx-2.7.0-21 C:\Users\hp\.gradle\caches\transforms-4\7d444eacfe793321b0309d964eb17c2d\transformed\jetified-lifecycle-runtime-ktx-2.7.0\res
+com.bms.app-jetified-lifecycle-livedata-core-ktx-2.7.0-22 C:\Users\hp\.gradle\caches\transforms-4\80e6c76b8df02e39f5be3585e9311c07\transformed\jetified-lifecycle-livedata-core-ktx-2.7.0\res
+com.bms.app-core-1.12.0-23 C:\Users\hp\.gradle\caches\transforms-4\81a5cea7f3507983f3e8df5f4f951568\transformed\core-1.12.0\res
+com.bms.app-jetified-lifecycle-viewmodel-compose-2.7.0-24 C:\Users\hp\.gradle\caches\transforms-4\843630907d74b85f944eb833f59760bd\transformed\jetified-lifecycle-viewmodel-compose-2.7.0\res
+com.bms.app-jetified-runtime-release-25 C:\Users\hp\.gradle\caches\transforms-4\85b784756c75f34520cd51d7e52e3b71\transformed\jetified-runtime-release\res
+com.bms.app-lifecycle-viewmodel-2.7.0-26 C:\Users\hp\.gradle\caches\transforms-4\85c3e985968200c7179775df843d9f11\transformed\lifecycle-viewmodel-2.7.0\res
+com.bms.app-browser-1.7.0-27 C:\Users\hp\.gradle\caches\transforms-4\87f406129198d8c77a86a70e2160ff65\transformed\browser-1.7.0\res
+com.bms.app-jetified-lifecycle-runtime-compose-2.7.0-28 C:\Users\hp\.gradle\caches\transforms-4\8e4b305b20887ccd069bf36cabdffd51\transformed\jetified-lifecycle-runtime-compose-2.7.0\res
+com.bms.app-jetified-navigation-compose-2.7.7-29 C:\Users\hp\.gradle\caches\transforms-4\925caf08cb8e5b64e9c3976085183fa0\transformed\jetified-navigation-compose-2.7.7\res
+com.bms.app-jetified-play-services-measurement-api-21.6.1-30 C:\Users\hp\.gradle\caches\transforms-4\932b45824e766ed8c2d3777a7bf4d1bb\transformed\jetified-play-services-measurement-api-21.6.1\res
+com.bms.app-navigation-common-2.7.7-31 C:\Users\hp\.gradle\caches\transforms-4\9650ce623dc28554f8aa263388f888e3\transformed\navigation-common-2.7.7\res
+com.bms.app-jetified-annotation-experimental-1.4.0-32 C:\Users\hp\.gradle\caches\transforms-4\a2ba1ba6ced3592de88cfb47aafceec5\transformed\jetified-annotation-experimental-1.4.0\res
+com.bms.app-jetified-ui-tooling-preview-release-33 C:\Users\hp\.gradle\caches\transforms-4\a42cbff18e32034d077383e091999da0\transformed\jetified-ui-tooling-preview-release\res
+com.bms.app-jetified-profileinstaller-1.3.0-34 C:\Users\hp\.gradle\caches\transforms-4\a882b80e88a5c3bb9f5dbb043cb9d70c\transformed\jetified-profileinstaller-1.3.0\res
+com.bms.app-jetified-ui-text-release-35 C:\Users\hp\.gradle\caches\transforms-4\a95d80ea3e7199eb8263f524ca9cfe79\transformed\jetified-ui-text-release\res
+com.bms.app-jetified-material-icons-core-release-36 C:\Users\hp\.gradle\caches\transforms-4\acf11140bca0891cc13b0dff7a7bb347\transformed\jetified-material-icons-core-release\res
+com.bms.app-jetified-ui-graphics-release-37 C:\Users\hp\.gradle\caches\transforms-4\ae41dd506c7eb296a13593697fb403a1\transformed\jetified-ui-graphics-release\res
+com.bms.app-jetified-animation-core-release-38 C:\Users\hp\.gradle\caches\transforms-4\aff52d45de079d06ac822ff0869c004e\transformed\jetified-animation-core-release\res
+com.bms.app-jetified-material-ripple-release-39 C:\Users\hp\.gradle\caches\transforms-4\afff507bb632cc989bbcdef8c81e14d8\transformed\jetified-material-ripple-release\res
+com.bms.app-jetified-play-services-base-18.0.1-40 C:\Users\hp\.gradle\caches\transforms-4\b87c45faf86290ad20b29c1691e013aa\transformed\jetified-play-services-base-18.0.1\res
+com.bms.app-jetified-startup-runtime-1.1.1-41 C:\Users\hp\.gradle\caches\transforms-4\b9035dc3260bf69cba7623d7f5315f27\transformed\jetified-startup-runtime-1.1.1\res
+com.bms.app-jetified-ui-util-release-42 C:\Users\hp\.gradle\caches\transforms-4\bd2101b5d5355db9a865165c158ddad9\transformed\jetified-ui-util-release\res
+com.bms.app-jetified-ui-tooling-release-43 C:\Users\hp\.gradle\caches\transforms-4\c98bc8690fbf81010dba52a5af0735d8\transformed\jetified-ui-tooling-release\res
+com.bms.app-jetified-ui-unit-release-44 C:\Users\hp\.gradle\caches\transforms-4\d1b98dc82d739bc3b35a3614fb3f0fd2\transformed\jetified-ui-unit-release\res
+com.bms.app-navigation-runtime-ktx-2.7.7-45 C:\Users\hp\.gradle\caches\transforms-4\d219f69fc89e135b545c30627c8a89b0\transformed\navigation-runtime-ktx-2.7.7\res
+com.bms.app-jetified-ui-geometry-release-46 C:\Users\hp\.gradle\caches\transforms-4\d47ab357658087ea29761b6b3ca863df\transformed\jetified-ui-geometry-release\res
+com.bms.app-jetified-ads-adservices-1.0.0-beta05-47 C:\Users\hp\.gradle\caches\transforms-4\d63793f8b30888ef92495663df59cfe1\transformed\jetified-ads-adservices-1.0.0-beta05\res
+com.bms.app-jetified-emoji2-1.3.0-48 C:\Users\hp\.gradle\caches\transforms-4\d6f098896cd29228771a4ac87ecc6629\transformed\jetified-emoji2-1.3.0\res
+com.bms.app-jetified-activity-ktx-1.8.2-49 C:\Users\hp\.gradle\caches\transforms-4\dd48133f00dabe87718e7bbb22273ef7\transformed\jetified-activity-ktx-1.8.2\res
+com.bms.app-lifecycle-livedata-core-2.7.0-50 C:\Users\hp\.gradle\caches\transforms-4\dd4fc94a58cf0b37cf6b51b040e4e272\transformed\lifecycle-livedata-core-2.7.0\res
+com.bms.app-fragment-1.5.1-51 C:\Users\hp\.gradle\caches\transforms-4\de69a5d5b559d0d9ec0eb95194e90bbc\transformed\fragment-1.5.1\res
+com.bms.app-jetified-savedstate-ktx-1.2.1-52 C:\Users\hp\.gradle\caches\transforms-4\df1edab5ed10f1e3253381763db6444f\transformed\jetified-savedstate-ktx-1.2.1\res
+com.bms.app-navigation-common-ktx-2.7.7-53 C:\Users\hp\.gradle\caches\transforms-4\e240824994b9c4098170a3072fba98ae\transformed\navigation-common-ktx-2.7.7\res
+com.bms.app-jetified-firebase-common-20.4.3-54 C:\Users\hp\.gradle\caches\transforms-4\e25c9d42b8f773629917b7087b332b72\transformed\jetified-firebase-common-20.4.3\res
+com.bms.app-lifecycle-livedata-2.7.0-55 C:\Users\hp\.gradle\caches\transforms-4\e4fccb49907460199673530b38674008\transformed\lifecycle-livedata-2.7.0\res
+com.bms.app-navigation-runtime-2.7.7-56 C:\Users\hp\.gradle\caches\transforms-4\ede9d6d22442097bad43b09392c047c7\transformed\navigation-runtime-2.7.7\res
+com.bms.app-jetified-activity-1.8.2-57 C:\Users\hp\.gradle\caches\transforms-4\f1536d4953db1ec2586aa007f4d13e05\transformed\jetified-activity-1.8.2\res
+com.bms.app-jetified-firebase-messaging-23.4.1-58 C:\Users\hp\.gradle\caches\transforms-4\f617b889680769979999a76e18da1197\transformed\jetified-firebase-messaging-23.4.1\res
+com.bms.app-jetified-lifecycle-process-2.7.0-59 C:\Users\hp\.gradle\caches\transforms-4\f692f7f43348ac9e5be76910b87b11c4\transformed\jetified-lifecycle-process-2.7.0\res
+com.bms.app-core-runtime-2.2.0-60 C:\Users\hp\.gradle\caches\transforms-4\f9686e0a54338993f7e47ac1f38b2309\transformed\core-runtime-2.2.0\res
+com.bms.app-jetified-hilt-navigation-compose-1.1.0-61 C:\Users\hp\.gradle\caches\transforms-4\f98dce457300fa55e0466e4ac065ee15\transformed\jetified-hilt-navigation-compose-1.1.0\res
+com.bms.app-res-62 E:\Booking Management App\Android\app\build\generated\res\processDebugGoogleServices
+com.bms.app-resValues-63 E:\Booking Management App\Android\app\build\generated\res\resValues\debug
+com.bms.app-packageDebugResources-64 E:\Booking Management App\Android\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+com.bms.app-packageDebugResources-65 E:\Booking Management App\Android\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+com.bms.app-merged_res-66 E:\Booking Management App\Android\app\build\intermediates\merged_res\debug
+com.bms.app-debug-67 E:\Booking Management App\Android\app\src\debug\res
+com.bms.app-main-68 E:\Booking Management App\Android\app\src\main\res

@@ -98,4 +98,18 @@ class NotificationRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
+    override suspend fun registerFcmToken(userId: String, token: String, deviceName: String?): Result<Unit> {
+        return try {
+            val fcmTokenObj = com.bms.app.domain.model.UserFcmToken(
+                userId = userId,
+                fcmToken = token,
+                deviceName = deviceName
+            )
+            postgrest["user_fcm_tokens"].upsert(fcmTokenObj)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

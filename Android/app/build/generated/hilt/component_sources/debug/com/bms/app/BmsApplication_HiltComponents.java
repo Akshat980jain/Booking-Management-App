@@ -1,5 +1,6 @@
 package com.bms.app;
 
+import com.bms.app.data.service.BmsFirebaseMessagingService_GeneratedInjector;
 import com.bms.app.di.AppModule;
 import com.bms.app.di.NetworkModule;
 import com.bms.app.di.RepositoryModule;
@@ -166,7 +167,8 @@ public final class BmsApplication_HiltComponents {
 
   @Subcomponent
   @ServiceScoped
-  public abstract static class ServiceC implements VideoCallService_GeneratedInjector,
+  public abstract static class ServiceC implements BmsFirebaseMessagingService_GeneratedInjector,
+      VideoCallService_GeneratedInjector,
       ServiceComponent,
       GeneratedComponent {
     @Subcomponent.Builder
