@@ -47,15 +47,11 @@ export const useChat = () => {
     queryFn: async () => {
       if (!user?.id) return [];
 
+      // Fetch conversations first without the provider join (which fails due to missing FK in DB)
       const { data, error } = await supabase
         .from("chat_conversations")
         .select(`
-          id, user_id, provider_id, last_message_at, created_at,
-          provider:provider_profiles(
-            id,
-            profession,
-            user_id
-          )
+          id, user_id, provider_id, last_message_at, created_at
         `)
         .order("last_message_at", { ascending: false })
         .limit(100);
@@ -63,11 +59,38 @@ export const useChat = () => {
       if (error) throw error;
       if (!data || data.length === 0) return [];
 
+      // Fetch provider profiles separately
+      const providerIds = data.map((c) => c.provider_id).filter(Boolean);
+      let providerProfiles: any[] = [];
+      if (providerIds.length > 0) {
+        const { data: ppData, error: ppError } = await supabase
+          .from("provider_profiles")
+          .select("id, profession, user_id")
+          .in("id", providerIds);
+        if (ppError) throw ppError;
+        providerProfiles = ppData || [];
+      }
+      const providerProfileMap = new Map(providerProfiles.map((p) => [p.id, p]));
+
       // Collect all user_ids we need profiles for (batch)
       const allUserIds = new Set<string>();
       const conversationIds: string[] = [];
-      data.forEach((conv) => {
-        allUserIds.add(conv.user_id);
+
+      // Enrich conversations with provider profile in memory
+      const enrichedConversations = data.map((conv) => {
+        const providerProfile = conv.provider_id ? providerProfileMap.get(conv.provider_id) : undefined;
+        return {
+          ...conv,
+          provider: providerProfile ? {
+            id: providerProfile.id,
+            profession: providerProfile.profession,
+            user_id: providerProfile.user_id
+          } : undefined
+        };
+      });
+
+      enrichedConversations.forEach((conv) => {
+        if (conv.user_id) allUserIds.add(conv.user_id);
         if (conv.provider?.user_id) allUserIds.add(conv.provider.user_id);
         conversationIds.push(conv.id);
       });
@@ -106,7 +129,7 @@ export const useChat = () => {
         }
       });
 
-      return data.map((conv) => ({
+      return enrichedConversations.map((conv) => ({
         ...conv,
         provider: conv.provider ? {
           ...conv.provider,
