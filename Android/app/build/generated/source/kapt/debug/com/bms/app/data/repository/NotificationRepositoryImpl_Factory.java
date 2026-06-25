@@ -1,5 +1,6 @@
 package com.bms.app.data.repository;
 
+import android.content.Context;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
 import dagger.internal.QualifierMetadata;
@@ -10,7 +11,7 @@ import javax.annotation.processing.Generated;
 import javax.inject.Provider;
 
 @ScopeMetadata("javax.inject.Singleton")
-@QualifierMetadata
+@QualifierMetadata("dagger.hilt.android.qualifiers.ApplicationContext")
 @DaggerGenerated
 @Generated(
     value = "dagger.internal.codegen.ComponentProcessor",
@@ -23,27 +24,31 @@ import javax.inject.Provider;
     "KotlinInternalInJava"
 })
 public final class NotificationRepositoryImpl_Factory implements Factory<NotificationRepositoryImpl> {
+  private final Provider<Context> contextProvider;
+
   private final Provider<Postgrest> postgrestProvider;
 
   private final Provider<Realtime> realtimeProvider;
 
-  public NotificationRepositoryImpl_Factory(Provider<Postgrest> postgrestProvider,
-      Provider<Realtime> realtimeProvider) {
+  public NotificationRepositoryImpl_Factory(Provider<Context> contextProvider,
+      Provider<Postgrest> postgrestProvider, Provider<Realtime> realtimeProvider) {
+    this.contextProvider = contextProvider;
     this.postgrestProvider = postgrestProvider;
     this.realtimeProvider = realtimeProvider;
   }
 
   @Override
   public NotificationRepositoryImpl get() {
-    return newInstance(postgrestProvider.get(), realtimeProvider.get());
+    return newInstance(contextProvider.get(), postgrestProvider.get(), realtimeProvider.get());
   }
 
-  public static NotificationRepositoryImpl_Factory create(Provider<Postgrest> postgrestProvider,
-      Provider<Realtime> realtimeProvider) {
-    return new NotificationRepositoryImpl_Factory(postgrestProvider, realtimeProvider);
+  public static NotificationRepositoryImpl_Factory create(Provider<Context> contextProvider,
+      Provider<Postgrest> postgrestProvider, Provider<Realtime> realtimeProvider) {
+    return new NotificationRepositoryImpl_Factory(contextProvider, postgrestProvider, realtimeProvider);
   }
 
-  public static NotificationRepositoryImpl newInstance(Postgrest postgrest, Realtime realtime) {
-    return new NotificationRepositoryImpl(postgrest, realtime);
+  public static NotificationRepositoryImpl newInstance(Context context, Postgrest postgrest,
+      Realtime realtime) {
+    return new NotificationRepositoryImpl(context, postgrest, realtime);
   }
 }
